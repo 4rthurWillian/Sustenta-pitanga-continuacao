@@ -118,7 +118,7 @@ body.dark-mode {
     --purple-500-color: #b794f4;
     --red-600-color: #fc8181;
     --orange-600-color: #f6ad55;
-    --blue-50-bg: #2a4365;
+    --blue-50-bg: #1c2b3e; /* Cor mais escura para a seção IoT no dark mode */
     --green-50-bg: #2d3748;
     --yellow-50-bg: #2d3748;
     --blue-800-color: #90cdf4;
@@ -164,6 +164,12 @@ body {
     background-color: var(--primary-btn-hover);
     transform: translateY(-2px);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+/* Nova regra para o estado :active dos botões primários e secundários para um "clique" mais simples */
+.btn-primary:active, .btn-secondary:active, .btn-danger:active {
+    transform: translateY(0); /* Remove o transform de hover para um clique mais direto */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra menor para indicar pressionado */
+    /* Mantém a cor de hover para feedback visual */
 }
 .btn-secondary {
     background-color: var(--secondary-btn-bg);
@@ -523,12 +529,35 @@ body.dark-mode .text-blue-700 {
     color: var(--text-blue-700-color) !important;
 }
 
-
-/* Estilo para o texto das metas na seção de pontos e resgate no modo escuro */
-body.dark-mode #points-redemption ul.list-disc li {
+/* Ajustes para o texto na landing page no modo escuro */
+body.dark-mode #landing-page p.text-gray-700 {
     color: var(--text-color) !important;
 }
 
+/* Ajustes para o texto na seção IoT no dashboard no modo escuro */
+body.dark-mode #dashboard .card p.text-gray-700 {
+    color: var(--text-color) !important;
+}
+
+/* Ajustes para textos gerais dentro de cards no dashboard que possam usar text-gray-600 */
+body.dark-mode #dashboard .card .text-gray-600 {
+    color: var(--text-color) !important;
+}
+
+/* Ajustes para o texto das metas na seção de pontos e resgate no modo escuro */
+body.dark-mode #points-redemption ul.list-disc li,
+body.dark-mode #points-redemption .text-gray-700,
+body.dark-mode #points-redemption .text-gray-600 {
+    color: var(--text-color) !important;
+}
+body.dark-mode #notifications-page .text-gray-600,
+body.dark-mode #notifications-page .text-gray-500 {
+    color: var(--text-color) !important;
+}
+/* Ajuste para as datas das notificações no modo escuro */
+body.dark-mode .notification-item .text-xs.text-gray-500 {
+    color: var(--text-color) !important; /* Garante que a data seja clara no dark mode */
+}
 
 /* Estilo para o spinner de carregamento */
 .loading-spinner {
@@ -584,4 +613,8 @@ body.dark-mode #points-redemption ul.list-disc li {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+/* Estilo para o container do link "Ver Mapa Maior" */
+.map-link-container {
+    background-color: transparent; /* Garante que o fundo seja transparente */
 }

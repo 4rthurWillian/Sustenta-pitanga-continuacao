@@ -3,16 +3,10 @@
 // Isso garante que, ao acessar diretamente o link, o usuário sempre precise fazer login.
 // IMPORTANTE: Para uma aplicação em produção onde você deseja que o login persista,
 // você precisaria REMOVER ou COMENTAR esta linha.
-localStorage.removeItem('isLoggedIn');
-localStorage.removeItem('loggedInUserEmail'); // Também limpa o email do usuário ao deslogar
-// --- FIM DA FERRAMENTA DE DESLOGAR AO CARREGAR ---
+// localStorage.removeItem('isLoggedIn'); // Removido para persistir o login
+// localStorage.removeItem('loggedInUserEmail'); // Removido para persistir o login
+// --- FIM DA FERRAMENTA DE DESLOGAR AO CARREGAR --
 
-// Exemplo da sua função showSection (se ela estiver no mesmo arquivo)
-function showSection(sectionId, pushState = true) {
-    // ... sua lógica existente ...
-}
-
-// ... (Outras partes do seu script) ...
 // Variáveis globais para simular dados do usuário e estado de login
 let currentUser = null;
 const users = JSON.parse(localStorage.getItem('users')) || {};
@@ -29,7 +23,10 @@ const WEATHER_API_KEYS = [
     "3741e8d7b0a23993ea689bcce514c279"
 ];
 let currentApiKeyIndex = 0; // Índice da chave de API atual a ser usada
-const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
+// Alterado para o endpoint de previsão
+const WEATHER_FORECAST_API_URL = "https://api.openweathermap.org/data/2.5/forecast";
+const WEATHER_CURRENT_API_URL = "https://api.openweathermap.org/data/2.5/weather";
+
 
 // Coordenadas padrão para Pitanga, PR (caso a localização seja negada ou indisponível)
 const DEFAULT_LATITUDE = -25.2929;
@@ -237,6 +234,8 @@ function showSection(sectionId, pushState = true) {
 
 // Função para verificar o estado de login
 function checkLoginState() {
+    // Verifica se há um usuário logado no localStorage
+    loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
     if (loggedInUserEmail && users[loggedInUserEmail]) {
         currentUser = users[loggedInUserEmail];
         // Inicializa pontos se não existirem
@@ -352,11 +351,6 @@ if (registerForm && registerSubmitBtn) {
         }
         if (users[email]) {
             showMessage(document.getElementById('registerMessage'), 'Este e-mail já está cadastrado.', 'error');
-            hideLoading(registerSubmitBtn, registerSubmitBtnText, registerSubmitBtnSpinner);
-            return;
-        }
-        if (!email.includes('@') || !email.includes('.')) {
-            showMessage(document.getElementById('registerMessage'), 'Por favor, insira um e-mail válido.', 'error');
             hideLoading(registerSubmitBtn, registerSubmitBtnText, registerSubmitBtnSpinner);
             return;
             }
@@ -488,13 +482,14 @@ function saveNotifications() {
     localStorage.setItem('notifications', JSON.stringify(notifications));
 }
 
-function addNotification(message, type = 'info') {
+function addNotification(message, type = 'info', conceptExplanation = '') {
     const newNotification = {
         id: Date.now(), // ID único
         message: message,
         type: type, // 'info', 'success', 'error', 'warning'
         timestamp: new Date().toLocaleString(),
-        read: false
+        read: false,
+        conceptExplanation: conceptExplanation // Nova propriedade para o tooltip
     };
     notifications.unshift(newNotification); // Adiciona no início para as mais recentes aparecerem primeiro
     saveNotifications();
@@ -519,11 +514,18 @@ function renderNotificationsDropdown() {
     recentNotifications.forEach(notification => {
         const notificationItem = document.createElement('a');
         notificationItem.href = "#"; // Pode ser um link para detalhes da notificação
-        notificationItem.classList.add('block', 'px-4', 'py-3', 'hover:bg-gray-100', 'border-b', 'border-gray-100');
+        notificationItem.classList.add('block', 'px-4', 'py-3', 'hover:bg-gray-100', 'border-b', 'border-gray-100', 'notification-item'); // Adiciona classe para estilo de data
+        notificationItem.title = notification.conceptExplanation; // Adiciona o tooltip
         notificationItem.innerHTML = `
             <p class="text-sm font-medium text-gray-900">${notification.message}</p>
             <p class="text-xs text-gray-500">${notification.timestamp}</p>
         `;
+        // Adiciona o event listener para navegar para a página de notificações
+        notificationItem.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('notifications-page');
+            notificationsDropdown.classList.add('hidden'); // Esconde o dropdown
+        });
         notificationDropdownList.appendChild(notificationItem);
     });
 }
@@ -540,7 +542,8 @@ function renderNotifications() {
 
     notifications.forEach(notification => {
         const notificationCard = document.createElement('div');
-        notificationCard.classList.add('card', 'p-4', 'mb-4');
+        notificationCard.classList.add('card', 'p-4', 'mb-4', 'notification-item'); // Adiciona classe para estilo de data
+        notificationCard.title = notification.conceptExplanation; // Adiciona o tooltip
         let bgColorClass = '';
         let textColorClass = '';
         let iconClass = '';
@@ -583,13 +586,12 @@ function renderNotifications() {
 }
 
 // Simula a chegada de algumas notificações iniciais (apenas para demonstração)
-function simulateInitialNotifications() {
+async function simulateInitialNotifications() {
     if (notifications.length === 0) { // Adiciona apenas se não houver notificações
-        addNotification('Alerta de Chuva: Prevista chuva forte amanhã - evite irrigação.', 'warning');
-        addNotification('Relatório Mensal: Seu relatório de junho está disponível.', 'info');
-        addNotification('Atualização do Sistema: Nova versão disponível com melhorias.', 'success');
-        addNotification('Recomendação: Reduza a irrigação de água em 4 litros por hectare.', 'info');
-        addNotification('Sensoriamento detectou melhora na qualidade do solo.', 'success'); // Removido "+10 pontos!"
+        addNotification('Sistema em desenvolvimento: Novas funcionalidades em breve!', 'info', 'Esta notificação indica que o sistema está em constante melhoria e novas funcionalidades serão lançadas.');
+        addNotification('Relatório Mensal: Seu relatório de junho está disponível.', 'info', 'Seu relatório mensal de desempenho agrícola está pronto para visualização.');
+        addNotification('Recomendação: Reduza a irrigação de água em 4 litros por hectare.', 'info', 'Uma recomendação para otimizar o uso da água e economizar recursos.');
+        addNotification('Sensoriamento detectou melhora na qualidade do solo.', 'success', 'Seus sensores IoT indicaram uma melhoria nos parâmetros de qualidade do solo.');
     }
 }
 
@@ -695,7 +697,7 @@ if (saveManualDataBtn && manualSaveMessage) {
         }
         console.log('Dados Manuais Salvos:', { dailyWater, fertilizerUse, soilObservation });
         showMessage(manualSaveMessage, 'Dados salvos com sucesso!', 'success');
-        addNotification(`Novos dados manuais registrados: Água ${dailyWater}L, Fertilizante ${fertilizerUse}kg. Você ganhou 20 pontos!`, 'info');
+        addNotification(`Novos dados manuais registrados: Água ${dailyWater}L, Fertilizante ${fertilizerUse}kg. Você ganhou 20 pontos!`, 'info', 'Registro de dados manuais da sua fazenda. Contribui para o monitoramento e pode gerar pontos de recompensa.');
         updatePointsDisplay(); // Atualiza a exibição de pontos
         // Não limpar campos para manter os dados salvos visíveis
         hideLoading(saveManualDataBtn, saveManualDataBtnText, saveManualDataBtnSpinner);
@@ -733,7 +735,7 @@ if (simulateSensorDataBtn && sensorSaveMessage) {
 
         console.log('Leitura do Sensor Salva:', { waterReading });
         showMessage(sensorSaveMessage, 'Leitura do sensor simulada e salva!', 'success');
-        addNotification(`Nova leitura do sensor de água: ${waterReading} litros/min.`, 'info');
+        addNotification(`Nova leitura do sensor de água: ${waterReading} litros/min.`, 'info', 'Dados simulados de um sensor IoT de medição de água. Em um sistema real, esses dados seriam coletados automaticamente.');
         // Exemplo de como adicionar pontos por ação positiva
         if (currentUser) {
             currentUser.points = (currentUser.points || 0) + 10; // Ganha 10 pontos por simular leitura
@@ -793,7 +795,7 @@ if (generatePdfReportBtn) {
 
         doc.save('relatorio_sustenta_pitanga.pdf');
         showMessage(pdfMessage, 'Relatório PDF gerado com sucesso!', 'success'); // Atualizado
-        addNotification('Relatório PDF gerado com sucesso!', 'success');
+        addNotification('Relatório PDF gerado com sucesso!', 'success', 'Um relatório detalhado sobre o desempenho de sustentabilidade da sua fazenda foi gerado em formato PDF.');
         // Exemplo de como adicionar pontos por ação positiva
         if (currentUser) {
             currentUser.points = (currentUser.points || 0) + 50; // Ganha 50 pontos por gerar relatório
@@ -1128,7 +1130,8 @@ function checkLocationPermission() {
         if (locationMessage) showMessage(locationMessage, 'Permissão de localização negada. O clima e o mapa podem não ser exibidos corretamente.', 'error');
         if (weatherInfo) showMessage(weatherInfo, 'Permissão de localização negada. O clima e o mapa podem não ser exibidos corretamente.', 'error'); // Adicionado
         if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível sem permissão de localização.</p>';
-        getLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar com coordenadas padrão
+        fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar com coordenadas padrão
+        fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar alerta com coordenadas padrão
     } else {
         // Se não há status ou "não perguntar novamente" não está marcado, mostra o popup
         if (locationPermissionPopup) locationPermissionPopup.classList.add('visible'); // Mostra o popup
@@ -1164,7 +1167,8 @@ if (denyLocationBtn) {
         if (locationMessage) showMessage(locationMessage, 'Permissão de localização negada. O clima e o mapa podem não ser exibidos corretamente.', 'error');
         if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Localização negada. Não foi possível obter o clima.</p>';
         if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível devido a erro de localização.</p>';
-        getLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar com coordenadas padrão
+        fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar com coordenadas padrão
+        fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar alerta com coordenadas padrão
     });
 }
 
@@ -1173,6 +1177,7 @@ async function getLocation(lat = null, lon = null) {
     // Se coordenadas forem passadas, usa-as diretamente para buscar clima/mapa
     if (lat !== null && lon !== null) {
         fetchWeatherAndMap(lat, lon);
+        fetchNextDayWeatherAlert(lat, lon); // Chama também a função para o alerta do próximo dia
         return;
     }
 
@@ -1182,6 +1187,7 @@ async function getLocation(lat = null, lon = null) {
                 const currentLat = position.coords.latitude;
                 const currentLon = position.coords.longitude;
                 fetchWeatherAndMap(currentLat, currentLon);
+                fetchNextDayWeatherAlert(currentLat, currentLon); // Chama também a função para o alerta do próximo dia
                 if (locationMessage) showMessage(locationMessage, 'Localização obtida com sucesso!', 'success');
             },
             showError
@@ -1192,20 +1198,20 @@ async function getLocation(lat = null, lon = null) {
         if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível.</p>';
         // Se a geolocalização não for suportada, usa as coordenadas padrão
         fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+        fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar alerta com coordenadas padrão
     }
 }
 
-// Nova função para buscar o clima e exibir o mapa, separada da lógica de permissão
+// Nova função para buscar o clima atual e exibir o mapa
 async function fetchWeatherAndMap(lat, lon) {
-    // Log das coordenadas que estão a ser usadas para depuração
-    console.log(`A obter clima e mapa para Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`);
+    console.log(`A obter clima atual e mapa para Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`);
 
     let success = false;
     for (let i = 0; i < WEATHER_API_KEYS.length; i++) {
         const apiKey = WEATHER_API_KEYS[i];
         try {
-            const apiUrl = `${WEATHER_API_URL}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`;
-            console.log(`Tentando API Key: ${apiKey.substring(0, 5)}...`); // Log da URL da API
+            const apiUrl = `${WEATHER_CURRENT_API_URL}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`;
+            console.log(`Tentando API Key (Atual): ${apiKey.substring(0, 5)}...`);
             const response = await fetch(apiUrl);
             
             if (!response.ok) {
@@ -1219,29 +1225,17 @@ async function fetchWeatherAndMap(lat, lon) {
                     <p class="text-sm">Umidade: ${data.main.humidity}%, Vento: ${data.wind.speed} m/s</p>
                     <p class="text-xs">Localização: ${data.name || 'Desconhecida'}, Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}</p>
                 `;
-                // Atualiza o alerta climático dinâmico
-                if (climateAlertElement) {
-                    if (data.main.temp > 30) {
-                        climateAlertElement.innerHTML = `<span class="font-semibold text-red-600">Alerta:</span> Temperatura alta (${data.main.temp}°C)! Considere aumentar a irrigação.`;
-                    } else if (data.weather[0].main.toLowerCase().includes('rain')) {
-                        climateAlertElement.innerHTML = `<span class="font-semibold text-blue-600">Alerta:</span> Chuva prevista (${data.weather[0].description}) - Não irrigue!`;
-                    } else {
-                        climateAlertElement.innerHTML = `<span class="font-semibold text-green-600">Clima:</span> ${data.weather[0].description} (${data.main.temp}°C). Condições favoráveis.`;
-                    }
-                }
                 success = true;
                 break; // Sai do loop se a requisição for bem-sucedida
             } else {
-                if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Não foi possível obter os dados climáticos.</p>';
-                if (climateAlertElement) climateAlertElement.innerHTML = `<span class="font-semibold text-gray-500">Alerta:</span> Clima indisponível. Verifique a conexão ou localização.`;
+                if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Não foi possível obter os dados climáticos atuais.</p>';
             }
         } catch (error) {
-            console.error(`Erro ao buscar dados climáticos com API Key ${apiKey.substring(0, 5)}...:`, error);
+            console.error(`Erro ao buscar dados climáticos atuais com API Key ${apiKey.substring(0, 5)}...:`, error);
             if (i === WEATHER_API_KEYS.length - 1) { // Se for a última chave e falhar
                 if (weatherInfo) {
-                    weatherInfo.innerHTML = `<p class="text-lg">Erro ao obter o clima. Verifique suas chaves de API ou conexão. Detalhes: ${error.message}</p>`;
+                    weatherInfo.innerHTML = `<p class="text-lg">Erro ao obter o clima atual. Verifique suas chaves de API ou conexão. Detalhes: ${error.message}</p>`;
                 }
-                if (climateAlertElement) climateAlertElement.innerHTML = `<span class="font-semibold text-gray-500">Alerta:</span> Erro ao obter clima. Verifique suas chaves de API.`;
             }
         }
     }
@@ -1255,9 +1249,6 @@ async function fetchWeatherAndMap(lat, lon) {
                 <p class="text-xs">Localização: Pitanga, Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}</p>
                 <p class="text-red-500 text-sm mt-1">Atenção: Todas as chaves de API do OpenWeatherMap falharam ou não foram configuradas. Dados climáticos são simulados.</p>
             `;
-        }
-        if (climateAlertElement) {
-            climateAlertElement.innerHTML = `<span class="font-semibold text-gray-500">Alerta:</span> Clima simulado. Chaves de API não funcionaram.`;
         }
     }
 
@@ -1274,10 +1265,94 @@ async function fetchWeatherAndMap(lat, lon) {
                 src="https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.01},${lat - 0.005},${lon + 0.01},${lat + 0.005}&amp;layer=mapnik&amp;marker=${lat},${lon}"
                 style="border: 1px solid var(--input-border); border-radius: 0.5rem;">
             </iframe>
-            <small class="mt-2 block"><a href="https://www.openstreetmap.org/#map=16/${lat}/${lon}" class="text-blue-500 hover:underline" target="_blank">Ver Mapa Maior</a></small>
+            <small class="mt-2 block text-center map-link-container">
+                <a href="https://www.openstreetmap.org/#map=16/${lat}/${lon}" target="_blank" 
+                   class="inline-block bg-blue-500 text-white px-3 py-1 rounded-md text-xs hover:bg-blue-600 transition-colors">
+                   Ver Mapa Maior
+                </a>
+            </small>
         `;
     }
 }
+
+// Nova função para buscar a previsão do clima para o próximo dia e gerar alerta
+async function fetchNextDayWeatherAlert(lat, lon) {
+    console.log(`A obter previsão do clima para Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`);
+
+    let success = false;
+    for (let i = 0; i < WEATHER_API_KEYS.length; i++) {
+        const apiKey = WEATHER_API_KEYS[i];
+        try {
+            const apiUrl = `${WEATHER_FORECAST_API_URL}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`;
+            console.log(`Tentando API Key (Previsão): ${apiKey.substring(0, 5)}...`);
+            const response = await fetch(apiUrl);
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Erro HTTP: ${response.status} - ${errorData.message || response.statusText}`);
+            }
+            const data = await response.json();
+            
+            if (data && data.list && climateAlertElement) {
+                const now = new Date();
+                const nextDay = new Date(now);
+                nextDay.setDate(now.getDate() + 1); // Define para o próximo dia
+
+                let nextDayForecast = null;
+                // Encontra a primeira previsão para o próximo dia (geralmente por volta do meio-dia do próximo dia)
+                for (const forecast of data.list) {
+                    const forecastDate = new Date(forecast.dt * 1000); // Convert timestamp to Date object
+                    if (forecastDate.getDate() === nextDay.getDate() && 
+                        forecastDate.getMonth() === nextDay.getMonth() &&
+                        forecastDate.getFullYear() === nextDay.getFullYear() &&
+                        forecastDate.getHours() >= 12 && forecastDate.getHours() < 18) { // Busca por um horário entre 12h e 18h
+                        nextDayForecast = forecast;
+                        break;
+                    }
+                }
+
+                if (nextDayForecast) {
+                    const temp = nextDayForecast.main.temp;
+                    const description = nextDayForecast.weather[0].description;
+                    const mainWeather = nextDayForecast.weather[0].main.toLowerCase();
+
+                    if (temp > 30) {
+                        climateAlertElement.innerHTML = `<span class="font-semibold text-red-600">Alerta:</span> Temperatura alta (${temp}°C) prevista para amanhã - Considere irrigar!`;
+                        addNotification(`Alerta: Temperatura alta (${temp}°C) prevista para amanhã.`, 'warning', 'Previsão de temperatura elevada para o próximo dia. Pode ser necessário aumentar a irrigação.');
+                    } else if (mainWeather.includes('rain')) {
+                        climateAlertElement.innerHTML = `<span class="font-semibold text-blue-600">Alerta:</span> Chuva (${description}) prevista para amanhã - Não irrigue!`;
+                        addNotification(`Alerta: Chuva (${description}) prevista para amanhã.`, 'warning', 'Previsão de chuva para o próximo dia. Evite irrigar para economizar água.');
+                    } else {
+                        climateAlertElement.innerHTML = `<span class="font-semibold text-green-600">Clima:</span> ${description} (${temp}°C) previsto para amanhã. Condições favoráveis.`;
+                        addNotification(`Previsão: ${description} (${temp}°C) para amanhã.`, 'info', 'Previsão de tempo estável e favorável para o próximo dia.');
+                    }
+                } else {
+                    climateAlertElement.innerHTML = `<span class="font-semibold text-gray-500">Alerta:</span> Previsão para amanhã indisponível.`;
+                }
+                success = true;
+                break; // Sai do loop se a requisição for bem-sucedida
+            } else {
+                if (climateAlertElement) climateAlertElement.innerHTML = `<span class="font-semibold text-gray-500">Alerta:</span> Previsão do tempo indisponível.`;
+            }
+        } catch (error) {
+            console.error(`Erro ao buscar previsão climática com API Key ${apiKey.substring(0, 5)}...:`, error);
+            if (i === WEATHER_API_KEYS.length - 1) { // Se for a última chave e falhar
+                if (climateAlertElement) climateAlertElement.innerHTML = `<span class="font-semibold text-gray-500">Alerta:</span> Erro ao obter previsão. Verifique suas chaves de API.`;
+            }
+        }
+    }
+
+    if (!success) {
+        // Exibir alerta simulado se todas as API Keys falharem
+        if (climateAlertElement) {
+            climateAlertElement.innerHTML = `
+                <span class="font-semibold text-gray-500">Alerta:</span> Previsão para amanhã: 28°C, parcialmente nublado (Dados Simulados).
+                <p class="text-red-500 text-sm mt-1">Atenção: Todas as chaves de API do OpenWeatherMap falharam ou não foram configuradas. Alerta climático é simulado.</p>
+            `;
+        }
+    }
+}
+
 
 function showError(error) {
     let errorMessage = '';
@@ -1287,21 +1362,25 @@ function showError(error) {
             localStorage.setItem('locationPermission', 'denied'); // Salva o status de negado
             // Após a negação, tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+            fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             break;
         case error.POSITION_UNAVAILABLE:
             errorMessage = 'Informação de localização indisponível.';
             // Tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+            fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             break;
         case error.TIMEOUT:
             errorMessage = 'A requisição para obter a localização expirou.';
             // Tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+            fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             break;
         case error.UNKNOWN_ERROR:
             errorMessage = 'Um erro desconhecido ocorreu.';
             // Tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+            fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             break;
     }
     if (locationMessage) showMessage(locationMessage, `Erro de Geolocalização: ${errorMessage}`, 'error');
