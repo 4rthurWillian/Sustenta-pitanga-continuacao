@@ -4,7 +4,7 @@ const users = JSON.parse(localStorage.getItem('users')) || {};
 let loggedInUserEmail = localStorage.getItem('loggedInUserEmail'); // Usar let para poder reatribuir
 
 // Instâncias de gráficos
-let myChartInstance = null; // Agora uma única instância para o gráfico principal
+let myChartInstance = null; // Agora uma única instância para o o gráfico principal
 
 // API Key do OpenWeatherMap (Substitua pela sua chave real)
 // ATENÇÃO: Em uma aplicação real, chaves de API nunca devem ser expostas no frontend.
@@ -183,7 +183,7 @@ function checkLoginState() {
         if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
         showSection('dashboard', false); // Não adiciona ao histórico na inicialização
         loggedInControls.classList.remove('hidden'); // Mostrar controles após login
-        checkLocationPermission();
+        checkLocationPermission(); // Chama a verificação de permissão após o login
         loadManualData(); // Carrega os dados manuais ao logar
     } else {
         showSection('landing-page', false); // Não adiciona ao histórico na inicialização
@@ -720,7 +720,7 @@ function initChart(chartType = 'pie') {
                     },
                 }
             };
-            break; // <<<<< Adicionado break para o case 'bar-horizontal'
+            break;
         case 'line':
             chartConfig = {
                 type: 'line',
@@ -782,7 +782,9 @@ function initChart(chartType = 'pie') {
 // Função para buscar o clima usando latitude e longitude
 async function fetchWeather(latitude, longitude) {
     if (!WEATHER_API_KEY || WEATHER_API_KEY === "SUA_CHAVE_AQUI") {
-        weatherInfo.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Erro: Chave da API do Clima ausente ou inválida.</span>';
+        if (weatherInfo) {
+            weatherInfo.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Erro: Chave da API do Clima ausente ou inválida.</span>';
+        }
         console.error("Chave da API do OpenWeatherMap não configurada ou é a chave padrão. Por favor, substitua 'SUA_CHAVE_AQUI' pela sua chave real.");
         return;
     }
@@ -799,7 +801,9 @@ async function fetchWeather(latitude, longitude) {
         displayWeather(data);
     } catch (error) {
         console.error("Erro ao buscar dados do clima:", error);
-        weatherInfo.innerHTML = `<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Não foi possível carregar o clima: ${error.message}</span>`;
+        if (weatherInfo) {
+            weatherInfo.innerHTML = `<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Não foi possível carregar o clima: ${error.message}</span>`;
+        }
     }
 }
 
@@ -826,15 +830,15 @@ function requestLocationPermission() {
             (position) => {
                 // Permissão concedida
                 localStorage.setItem('locationPermission', 'granted');
-                locationPermissionPopup.classList.add('hidden');
+                if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
                 fetchWeather(position.coords.latitude, position.coords.longitude);
             },
             (error) => {
                 // Permissão negada ou erro
                 console.error("Erro ao obter localização:", error);
                 localStorage.setItem('locationPermission', 'denied');
-                locationPermissionPopup.classList.add('hidden');
-                locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Localização negada. O clima pode não ser preciso.</span>';
+                if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
+                if (locationMessage) locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Localização negada. O clima pode não ser preciso.</span>';
                 // Tenta carregar clima para uma localização padrão (ex: Pitanga, PR)
                 fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
             },
@@ -843,8 +847,8 @@ function requestLocationPermission() {
     } else {
         // Navegador não suporta Geolocation
         localStorage.setItem('locationPermission', 'unsupported');
-        locationPermissionPopup.classList.add('hidden');
-        locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Seu navegador não suporta geolocalização. O clima pode não ser preciso.</span>';
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
+        if (locationMessage) locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Seu navegador não suporta geolocalização. O clima pode não ser preciso.</span>';
         // Tenta carregar clima para uma localização padrão (ex: Pitanga, PR)
         fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
     }
@@ -853,19 +857,25 @@ function requestLocationPermission() {
 // Função para verificar o estado da permissão de localização
 function checkLocationPermission() {
     const permissionStatus = localStorage.getItem('locationPermission');
+    const doNotAskAgain = localStorage.getItem('doNotAskAgainLocation');
 
     if (permissionStatus === 'granted') {
         // Se já foi concedida, tente obter a localização
         requestLocationPermission();
-    } else if (permissionStatus === 'denied') {
-        // Se foi negada anteriormente, usa a localização padrão e mostra a mensagem
-        locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Localização negada anteriormente. O clima pode não ser preciso.</span>';
+    } else if (permissionStatus === 'denied' && doNotAskAgain === 'true') {
+        // Se foi negada e o usuário pediu para não perguntar novamente
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
+        if (locationMessage) locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Localização negada permanentemente. O clima pode não ser preciso.</span>';
         fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
     } else if (permissionStatus === 'unsupported') {
         // Se não suporta, usa a localização padrão e mostra a mensagem
-        locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Seu navegador não suporta geolocalização. O clima pode não ser preciso.</span>';
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
+        if (locationMessage) locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Seu navegador não suporta geolocalização. O clima pode não ser preciso.</span>';
         fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
-    } 
+    } else {
+        // Se nunca foi perguntado, ou negado sem "não perguntar novamente", mostra o popup
+        if (locationPermissionPopup) locationPermissionPopup.classList.remove('hidden');
+    }
 }
 
 // Eventos para o popup de permissão de localização
@@ -880,9 +890,12 @@ if (denyLocationBtn) {
         localStorage.setItem('locationPermission', 'denied');
         if (doNotAskAgainCheckbox && doNotAskAgainCheckbox.checked) {
             localStorage.setItem('doNotAskAgainLocation', 'true');
+        } else {
+             // Se não marcou "não perguntar novamente", remove a flag para que o pop-up possa aparecer de novo
+             localStorage.removeItem('doNotAskAgainLocation');
         }
-        locationPermissionPopup.classList.add('hidden');
-        locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Localização negada. O clima pode não ser preciso.</span>';
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
+        if (locationMessage) locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Localização negada. O clima pode não ser preciso.</span>';
         fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
     });
 }
@@ -980,21 +993,9 @@ if (headerDarkModeToggle) {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-    // Esconde o popup de permissão de localização se 'doNotAskAgain' foi marcado e negado
-    if (localStorage.getItem('doNotAskAgainLocation') === 'true' && localStorage.getItem('locationPermission') === 'denied') {
-        locationPermissionPopup.classList.add('hidden');
-        locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Localização negada permanentemente. O clima pode não ser preciso.</span>';
-        fetchWeather(-25.2929, -51.0425); // Carrega clima padrão
-    } else {
-        checkLoginState(); // Inicia a verificação de login e, consequentemente, de permissão de localização se logado
-    }
-
-    // Inicializa o gráfico no dashboard (se ele for a primeira tela visível após o login)
-    // Isso será tratado pela função checkLoginState ao navegar para o dashboard.
-    // Para garantir que o gráfico é inicializado corretamente ao carregar a página diretamente no dashboard
-    if (dashboardSection && !dashboardSection.classList.contains('hidden')) {
-        initChart('pie');
-    }
+    // Apenas chame checkLoginState, que por sua vez chama checkLocationPermission
+    // A lógica de ocultar o popup e exibir a mensagem já está em checkLocationPermission
+    checkLoginState();
 
     // Se a página for carregada diretamente com uma hash de seção, garante que ela é exibida
     const initialHash = window.location.hash.substring(1);
@@ -1008,6 +1009,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     } else {
         // Se não houver hash, ou hash inválida, verifica o estado de login
-        checkLoginState();
+        // Isso já foi feito por checkLoginState() no início
     }
 });
