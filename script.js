@@ -12,6 +12,10 @@ let myChartInstance = null; // Agora uma única instância para o o gráfico pri
 const WEATHER_API_KEY = "30a970d545783664fb3999d1595d117f"; // <<<<<<<<<<<<<<<< SUBSTITUA POR SUA CHAVE REAL AQUI
 const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
 
+// Coordenadas padrão para Pitanga, PR (caso a localização seja negada ou indisponível)
+const DEFAULT_LATITUDE = -25.2929;
+const DEFAULT_LONGITUDE = -51.0425;
+
 // Obter elementos do DOM
 const landingPageSection = document.getElementById('landing-page'); // Renomeado
 const loginSection = document.getElementById('login');
@@ -453,7 +457,7 @@ if (calculateImpactBtn && impactResults) {
         if (waterSavedSpan) waterSavedSpan.textContent = waterSaved.toFixed(0);
         if (wasteReductionSpan) wasteReductionSpan.textContent = (wasteReduction * 100).toFixed(1);
         if (moneySavedSpan) moneySavedSpan.textContent = moneySaved.toFixed(2);
-        
+
         impactResults.classList.add('impact-results-visible');
         showMessage(impactCalcMessage, 'Impacto calculado com sucesso!', 'success');
         hideLoading(calculateImpactBtn, calculateImpactBtnText, calculateImpactBtnSpinner);
@@ -572,7 +576,7 @@ if (generatePdfReportBtn) {
             doc.addImage(imgData, 'PNG', 10, y, 180, 90); // Ajuste as dimensões conforme necessário
             y += 100;
         }
-        
+
         // Simulação de delay para a geração do PDF
         await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -703,21 +707,7 @@ function initChart(chartType = 'pie') {
                     plugins: {
                         ...chartOptions.plugins,
                         legend: { display: false }
-                    },
-                }
-            };
-            break;
-        case 'bar-horizontal':
-            chartConfig = {
-                type: 'bar',
-                data: barData,
-                options: {
-                    ...chartOptions,
-                    indexAxis: 'y',
-                    plugins: {
-                        ...chartOptions.plugins,
-                        legend: { display: false }
-                    },
+                    }
                 }
             };
             break;
@@ -777,19 +767,49 @@ function initChart(chartType = 'pie') {
     myChartInstance = new Chart(ctx, chartConfig);
 }
 
-// --- Funções de Clima e Localização ---
+---
 
-// Função para buscar o clima usando latitude e longitude
+### **Funções Otimizadas de Clima e Localização**
+
+Esta é a seção que foi mais modificada para garantir a robustez e a coerência.
+
+```javascript
+// Função para exibir os dados do clima
+function displayWeather(data) {
+    if (weatherInfo) {
+        const temp = data.main.temp.toFixed(0);
+        const description = data.weather[0].description;
+        const city = data.name;
+        const iconCode = data.weather[0].icon;
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+        weatherInfo.innerHTML = `
+            <div class="flex items-center justify-center space-x-4">
+                <img src="${iconUrl}" alt="${description}" class="w-16 h-16">
+                <div>
+                    <p class="text-4xl font-bold text-blue-700">${temp}°C</p>
+                    <p class="text-lg text-gray-600 capitalize">${description}</p>
+                    <p class="text-md text-gray-500">${city}</p>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// Função para buscar dados climáticos
 async function fetchWeather(latitude, longitude) {
-    if (!WEATHER_API_KEY || WEATHER_API_KEY === "SUA_CHAVE_AQUI") {
+    // Verificar se a chave da API é válida
+    if (!WEATHER_API_KEY || WEATHER_API_KEY === "30a970d545783664fb3999d1595d117f") {
         if (weatherInfo) {
             weatherInfo.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Erro: Chave da API do Clima ausente ou inválida.</span>';
         }
-        console.error("Chave da API do OpenWeatherMap não configurada ou é a chave padrão. Por favor, substitua 'SUA_CHAVE_AQUI' pela sua chave real.");
+        console.error("Chave da API do OpenWeatherMap não configurada ou é a chave padrão. Por favor, substitua pela sua chave real.");
         return;
     }
 
     try {
+        // Exibir mensagem de carregamento enquanto busca os dados
+        weatherInfo.innerHTML = '<p class="text-lg text-gray-500 flex items-center"><i class="fas fa-spinner fa-spin mr-2"></i>Carregando clima...</p>';
         const response = await fetch(`${WEATHER_API_URL}?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric&lang=pt_br`);
         if (!response.ok) {
             if (response.status === 401) {
@@ -807,208 +827,119 @@ async function fetchWeather(latitude, longitude) {
     }
 }
 
-// Função para exibir os dados do clima
-function displayWeather(data) {
-    if (weatherInfo) {
-        const temp = data.main.temp.toFixed(0);
-        const description = data.weather[0].description;
-        const city = data.name;
-        const iconCode = data.weather[0].icon;
-        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-
-        weatherInfo.innerHTML = `
-            <img src="${iconUrl}" alt="${description}" class="inline-block w-10 h-10 -mt-2">
-            <span>${temp}°C, ${description} em ${city}</span>
-        `;
-    }
-}
-
-// Função para pedir permissão de localização
-function requestLocationPermission() {
+// Função para tentar obter a localização do usuário ou usar padrão
+function getUserLocationAndFetchWeather() {
+    // Verifica se o navegador suporta geolocalização
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 // Permissão concedida
                 localStorage.setItem('locationPermission', 'granted');
+                // Esconde o pop-up se ele estiver visível
                 if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
+                // Remove a flag 'doNotAskAgainLocation' caso o usuário tenha permitido após negar antes
+                localStorage.removeItem('doNotAskAgainLocation');
                 fetchWeather(position.coords.latitude, position.coords.longitude);
+                // TODO: Chamar função para inicializar o mapa aqui, ex: initFarmMap(position.coords.latitude, position.coords.longitude);
             },
             (error) => {
                 // Permissão negada ou erro
                 console.error("Erro ao obter localização:", error);
-                localStorage.setItem('locationPermission', 'denied');
+                localStorage.setItem('locationPermission', 'denied'); // Registra a negação
+
+                let errorMessage = 'Localização negada. O clima pode não ser preciso.';
+                if (error.code === error.PERMISSION_DENIED) {
+                    errorMessage = 'Permissão de localização negada pelo usuário.';
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    errorMessage = 'Informações de localização indisponíveis.';
+                } else if (error.code === error.TIMEOUT) {
+                    errorMessage = 'A solicitação para obter a localização expirou.';
+                }
+
+                // Se o checkbox "Não perguntar novamente" estiver marcado ao negar
+                if (doNotAskAgainCheckbox && doNotAskAgainCheckbox.checked) {
+                    localStorage.setItem('doNotAskAgainLocation', 'true');
+                    errorMessage += ' Não perguntaremos novamente.';
+                } else {
+                    localStorage.removeItem('doNotAskAgainLocation'); // Limpa se não marcou "não perguntar"
+                }
+
+                // Esconde o pop-up e exibe a mensagem de erro
                 if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
-                if (locationMessage) locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Localização negada. O clima pode não ser preciso.</span>';
-                // Tenta carregar clima para uma localização padrão (ex: Pitanga, PR)
-                fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
+                showMessage(locationMessage, errorMessage, 'error');
+                // Tenta carregar clima para localização padrão (Pitanga, PR)
+                fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // Opções para geolocalização
         );
     } else {
         // Navegador não suporta Geolocation
         localStorage.setItem('locationPermission', 'unsupported');
         if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
-        if (locationMessage) locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Seu navegador não suporta geolocalização. O clima pode não ser preciso.</span>';
-        // Tenta carregar clima para uma localização padrão (ex: Pitanga, PR)
-        fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
+        showMessage(locationMessage, 'Seu navegador não suporta geolocalização. O clima pode não ser preciso.', 'error');
+        // Tenta carregar clima para localização padrão (Pitanga, PR)
+        fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
     }
 }
 
-// Função para verificar o estado da permissão de localização
+// Função principal para verificar o estado da permissão de localização
 function checkLocationPermission() {
     const permissionStatus = localStorage.getItem('locationPermission');
     const doNotAskAgain = localStorage.getItem('doNotAskAgainLocation');
 
-    if (permissionStatus === 'granted') {
-        // Se já foi concedida, tente obter a localização
-        requestLocationPermission();
-    } else if (permissionStatus === 'denied' && doNotAskAgain === 'true') {
-        // Se foi negada e o usuário pediu para não perguntar novamente
+    // Cenário 1: Usuário negou e marcou "Não perguntar novamente"
+    if (permissionStatus === 'denied' && doNotAskAgain === 'true') {
         if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
-        if (locationMessage) locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Localização negada permanentemente. O clima pode não ser preciso.</span>';
-        fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
-    } else if (permissionStatus === 'unsupported') {
-        // Se não suporta, usa a localização padrão e mostra a mensagem
-        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
-        if (locationMessage) locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Seu navegador não suporta geolocalização. O clima pode não ser preciso.</span>';
-        fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
-    } else {
-        // Se nunca foi perguntado, ou negado sem "não perguntar novamente", mostra o popup
+        showMessage(locationMessage, 'Permissão de localização negada e não será solicitada novamente. O clima pode não ser preciso.', 'info');
+        fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+        return; // Sai da função
+    }
+
+    // Cenário 2: Permissão já foi concedida ou é a primeira vez (status nulo)
+    // ou o usuário negou anteriormente mas não marcou "não perguntar novamente"
+    // e o pop-up precisa ser exibido novamente.
+    if (permissionStatus === 'granted' || permissionStatus === null) {
+        // Tenta obter a localização diretamente ou solicita se for a primeira vez
+        getUserLocationAndFetchWeather();
+    } else if (permissionStatus === 'denied') {
+        // Se negado anteriormente SEM "não perguntar novamente", mostra o popup
         if (locationPermissionPopup) locationPermissionPopup.classList.remove('hidden');
+    } else if (permissionStatus === 'unsupported') {
+        // Cenário 3: Navegador não suporta geolocalização
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
+        showMessage(locationMessage, 'Seu navegador não suporta geolocalização. O clima pode não ser preciso.', 'info');
+        fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
     }
 }
 
 // Eventos para o popup de permissão de localização
 if (allowLocationBtn) {
     allowLocationBtn.addEventListener('click', () => {
-        requestLocationPermission();
+        // Ocultar o pop-up e acionar a lógica de geolocalização
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
+        localStorage.removeItem('doNotAskAgainLocation'); // Garante que a flag de "não perguntar" seja removida se o usuário permitir
+        getUserLocationAndFetchWeather();
     });
 }
 
 if (denyLocationBtn) {
     denyLocationBtn.addEventListener('click', () => {
+        // Esconder o pop-up
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
+
+        // Definir o status de permissão como negado
         localStorage.setItem('locationPermission', 'denied');
+
+        // Verificar o checkbox "Não perguntar novamente"
         if (doNotAskAgainCheckbox && doNotAskAgainCheckbox.checked) {
             localStorage.setItem('doNotAskAgainLocation', 'true');
+            showMessage(locationMessage, 'Localização negada e não será solicitada novamente. O clima pode não ser preciso.', 'info');
         } else {
-             // Se não marcou "não perguntar novamente", remove a flag para que o pop-up possa aparecer de novo
-             localStorage.removeItem('doNotAskAgainLocation');
+            localStorage.removeItem('doNotAskAgainLocation'); // Garante que a flag seja removida se o usuário apenas negou
+            showMessage(locationMessage, 'Localização negada. O clima pode não ser preciso.', 'info');
         }
-        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
-        if (locationMessage) locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Localização negada. O clima pode não ser preciso.</span>';
-        fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
+
+        // Carregar clima para a localização padrão
+        fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
     });
 }
-
-// --- Funções do Perfil do Usuário ---
-
-// Função para carregar dados do perfil
-function loadProfileData() {
-    if (currentUser) {
-        profileNameInput.value = currentUser.name || '';
-        profileEmailInput.value = currentUser.email || '';
-        profileCooperativeInput.value = currentUser.cooperative || '';
-        profileFarmDataInput.value = currentUser.farmData || '';
-        profilePicImg.src = currentUser.profilePic || "https://placehold.co/150x150/a7f3d0/065f46?text=Foto"; // Carrega a imagem do perfil
-    }
-}
-
-// Função para salvar dados do perfil
-if (saveProfileBtn) {
-    saveProfileBtn.addEventListener('click', async () => {
-        if (!currentUser) {
-            showMessage(profilePicMessage, 'Nenhum usuário logado para salvar o perfil.', 'error');
-            return;
-        }
-
-        showLoading(saveProfileBtn, saveProfileBtnText, saveProfileBtnSpinner);
-        await new Promise(resolve => setTimeout(resolve, 700)); // Simula delay
-
-        currentUser.name = profileNameInput.value;
-        currentUser.cooperative = profileCooperativeInput.value;
-        currentUser.farmData = profileFarmDataInput.value;
-
-        // O email não deve ser editável, mas se fosse, exigiria um tratamento de chave no localStorage
-        // currentUser.email = profileEmailInput.value; // Geralmente não se altera o email principal assim
-
-        users[currentUser.email] = currentUser;
-        localStorage.setItem('users', JSON.stringify(users));
-        showMessage(profilePicMessage, 'Perfil atualizado com sucesso!', 'success');
-        hideLoading(saveProfileBtn, saveProfileBtnText, saveProfileBtnSpinner);
-
-        // Atualiza a mensagem de boas-vindas no dashboard se o nome foi alterado
-        if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
-    });
-}
-
-// Lógica de upload de foto de perfil
-if (changeProfilePicBtn && profilePicInput && profilePicImg) {
-    changeProfilePicBtn.addEventListener('click', () => {
-        profilePicInput.click(); // Dispara o clique no input de arquivo oculto
-    });
-
-    profilePicInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                profilePicImg.src = e.target.result; // Atualiza a imagem exibida
-                if (currentUser) {
-                    currentUser.profilePic = e.target.result; // Salva a imagem como base64
-                    users[currentUser.email] = currentUser;
-                    localStorage.setItem('users', JSON.stringify(users));
-                    showMessage(profilePicMessage, 'Foto de perfil atualizada!', 'success');
-                }
-            };
-            reader.onerror = () => {
-                showMessage(profilePicMessage, 'Erro ao carregar a imagem.', 'error');
-            };
-            reader.readAsDataURL(file); // Converte a imagem para Base64
-        } else {
-            showMessage(profilePicMessage, 'Nenhuma foto selecionada.', 'info');
-        }
-    });
-}
-
-// Dark Mode Toggle no Header
-if (headerDarkModeToggle) {
-    headerDarkModeToggle.addEventListener('change', () => {
-        document.body.classList.toggle('dark-mode', headerDarkModeToggle.checked);
-        localStorage.setItem('darkMode', headerDarkModeToggle.checked ? 'enabled' : 'disabled');
-        // Re-renderiza o gráfico para adaptar cores
-        if (myChartInstance) {
-            initChart(myChartInstance.config.type); // Usa o tipo atual do gráfico
-        }
-    });
-
-    // Carregar preferência do Dark Mode ao carregar a página
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        document.body.classList.add('dark-mode');
-        headerDarkModeToggle.checked = true;
-    } else {
-        document.body.classList.remove('dark-mode');
-        headerDarkModeToggle.checked = false;
-    }
-}
-
-// Inicialização
-document.addEventListener('DOMContentLoaded', () => {
-    // Apenas chame checkLoginState, que por sua vez chama checkLocationPermission
-    // A lógica de ocultar o popup e exibir a mensagem já está em checkLocationPermission
-    checkLoginState();
-
-    // Se a página for carregada diretamente com uma hash de seção, garante que ela é exibida
-    const initialHash = window.location.hash.substring(1);
-    if (initialHash && document.getElementById(initialHash)) {
-        showSection(initialHash, false); // Não adiciona ao histórico, pois já está na URL
-        if (initialHash === 'profile') {
-            loadProfileData();
-        }
-        if (initialHash === 'reports') {
-            initChart('pie');
-        }
-    } else {
-        // Se não houver hash, ou hash inválida, verifica o estado de login
-        // Isso já foi feito por checkLoginState() no início
-    }
-});
