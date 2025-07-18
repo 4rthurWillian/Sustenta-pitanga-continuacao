@@ -1,15 +1,11 @@
-// seu_script.js
-
-// --- INÍCIO DO SEU SCRIPT ---
-
-// Esta linha garante que o usuário esteja sempre deslogado ao carregar a página
-localStorage.removeItem('isLoggedInUserEmail');
-// Se você usa sessionStorage para algo, também pode limpar:
-// sessionStorage.clear(); 
-// Ou remover itens específicos:
-// sessionStorage.removeItem('algumItemDeSessao'); 
-
-// ... (Restante do seu código JavaScript, variáveis, funções, listeners, etc.) ...
+// --- INÍCIO DA FERRAMENTA PARA GARANTIR DESLOGADO NO ACESSO AO LINK ---
+// Esta linha limpa o estado de login ao carregar a página.
+// Isso garante que, ao acessar diretamente o link, o usuário sempre precise fazer login.
+// IMPORTANTE: Para uma aplicação em produção onde você deseja que o login persista,
+// você precisaria REMOVER ou COMENTAR esta linha.
+localStorage.removeItem('isLoggedIn');
+localStorage.removeItem('loggedInUserEmail'); // Também limpa o email do usuário ao deslogar
+// --- FIM DA FERRAMENTA DE DESLOGAR AO CARREGAR ---
 
 // Exemplo da sua função showSection (se ela estiver no mesmo arquivo)
 function showSection(sectionId, pushState = true) {
