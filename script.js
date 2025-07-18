@@ -1,3 +1,23 @@
+// seu_script.js
+
+// --- INÍCIO DO SEU SCRIPT ---
+
+// Esta linha garante que o usuário esteja sempre deslogado ao carregar a página
+localStorage.removeItem('isLoggedIn');
+localStorage.removeItem('userEmail'); // Remova também o email ou qualquer outro dado de usuário
+// Se você usa sessionStorage para algo, também pode limpar:
+// sessionStorage.clear(); 
+// Ou remover itens específicos:
+// sessionStorage.removeItem('algumItemDeSessao'); 
+
+// ... (Restante do seu código JavaScript, variáveis, funções, listeners, etc.) ...
+
+// Exemplo da sua função showSection (se ela estiver no mesmo arquivo)
+function showSection(sectionId, pushState = true) {
+    // ... sua lógica existente ...
+}
+
+// ... (Outras partes do seu script) ...
 // Variáveis globais para simular dados do usuário e estado de login
 let currentUser = null;
 const users = JSON.parse(localStorage.getItem('users')) || {};
