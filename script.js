@@ -3,8 +3,7 @@
 // --- INÍCIO DO SEU SCRIPT ---
 
 // Esta linha garante que o usuário esteja sempre deslogado ao carregar a página
-localStorage.removeItem('isLoggedIn');
-localStorage.removeItem('userEmail'); // Remova também o email ou qualquer outro dado de usuário
+localStorage.removeItem('isLoggedInUserEmail');
 // Se você usa sessionStorage para algo, também pode limpar:
 // sessionStorage.clear(); 
 // Ou remover itens específicos:
