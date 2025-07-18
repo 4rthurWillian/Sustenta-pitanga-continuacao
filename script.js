@@ -865,10 +865,7 @@ function checkLocationPermission() {
         // Se não suporta, usa a localização padrão e mostra a mensagem
         locationMessage.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Seu navegador não suporta geolocalização. O clima pode não ser preciso.</span>';
         fetchWeather(-25.2929, -51.0425); // Coordenadas de Pitanga, PR
-    } else {
-        // Se nunca foi perguntado ou 'doNotAskAgain' não marcado, mostra o popup
-        locationPermissionPopup.classList.remove('hidden');
-    }
+    } 
 }
 
 // Eventos para o popup de permissão de localização
