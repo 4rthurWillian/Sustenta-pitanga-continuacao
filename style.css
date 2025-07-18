@@ -102,13 +102,13 @@ body.dark-mode {
     --link-hover: #4299e1;
     --mobile-menu-bg: #2d3748;
     --mobile-menu-border: #4a5568;
-    --mobile-menu-link-text: #e2e8f0;
-    --mobile-menu-link-hover: #4a5568;
+    --mobile-menu-link-text: #e2e8f0; /* Cor do texto dos links no menu mobile escuro */
+    --mobile-menu-link-hover: #4a5568; /* Fundo do hover dos links no menu mobile escuro */
     --footer-bg: #1a202c;
     --footer-text: #ffffff;
     /* Cores para adaptação de texto e fundos específicos no modo escuro */
-    --text-gray-700-color: #a0aec0;
-    --text-gray-600-color: #a0aec0;
+    --text-gray-700-color: #cbd5e0; /* Mais claro para melhor contraste */
+    --text-gray-600-color: #e2e8f0; /* Alterado para maior contraste no modo escuro */
     --text-gray-800-color: #e2e8f0;
     --text-gray-900-color: #e2e8f0;
     --green-700-color: #68d391;
@@ -124,6 +124,12 @@ body.dark-mode {
     --blue-800-color: #90cdf4;
     --indigo-500-color: #9f7aea;
     --border-gray-200-color: #4a5568;
+    --text-blue-700-color: #90cdf4; /* Adicionado para adaptação do texto azul no dark mode */
+}
+
+/* Regra específica para o texto da seção IoT no modo escuro */
+body.dark-mode #dashboard .card .text-gray-600 {
+    color: var(--text-color) !important; /* Usar a cor de texto geral do dark mode para garantir contraste */
 }
 
 body {
@@ -144,7 +150,7 @@ body {
     padding: 1.5rem;
     transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     color: var(--text-color); /* Garante que o texto dentro do card seja adaptável */
-    /* Removido position: relative; daqui para evitar conflitos com message-box */
+    position: relative; /* Adicionado para posicionamento absoluto da mensagem interna */
 }
 .btn-primary {
     background-color: var(--primary-btn-bg);
@@ -282,7 +288,8 @@ body {
 
 /* Estilo para mensagens de erro/sucesso - Corrigido para não causar desalinhamento */
 .message-box {
-    width: 100%; /* Ocupa a largura total do contêiner pai */
+    width: auto; /* Alterado de 100% para auto */
+    max-width: 90%; /* Adicionado para evitar overflow em telas pequenas */
     padding: 0.75rem 1.25rem;
     border-radius: 0.375rem;
     text-align: center;
@@ -295,7 +302,13 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.5rem; /* Espaçamento entre ícone e texto */
-    margin-top: 1rem; /* Adiciona margem acima para posicionar abaixo do elemento anterior */
+    
+    /* Posicionamento absoluto para evitar que afete o layout */
+    position: absolute;
+    top: 1rem; /* Posição do topo */
+    left: 50%; /* Centraliza horizontalmente */
+    transform: translateX(-50%); /* Ajuste para centralização perfeita */
+    margin-top: 0; /* Removido, pois o posicionamento é absoluto */
 }
 .message-box.visible {
     opacity: 1;
@@ -428,6 +441,17 @@ input:checked + .slider:before {
     pointer-events: auto; /* Permite cliques */
 }
 
+/* Correção para o contraste dos links de navegação no modo escuro */
+body.dark-mode .nav-link {
+    color: var(--mobile-menu-link-text); /* Garante que o texto seja claro no modo escuro */
+}
+
+body.dark-mode .nav-link:hover {
+    background-color: var(--mobile-menu-link-hover); /* Fundo mais escuro para contraste no hover */
+    color: var(--mobile-menu-link-text); /* Mantém o texto claro no hover */
+}
+
+
 /* Esconder a navegação desktop */
 .header-nav-desktop {
     display: none;
@@ -494,6 +518,16 @@ body.dark-mode #about-us .text-gray-600,
 body.dark-mode #about-us .text-gray-500 {
     color: var(--text-color) !important;
 }
+/* Regra específica para o texto azul-700 no modo escuro */
+body.dark-mode .text-blue-700 {
+    color: var(--text-blue-700-color) !important;
+}
+
+
+/* Estilo para o texto das metas na seção de pontos e resgate no modo escuro */
+body.dark-mode #points-redemption ul.list-disc li {
+    color: var(--text-color) !important;
+}
 
 
 /* Estilo para o spinner de carregamento */
@@ -529,7 +563,7 @@ body.dark-mode #about-us .text-gray-500 {
     /* Quando a classe 'visible' é adicionada pelo JS */
     opacity: 1;
     pointer-events: auto; /* Permite interações com o popup */
-    /* Se você está usando TailwindCSS ou classes utilitárias, a classe 'hidden' faria display: none; */
+    /* Se você estiver usando TailwindCSS ou classes utilitárias, a classe 'hidden' faria display: none; */
     /* então a remoção da classe 'hidden' já o tornaria visível */
 }
 
@@ -537,3 +571,17 @@ body.dark-mode #about-us .text-gray-500 {
    basta garantir que o JS remova 'hidden' e adicione 'visible' para transições.
    Nesse caso, a propriedade `opacity` pode ser mais para um efeito visual de fade.
 */
+
+/* Ajustes para alinhar botões na seção de pontos e resgate */
+#points-redemption .grid > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Empurra o botão para baixo */
+}
+#points-redemption .grid > div > div:first-child { /* Conteúdo acima do botão */
+    flex-grow: 1; /* Permite que o conteúdo se expanda */
+    display: flex; /* Para alinhar o texto e a imagem */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

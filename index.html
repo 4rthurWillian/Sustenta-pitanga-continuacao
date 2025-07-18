@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Link para o arquivo CSS externo -->
     <link rel="stylesheet" href="style.css">
- 
 </head>
 <body class="min-h-screen flex flex-col">
     <header class="bg-gradient-to-r from-blue-500 to-green-500 text-white p-4 shadow-lg rounded-b-xl"
@@ -50,7 +49,8 @@
                     <li><a class="nav-link block p-2 rounded-md hover:bg-gray-100" data-target="dashboard"><i class="fas fa-home mr-2"></i>Dashboard</a></li>
                     <li><a class="nav-link block p-2 rounded-md hover:bg-gray-100" data-target="reports"><i class="fas fa-file-alt mr-2"></i>Relatórios</a></li>
                     <li><a class="nav-link block p-2 rounded-md hover:bg-gray-100" data-target="profile"><i class="fas fa-user mr-2"></i>Perfil</a></li>
-                    <li><a class="nav-link block p-2 rounded-md hover:bg-gray-100" data-target="about-us"><i class="fas fa-info-circle mr-2"></i>Sobre Nós</a></li> <!-- Novo link -->
+                    <li><a class="nav-link block p-2 rounded-md hover:bg-gray-100" data-target="points-redemption"><i class="fas fa-star mr-2"></i>Pontos e Resgate</a></li> <!-- Novo link -->
+                    <li><a class="nav-link block p-2 rounded-md hover:bg-gray-100" data-target="about-us"><i class="fas fa-info-circle mr-2"></i>Sobre Nós</a></li>
                 </ul>
             </div>
 
@@ -59,22 +59,11 @@
                 <div class="p-4 border-b border-gray-200">
                     <h4 class="font-bold text-gray-800">Notificações</h4>
                 </div>
-                <div class="max-h-60 overflow-y-auto">
-                    <a href="#" class="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100">
-                        <p class="text-sm font-medium text-gray-900">Alerta de Chuva</p>
-                        <p class="text-xs text-gray-500">Prevista chuva forte amanhã - evite irrigação</p>
-                    </a>
-                    <a href="#" class="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100">
-                        <p class="text-sm font-medium text-gray-900">Relatório Mensal</p>
-                        <p class="text-xs text-gray-500">Seu relatório de junho está disponível</p>
-                    </a>
-                    <a href="#" class="block px-4 py-3 hover:bg-gray-100">
-                        <p class="text-sm font-medium text-gray-900">Atualização do Sistema</p>
-                        <p class="text-xs text-gray-500">Nova versão disponível com melhorias</p>
-                    </a>
+                <div class="max-h-60 overflow-y-auto" id="notificationDropdownList">
+                    <!-- Notificações serão carregadas aqui pelo JS -->
                 </div>
                 <div class="p-2 bg-gray-50 text-center rounded-b-md">
-                    <a href="#" class="text-sm text-blue-600 hover:underline">Ver todas</a>
+                    <a href="#" id="viewAllNotificationsLink" class="text-sm text-blue-600 hover:underline" data-target="notifications-page">Ver todas</a>
                 </div>
             </div>
         </div>
@@ -136,7 +125,7 @@
                     <div class="flex items-center justify-between">
                         <button type="submit" class="btn-primary w-full" id="loginBtn">
                             <span id="loginBtnText">Entrar</span>
-                            <span id="loginBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                            <span id="loginBtnSpinner"></span>
                         </button>
                     </div>
                     <p class="text-center text-sm mt-4">Não tem uma conta? <a href="#" id="registerLink" class="text-blue-500 hover:underline">Cadastre-se aqui</a></p>
@@ -177,7 +166,7 @@
                     <div class="flex items-center justify-between">
                         <button type="submit" class="btn-primary w-full" id="registerSubmitBtn">
                             <span id="registerSubmitBtnText">Cadastrar</span>
-                            <span id="registerSubmitBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                            <span id="registerSubmitBtnSpinner"></span>
                         </button>
                     </div>
                     <p class="text-center text-sm mt-4">Já tem uma conta? <a href="#" id="backToLoginLink" class="text-blue-500 hover:underline">Faça login aqui</a></p>
@@ -252,8 +241,8 @@
                     </div>
                     <button id="calculateImpactBtn" class="btn-primary w-full">
                         <span id="calculateImpactBtnText">Calcular Resultados</span>
-                        <span id="calculateImpactBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
-                    </button>
+                        <span id="calculateImpactBtnSpinner"></span>
+                        </button>
                     <div id="impactCalcMessage" class="message-box hidden"></div>
                     <div id="impactResults" class="p-4 bg-blue-50 rounded-lg">
                         <h4 class="font-bold text-blue-800 mb-2">Resultados:</h4>
@@ -272,9 +261,9 @@
                     Alertas Úteis
                 </h3>
                 <ul class="list-disc pl-5 space-y-2">
-                    <li><span class="font-semibold text-red-600">Alerta:</span> Amanhã: CHUVA FORTE - Não irrigue!</li>
+                    <li id="climateAlert"><span class="font-semibold text-gray-500">Carregando alerta climático...</span></li>
                     <li><span class="font-semibold text-orange-600">Recomendação:</span> Reduza a irrigação de água em 4 litros por hectare.</li>
-                    <li><span class="font-semibold text-green-600">Notificação:</span> Sensoriamento detectou melhora na qualidade do solo. +10 pontos!</li>
+                    <li><span class="font-semibold text-green-600">Notificação:</span> Sensoriamento detectou melhora na qualidade do solo.</li>
                 </ul>
             </div>
 
@@ -317,7 +306,7 @@
                         </div>
                         <button id="saveManualDataBtn" class="btn-primary">
                             <span id="saveManualDataBtnText">Salvar Dados Manuais</span>
-                            <span id="saveManualDataBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                            <span id="saveManualDataBtnSpinner"></span>
                         </button>
                         <div id="manualSaveMessage" class="message-box hidden"></div>
                     </div>
@@ -334,10 +323,28 @@
                         </div>
                         <button id="simulateSensorDataBtn" class="btn-secondary">
                             <span id="simulateSensorDataBtnText">Simular Leitura do Sensor</span>
-                            <span id="simulateSensorDataBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                            <span id="simulateSensorDataBtnSpinner"></span>
                         </button>
                         <div id="sensorSaveMessage" class="message-box hidden"></div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Novo Card: Conexão com Dispositivos IoT -->
+            <div class="card lg:col-span-3">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-wifi mr-2 text-indigo-500"></i>
+                    Conexão com Dispositivos IoT
+                </h3>
+                <p class="text-gray-700 mb-4">Esta área é dedicada à integração e gerenciamento de seus dispositivos de Internet das Coisas (IoT) no campo.</p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                    <li>Conecte seus sensores de umidade, temperatura e pH do solo.</li>
+                    <li>Monitore o status da bateria e a conectividade dos seus dispositivos.</li>
+                    <li>Configure alertas personalizados com base nas leituras dos sensores.</li>
+                </ul>
+                <div class="text-center mt-6 p-4 bg-blue-50 rounded-lg">
+                    <p class="font-semibold text-blue-800">Funcionalidade em desenvolvimento!</p>
+                    <p class="text-sm text-blue-700">Em breve, você poderá adicionar e gerenciar seus próprios dispositivos IoT aqui para um monitoramento ainda mais preciso.</p>
                 </div>
             </div>
 
@@ -351,11 +358,12 @@
                     <p class="text-gray-500">Carregando mapa...</p>
                 </div>
                 <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <button class="btn-secondary">Visualização Satélite</button>
-                    <button class="btn-secondary">Visualização Terreno</button>
-                    <button class="btn-secondary">Medir Área</button>
-                    <button class="btn-secondary">Adicionar Marcador</button>
+                    <button id="satelliteViewBtn" class="btn-secondary">Visualização Satélite</button>
+                    <button id="terrainViewBtn" class="btn-secondary">Visualização Terreno</button>
+                    <button id="measureAreaBtn" class="btn-secondary">Medir Área</button>
+                    <button id="addMarkerBtn" class="btn-secondary">Adicionar Marcador</button>
                 </div>
+                <div id="mapMessage" class="message-box hidden mt-4"></div> <!-- Adicionado para mensagens do mapa -->
             </div>
         </section>
 
@@ -382,7 +390,7 @@
                             <i class="fas fa-file-alt mr-2 text-purple-500"></i>
                             Relatório Personalizado - Uso de Pesticidas (Maio 2025)
                         </h3>
-                        <p class="text-lg mb-2">Impacto Ambiental: <span class="font-bold text-red-600">Uso acima do recomendado em 10%</span>.</p>
+                        <p class="text-lg mb-2">Impacto Ambiental: <span class="font-bold text-red-600">Uso acima do recomendado em 10%</span>.< /p>
                         <ul class="list-disc pl-5 space-y-2">
                             <li>Pesticida X: 5% acima do limite seguro.</li>
                             <li>Recomendação: Avaliar alternativas biológicas para a próxima safra.</li>
@@ -411,7 +419,7 @@
                     <div class="text-center mt-8">
                         <button id="generatePdfReportBtn" class="btn-secondary">
                             <span id="generatePdfReportBtnText">Gerar Relatório em PDF</span>
-                            <span id="generatePdfReportBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                            <span id="generatePdfReportBtnSpinner"></span>
                         </button>
                         <div id="pdfMessage" class="message-box hidden"></div>
                     </div>
@@ -433,7 +441,6 @@
                         <img id="profilePicImg" src="https://placehold.co/150x150/a7f3d0/065f46?text=Foto" alt="Foto de perfil do usuário, atualmente uma imagem de placeholder" class="w-36 h-36 rounded-full object-cover border-4 border-green-400 shadow-md">
                         <input type="file" id="profilePicInput" accept="image/png, image/jpeg, image="jpg" class="hidden">
                         <button id="changeProfilePicBtn" class="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">Alterar Foto</button>
-                        <div id="profilePicMessage" class="message-box hidden mt-2"></div>
                     </div>
 
                     <div class="flex-grow w-full">
@@ -456,14 +463,163 @@
                         <div class="text-right mt-6 flex justify-end gap-4">
                             <button id="saveProfileBtn" class="btn-primary">
                                 <span id="saveProfileBtnText">Salvar Alterações</span>
-                                <span id="saveProfileBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                                <span id="saveProfileBtnSpinner"></span>
                             </button>
                             <button id="logoutBtn" class="btn-danger">Sair da Conta</button>
                         </div>
                     </div>
                 </div>
+                <!-- Nova localização para a mensagem do perfil -->
+                <div id="profileMessage" class="message-box hidden"></div>
                 <div class="text-center mt-8">
                     <button id="backToDashboardFromProfileBtn" class="btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar para o Dashboard
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nova Seção "Pontos e Resgate" -->
+        <section id="points-redemption" class="hidden">
+            <div class="card max-w-4xl mx-auto">
+                <h2 class="text-2xl font-semibold mb-6 text-center">Pontos e Resgate</h2>
+                
+                <div class="mb-8 text-center">
+                    <h3 class="text-xl font-semibold mb-2">Seus Pontos Atuais:</h3>
+                    <p id="currentPoints" class="text-5xl font-bold text-green-600">0</p>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-bullseye mr-2 text-blue-500"></i>
+                        Metas para Ganhar Pontos
+                    </h3>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                        <li><strong>100 Pontos:</strong> Reduza o desperdício de água em 5% por mês.</li>
+                        <li><strong>150 Pontos:</strong> Utilize fertilizantes orgânicos por 3 meses consecutivos.</li>
+                        <li><strong>200 Pontos:</strong> Implemente um novo método de rotação de culturas.</li>
+                        <li><strong>250 Pontos:</strong> Participe de 3 workshops de sustentabilidade agrícola.</li>
+                        <li><strong>300 Pontos:</strong> Compartilhe suas melhores práticas com a comunidade.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-gift mr-2 text-purple-500"></i>
+                        Produtos para Resgate
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        <!-- Produto 1: Sementes de Milho Híbrido -->
+                        <div class="border border-gray-200 rounded-lg p-4 text-center relative">
+                            <div class="flex-grow flex flex-col justify-center items-center">
+                                <img src="https://placehold.co/100x100/a7f3d0/065f46?text=Milho" alt="Sementes de Milho Híbrido" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover">
+                                <h4 class="font-semibold text-lg">Sementes de Milho Híbrido</h4>
+                                <p class="text-sm text-gray-600">Custo: 500 Pontos</p>
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">Esgotado</span>
+                            <button class="btn-primary w-full mt-3 opacity-50 cursor-not-allowed" disabled>Resgatar</button>
+                        </div>
+                        <!-- Produto 2: Kit de Irrigação por Gotejamento -->
+                        <div class="border border-gray-200 rounded-lg p-4 text-center relative">
+                            <div class="flex-grow flex flex-col justify-center items-center">
+                                <img src="https://placehold.co/100x100/a7f3d0/065f46?text=Irrigação" alt="Kit de Irrigação por Gotejamento" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover">
+                                <h4 class="font-semibold text-lg">Kit de Irrigação por Gotejamento</h4>
+                                <p class="text-sm text-gray-600">Custo: 1000 Pontos</p>
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">Esgotado</span>
+                            <button class="btn-primary w-full mt-3 opacity-50 cursor-not-allowed" disabled>Resgatar</button>
+                        </div>
+                        <!-- Produto 3: Adubo Orgânico Premium (20kg) -->
+                        <div class="border border-gray-200 rounded-lg p-4 text-center relative">
+                            <div class="flex-grow flex flex-col justify-center items-center">
+                                <img src="https://placehold.co/100x100/a7f3d0/065f46?text=Adubo" alt="Adubo Orgânico Premium" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover">
+                                <h4 class="font-semibold text-lg">Adubo Orgânico Premium (20kg)</h4>
+                                <p class="text-sm text-gray-600">Custo: 300 Pontos</p>
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">Esgotado</span>
+                            <button class="btn-primary w-full mt-3 opacity-50 cursor-not-allowed" disabled>Resgatar</button>
+                        </div>
+                        <!-- Produto 4: Ferramentas de Jardinagem Ergonômicas -->
+                        <div class="border border-gray-200 rounded-lg p-4 text-center relative">
+                            <div class="flex-grow flex flex-col justify-center items-center">
+                                <img src="https://placehold.co/100x100/a7f3d0/065f46?text=Ferramentas" alt="Ferramentas de Jardinagem Ergonômicas" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover">
+                                <h4 class="font-semibold text-lg">Ferramentas de Jardinagem Ergonômicas</h4>
+                                <p class="text-sm text-gray-600">Custo: 400 Pontos</p>
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">Esgotado</span>
+                            <button class="btn-primary w-full mt-3 opacity-50 cursor-not-allowed" disabled>Resgatar</button>
+                        </div>
+                        <!-- Produto 5: Curso Online de Agricultura Sustentável -->
+                        <div class="border border-gray-200 rounded-lg p-4 text-center relative">
+                            <div class="flex-grow flex flex-col justify-center items-center">
+                                <img src="https://placehold.co/100x100/a7f3d0/065f46?text=Curso" alt="Curso Online de Agricultura Sustentável" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover">
+                                <h4 class="font-semibold text-lg">Curso Online de Agricultura Sustentável</h4>
+                                <p class="text-sm text-gray-600">Custo: 700 Pontos</p>
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">Esgotado</span>
+                            <button class="btn-primary w-full mt-3 opacity-50 cursor-not-allowed" disabled>Resgatar</button>
+                        </div>
+                        <!-- Produto 6: Voucher para Análise de Solo -->
+                        <div class="border border-gray-200 rounded-lg p-4 text-center relative">
+                            <div class="flex-grow flex flex-col justify-center items-center">
+                                <img src="https://placehold.co/100x100/a7f3d0/065f46?text=Solo" alt="Voucher para Análise de Solo" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover">
+                                <h4 class="font-semibold text-lg">Voucher para Análise de Solo</h4>
+                                <p class="text-sm text-gray-600">Custo: 200 Pontos</p>
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">Esgotado</span>
+                            <button class="btn-primary w-full mt-3 opacity-50 cursor-not-allowed" disabled>Resgatar</button>
+                        </div>
+                        <!-- Novo Produto 7: Desconto em Fertilizantes -->
+                        <div class="border border-gray-200 rounded-lg p-4 text-center relative">
+                            <div class="flex-grow flex flex-col justify-center items-center">
+                                <img src="https://placehold.co/100x100/a7f3d0/065f46?text=Desconto" alt="Desconto em Fertilizantes" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover">
+                                <h4 class="font-semibold text-lg">Desconto de 10% em Fertilizantes</h4>
+                                <p class="text-sm text-gray-600">Custo: 250 Pontos</p>
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">Esgotado</span>
+                            <button class="btn-primary w-full mt-3 opacity-50 cursor-not-allowed" disabled>Resgatar</button>
+                        </div>
+                        <!-- Novo Produto 8: Consultoria Agronômica -->
+                        <div class="border border-gray-200 rounded-lg p-4 text-center relative">
+                            <div class="flex-grow flex flex-col justify-center items-center">
+                                <img src="https://placehold.co/100x100/a7f3d0/065f46?text=Consultoria" alt="Consultoria Agronômica" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover">
+                                <h4 class="font-semibold text-lg">Consultoria Agronômica (1h)</h4>
+                                <p class="text-sm text-gray-600">Custo: 600 Pontos</p>
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">Esgotado</span>
+                            <button class="btn-primary w-full mt-3 opacity-50 cursor-not-allowed" disabled>Resgatar</button>
+                        </div>
+                        <!-- Novo Produto 9: Kit de Ferramentas Manuais -->
+                        <div class="border border-gray-200 rounded-lg p-4 text-center relative">
+                            <div class="flex-grow flex flex-col justify-center items-center">
+                                <img src="https://placehold.co/100x100/a7f3d0/065f46?text=Kit" alt="Kit de Ferramentas Manuais" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover">
+                                <h4 class="font-semibold text-lg">Kit de Ferramentas Manuais</h4>
+                                <p class="text-sm text-gray-600">Custo: 350 Pontos</p>
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">Esgotado</span>
+                            <button class="btn-primary w-full mt-3 opacity-50 cursor-not-allowed" disabled>Resgatar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-8">
+                    <button id="backToDashboardFromPointsBtn" class="btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar para o Dashboard
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nova Seção "Notificações" -->
+        <section id="notifications-page" class="hidden">
+            <div class="card max-w-4xl mx-auto">
+                <h2 class="text-2xl font-semibold mb-6 text-center">Suas Notificações</h2>
+                <div id="notificationList" class="space-y-4">
+                    <!-- As notificações serão carregadas aqui pelo JavaScript -->
+                    <p class="text-gray-600 text-center">Nenhuma notificação para exibir.</p>
+                </div>
+                <div class="text-center mt-8">
+                    <button id="backToDashboardFromNotificationsBtn" class="btn-secondary">
                         <i class="fas fa-arrow-left mr-2"></i>Voltar para o Dashboard
                     </button>
                 </div>
@@ -569,8 +725,16 @@
 
     <footer class="bg-gray-800 text-white p-4 text-center mt-8 rounded-t-xl"
             style="background-color: var(--footer-bg); color: var(--footer-text);">
-        <div class="container">
+        <div class="container flex flex-col sm:flex-row justify-between items-center">
             <p>&copy; 2025 Sustenta Pitanga. Todos os direitos reservados.</p>
+            <div class="flex space-x-4 mt-4 sm:mt-0">
+                <a href="https://www.instagram.com/ccmdompedro" target="_blank" aria-label="Instagram do CCM Dom Pedro" class="text-white hover:text-gray-300 transition-colors">
+                    <i class="fab fa-instagram text-2xl"></i>
+                </a>
+                <a href="https://www.facebook.com/ccmdompedro?locale=pt_BR" target="_blank" aria-label="Facebook do CCM Dom Pedro" class="text-white hover:text-gray-300 transition-colors">
+                    <i class="fab fa-facebook-f text-2xl"></i>
+                </a>
+            </div>
         </div>
     </footer>
     

@@ -21,10 +21,14 @@ let loggedInUserEmail = localStorage.getItem('loggedInUserEmail'); // Usar let p
 // Instâncias de gráficos
 let myChartInstance = null; // Agora uma única instância para o gráfico principal
 
-// API Key do OpenWeatherMap (Substitua pela sua chave real)
+// API Keys do OpenWeatherMap
 // ATENÇÃO: Em uma aplicação real, chaves de API nunca devem ser expostas no frontend.
 // Elas devem ser gerenciadas por um servidor backend.
-const WEATHER_API_KEY = "30a970d545783664fb3999d1595d117f"; 
+const WEATHER_API_KEYS = [
+    "c907545cefe53d7cd9e2da14805ffd1c",
+    "3741e8d7b0a23993ea689bcce514c279"
+];
+let currentApiKeyIndex = 0; // Índice da chave de API atual a ser usada
 const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
 
 // Coordenadas padrão para Pitanga, PR (caso a localização seja negada ou indisponível)
@@ -38,6 +42,8 @@ const registerSection = document.getElementById('register');
 const dashboardSection = document.getElementById('dashboard');
 const reportsSection = document.getElementById('reports');
 const profileSection = document.getElementById('profile');
+const notificationsPageSection = document.getElementById('notifications-page'); // Nova seção de notificações
+const pointsRedemptionSection = document.getElementById('points-redemption'); // Nova seção de pontos e resgate
 const aboutUsSection = document.getElementById('about-us'); // Nova seção
 
 const loggedInControls = document.getElementById('logged-in-controls');
@@ -93,12 +99,16 @@ const profileFarmDataInput = document.getElementById('profileFarmDataInput');
 const headerDarkModeToggle = document.getElementById('headerDarkModeToggle');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 
+// Referência para o novo elemento de mensagem do perfil
+const profileMessage = document.getElementById('profileMessage');
+
 const changeProfilePicBtn = document.getElementById('changeProfilePicBtn');
 const profilePicInput = document.getElementById('profilePicInput');
 const profilePicImg = document.getElementById('profilePicImg');
-const profilePicMessage = document.getElementById('profilePicMessage');
+// Removida a referência a profilePicMessage, agora usamos profileMessage para todas as mensagens do perfil
+// const profilePicMessage = document.getElementById('profilePicMessage'); 
 
-// --- Variáveis do DOM para o Popup de Localização ---
+// --- Variáveis do DOM para o Popup de Permissão de Localização ---
 const locationPermissionPopup = document.getElementById('locationPermissionPopup');
 const allowLocationBtn = document.getElementById('allowLocationBtn');
 const denyLocationBtn = document.getElementById('denyLocationBtn');
@@ -124,9 +134,30 @@ const saveProfileBtnSpinner = document.getElementById('saveProfileBtnSpinner');
 // Novos botões de voltar para o Dashboard
 const backToDashboardFromProfileBtn = document.getElementById('backToDashboardFromProfileBtn');
 const backToDashboardFromReportsBtn = document.getElementById('backToDashboardFromReportsBtn');
+const backToDashboardFromNotificationsBtn = document.getElementById('backToDashboardFromNotificationsBtn');
+const backToDashboardFromPointsBtn = document.getElementById('backToDashboardFromPointsBtn'); // Novo botão de voltar para pontos
+
+// Elementos para a nova seção de notificações
+const notificationDropdownList = document.getElementById('notificationDropdownList');
+const viewAllNotificationsLink = document.getElementById('viewAllNotificationsLink');
+const notificationList = document.getElementById('notificationList'); // Contêiner para notificações na página dedicada
+
+// Elementos para a nova seção de pontos e resgate
+const currentPointsDisplay = document.getElementById('currentPoints');
+const climateAlertElement = document.getElementById('climateAlert'); // Adicionado para o alerta climático dinâmico
+
+// Elementos para os botões de visualização do mapa e mensagem
+const satelliteViewBtn = document.getElementById('satelliteViewBtn');
+const terrainViewBtn = document.getElementById('terrainViewBtn');
+const measureAreaBtn = document.getElementById('measureAreaBtn');
+const addMarkerBtn = document.getElementById('addMarkerBtn');
+const mapMessage = document.getElementById('mapMessage');
 
 // Variável para armazenar a seção atual
 let currentSectionId = '';
+
+// Array para armazenar as notificações
+let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
 
 // Função para exibir mensagens
 function showMessage(element, message, type = 'info') {
@@ -166,7 +197,7 @@ function hideLoading(buttonElement, textSpan, spinnerSpan) {
 
 // Função para alternar seções e gerenciar o histórico do navegador
 function showSection(sectionId, pushState = true) {
-    const sections = [landingPageSection, loginSection, registerSection, dashboardSection, reportsSection, profileSection, aboutUsSection];
+    const sections = [landingPageSection, loginSection, registerSection, dashboardSection, reportsSection, profileSection, notificationsPageSection, pointsRedemptionSection, aboutUsSection];
     sections.forEach(section => {
         if (section && section.id === sectionId) {
             section.classList.remove('hidden');
@@ -194,17 +225,31 @@ function showSection(sectionId, pushState = true) {
         history.pushState({ section: sectionId }, '', `#${sectionId}`);
     }
     currentSectionId = sectionId; // Atualiza a seção atual
+
+    // Ações específicas ao mostrar certas seções
+    if (sectionId === 'notifications-page') {
+        renderNotifications(); // Renderiza as notificações ao entrar na página
+    }
+    if (sectionId === 'points-redemption') {
+        updatePointsDisplay(); // Atualiza a exibição de pontos
+    }
 }
 
 // Função para verificar o estado de login
 function checkLoginState() {
     if (loggedInUserEmail && users[loggedInUserEmail]) {
         currentUser = users[loggedInUserEmail];
+        // Inicializa pontos se não existirem
+        if (currentUser.points === undefined) {
+            currentUser.points = 0;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
         if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
         showSection('dashboard', false); // Não adiciona ao histórico na inicialização
         loggedInControls.classList.remove('hidden'); // Mostrar controles após login
         checkLocationPermission(); // Chama a função para verificar e possivelmente mostrar o popup
         loadManualData(); // Carrega os dados manuais ao logar
+        renderNotificationsDropdown(); // Carrega as notificações no dropdown
     } else {
         showSection('landing-page', false); // Não adiciona ao histórico na inicialização
         loggedInControls.classList.add('hidden'); // Esconder controles antes do login
@@ -258,12 +303,18 @@ if (loginForm && loginBtn) {
         if (users[email] && users[email].password === password) {
             currentUser = users[email];
             localStorage.setItem('loggedInUserEmail', email);
+            // Inicializa pontos se não existirem para o usuário logado
+            if (currentUser.points === undefined) {
+                currentUser.points = 0;
+                localStorage.setItem('users', JSON.stringify(users));
+            }
             showMessage(document.getElementById('loginMessage'), 'Login bem-sucedido!', 'success');
             if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
             loggedInControls.classList.remove('hidden'); // Mostrar controles após login
             showSection('dashboard'); // Adiciona ao histórico
             checkLocationPermission(); // Chama a função para verificar e possivelmente mostrar o popup
             loadManualData(); // Carrega os dados manuais ao logar
+            renderNotificationsDropdown(); // Carrega as notificações no dropdown
         } else {
             showMessage(document.getElementById('loginMessage'), 'E-mail ou senha inválidos.', 'error');
         }
@@ -308,12 +359,12 @@ if (registerForm && registerSubmitBtn) {
             showMessage(document.getElementById('registerMessage'), 'Por favor, insira um e-mail válido.', 'error');
             hideLoading(registerSubmitBtn, registerSubmitBtnText, registerSubmitBtnSpinner);
             return;
-        }
+            }
 
         // Simulação de delay para a "requisição"
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        users[email] = { name, email, password, cooperative, farmData, profilePic: "https://placehold.co/150x150/a7f3d0/065f46?text=Foto", manualData: {} }; // Adiciona foto padrão e objeto para dados manuais
+        users[email] = { name, email, password, cooperative, farmData, profilePic: "https://placehold.co/150x150/a7f3d0/065f46?text=Foto", manualData: {}, points: 0 }; // Adiciona foto padrão, objeto para dados manuais e pontos
         localStorage.setItem('users', JSON.stringify(users));
         showMessage(document.getElementById('registerMessage'), 'Cadastro realizado com sucesso! Faça login.', 'success');
         e.target.reset(); // Limpa o formulário
@@ -343,6 +394,12 @@ if (backToDashboardFromProfileBtn) {
 }
 if (backToDashboardFromReportsBtn) {
     backToDashboardFromReportsBtn.addEventListener('click', () => showSection('dashboard'));
+}
+if (backToDashboardFromNotificationsBtn) {
+    backToDashboardFromNotificationsBtn.addEventListener('click', () => showSection('dashboard'));
+}
+if (backToDashboardFromPointsBtn) {
+    backToDashboardFromPointsBtn.addEventListener('click', () => showSection('dashboard'));
 }
 
 if (registerLink) registerLink.addEventListener('click', (e) => {
@@ -377,7 +434,8 @@ if (navLinks) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const target = e.target.dataset.target;
-            if (currentUser || target === 'landing-page' || target === 'about-us') { // Permite acesso a landing-page e about-us sem login
+            // Permite acesso a landing-page, about-us, notifications-page e points-redemption sem login
+            if (currentUser || target === 'landing-page' || target === 'about-us' || target === 'notifications-page' || target === 'points-redemption') {
                 showSection(target); // Adiciona ao histórico
                 if (target === 'profile') {
                     loadProfileData();
@@ -415,6 +473,132 @@ document.addEventListener('click', (e) => {
         mobileMenu.classList.remove('active');
     }
 });
+
+// Lógica para o link "Ver todas" no dropdown de notificações
+if (viewAllNotificationsLink) {
+    viewAllNotificationsLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showSection('notifications-page');
+        notificationsDropdown.classList.add('hidden'); // Esconde o dropdown ao navegar
+    });
+}
+
+// Funções para gerenciar notificações
+function saveNotifications() {
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+}
+
+function addNotification(message, type = 'info') {
+    const newNotification = {
+        id: Date.now(), // ID único
+        message: message,
+        type: type, // 'info', 'success', 'error', 'warning'
+        timestamp: new Date().toLocaleString(),
+        read: false
+    };
+    notifications.unshift(newNotification); // Adiciona no início para as mais recentes aparecerem primeiro
+    saveNotifications();
+    renderNotificationsDropdown(); // Atualiza o dropdown
+    // Se estiver na página de notificações, atualiza também
+    if (currentSectionId === 'notifications-page') {
+        renderNotifications();
+    }
+}
+
+function renderNotificationsDropdown() {
+    if (!notificationDropdownList) return;
+
+    notificationDropdownList.innerHTML = '';
+    if (notifications.length === 0) {
+        notificationDropdownList.innerHTML = '<p class="text-sm text-gray-500 p-4 text-center">Nenhuma notificação.</p>';
+        return;
+    }
+
+    // Exibe apenas as 3 notificações mais recentes no dropdown
+    const recentNotifications = notifications.slice(0, 3);
+    recentNotifications.forEach(notification => {
+        const notificationItem = document.createElement('a');
+        notificationItem.href = "#"; // Pode ser um link para detalhes da notificação
+        notificationItem.classList.add('block', 'px-4', 'py-3', 'hover:bg-gray-100', 'border-b', 'border-gray-100');
+        notificationItem.innerHTML = `
+            <p class="text-sm font-medium text-gray-900">${notification.message}</p>
+            <p class="text-xs text-gray-500">${notification.timestamp}</p>
+        `;
+        notificationDropdownList.appendChild(notificationItem);
+    });
+}
+
+function renderNotifications() {
+    if (!notificationList) return;
+
+    notificationList.innerHTML = ''; // Limpa a lista existente
+
+    if (notifications.length === 0) {
+        notificationList.innerHTML = '<p class="text-gray-600 text-center">Nenhuma notificação para exibir.</p>';
+        return;
+    }
+
+    notifications.forEach(notification => {
+        const notificationCard = document.createElement('div');
+        notificationCard.classList.add('card', 'p-4', 'mb-4');
+        let bgColorClass = '';
+        let textColorClass = '';
+        let iconClass = '';
+
+        switch (notification.type) {
+            case 'success':
+                bgColorClass = 'bg-green-50';
+                textColorClass = 'text-green-800';
+                iconClass = 'fas fa-check-circle';
+                break;
+            case 'error':
+                bgColorClass = 'bg-red-50';
+                textColorClass = 'text-red-800';
+                iconClass = 'fas fa-times-circle';
+                break;
+            case 'warning':
+                bgColorClass = 'bg-yellow-50';
+                textColorClass = 'text-yellow-800';
+                iconClass = 'fas fa-exclamation-triangle';
+                break;
+            case 'info':
+            default:
+                bgColorClass = 'bg-blue-50';
+                textColorClass = 'text-blue-800';
+                iconClass = 'fas fa-info-circle';
+                break;
+        }
+
+        notificationCard.classList.add(bgColorClass, textColorClass);
+
+        notificationCard.innerHTML = `
+            <div class="flex items-center mb-2">
+                <i class="${iconClass} mr-2"></i>
+                <p class="font-semibold">${notification.message}</p>
+            </div>
+            <p class="text-xs text-gray-500">${notification.timestamp}</p>
+        `;
+        notificationList.appendChild(notificationCard);
+    });
+}
+
+// Simula a chegada de algumas notificações iniciais (apenas para demonstração)
+function simulateInitialNotifications() {
+    if (notifications.length === 0) { // Adiciona apenas se não houver notificações
+        addNotification('Alerta de Chuva: Prevista chuva forte amanhã - evite irrigação.', 'warning');
+        addNotification('Relatório Mensal: Seu relatório de junho está disponível.', 'info');
+        addNotification('Atualização do Sistema: Nova versão disponível com melhorias.', 'success');
+        addNotification('Recomendação: Reduza a irrigação de água em 4 litros por hectare.', 'info');
+        addNotification('Sensoriamento detectou melhora na qualidade do solo.', 'success'); // Removido "+10 pontos!"
+    }
+}
+
+// Função para atualizar a exibição de pontos
+function updatePointsDisplay() {
+    if (currentPointsDisplay && currentUser) {
+        currentPointsDisplay.textContent = currentUser.points;
+    }
+}
 
 // Calculadora de Impacto
 if (calculateImpactBtn && impactResults) {
@@ -504,11 +688,15 @@ if (saveManualDataBtn && manualSaveMessage) {
                 fertilizerUse: fertilizerUse,
                 soilObservation: soilObservation
             };
+            // Exemplo de como adicionar pontos por ação positiva
+            currentUser.points = (currentUser.points || 0) + 20; // Ganha 20 pontos por salvar dados manuais
             users[currentUser.email] = currentUser;
             localStorage.setItem('users', JSON.stringify(users));
         }
         console.log('Dados Manuais Salvos:', { dailyWater, fertilizerUse, soilObservation });
         showMessage(manualSaveMessage, 'Dados salvos com sucesso!', 'success');
+        addNotification(`Novos dados manuais registrados: Água ${dailyWater}L, Fertilizante ${fertilizerUse}kg. Você ganhou 20 pontos!`, 'info');
+        updatePointsDisplay(); // Atualiza a exibição de pontos
         // Não limpar campos para manter os dados salvos visíveis
         hideLoading(saveManualDataBtn, saveManualDataBtnText, saveManualDataBtnSpinner);
     });
@@ -545,6 +733,14 @@ if (simulateSensorDataBtn && sensorSaveMessage) {
 
         console.log('Leitura do Sensor Salva:', { waterReading });
         showMessage(sensorSaveMessage, 'Leitura do sensor simulada e salva!', 'success');
+        addNotification(`Nova leitura do sensor de água: ${waterReading} litros/min.`, 'info');
+        // Exemplo de como adicionar pontos por ação positiva
+        if (currentUser) {
+            currentUser.points = (currentUser.points || 0) + 10; // Ganha 10 pontos por simular leitura
+            users[currentUser.email] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        updatePointsDisplay(); // Atualiza a exibição de pontos
         waterMeterInput.value = '';
         hideLoading(simulateSensorDataBtn, simulateSensorDataBtnText, simulateSensorDataBtnSpinner);
     });
@@ -597,6 +793,14 @@ if (generatePdfReportBtn) {
 
         doc.save('relatorio_sustenta_pitanga.pdf');
         showMessage(pdfMessage, 'Relatório PDF gerado com sucesso!', 'success'); // Atualizado
+        addNotification('Relatório PDF gerado com sucesso!', 'success');
+        // Exemplo de como adicionar pontos por ação positiva
+        if (currentUser) {
+            currentUser.points = (currentUser.points || 0) + 50; // Ganha 50 pontos por gerar relatório
+            users[currentUser.email] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        updatePointsDisplay(); // Atualiza a exibição de pontos
         hideLoading(generatePdfReportBtn, generatePdfReportBtnText, generatePdfReportBtnSpinner);
     });
 }
@@ -838,7 +1042,8 @@ if (saveProfileBtn) {
             // Simulação de delay para o salvamento
             await new Promise(resolve => setTimeout(resolve, 700));
 
-            showMessage(profilePicMessage, 'Dados do perfil atualizados com sucesso!', 'success');
+            // Usa o novo elemento profileMessage
+            showMessage(profileMessage, 'Dados do perfil atualizados com sucesso!', 'success');
         }
         hideLoading(saveProfileBtn, saveProfileBtnText, saveProfileBtnSpinner);
     });
@@ -860,15 +1065,16 @@ if (changeProfilePicBtn && profilePicInput && profilePicImg) {
                     currentUser.profilePic = reader.result; // Salva a imagem no objeto do usuário
                     users[currentUser.email] = currentUser;
                     localStorage.setItem('users', JSON.stringify(users)); // Persiste no localStorage
-                    showMessage(profilePicMessage, 'Foto de perfil atualizada!', 'success');
+                    // Usa o novo elemento profileMessage para mensagens da foto de perfil também
+                    showMessage(profileMessage, 'Foto de perfil atualizada!', 'success');
                 }
             };
             reader.onerror = () => {
-                showMessage(profilePicMessage, 'Erro ao carregar a imagem.', 'error');
+                showMessage(profileMessage, 'Erro ao carregar a imagem.', 'error');
             };
             reader.readAsDataURL(file); // Lê o arquivo como Data URL
         } else {
-            showMessage(profilePicMessage, 'Nenhuma imagem selecionada.', 'info');
+            showMessage(profileMessage, 'Nenhuma imagem selecionada.', 'info');
         }
     });
 }
@@ -991,37 +1197,74 @@ async function getLocation(lat = null, lon = null) {
 
 // Nova função para buscar o clima e exibir o mapa, separada da lógica de permissão
 async function fetchWeatherAndMap(lat, lon) {
-    if (WEATHER_API_KEY && WEATHER_API_KEY !== "YOUR_OPENWEATHERMAP_API_KEY") {
+    // Log das coordenadas que estão a ser usadas para depuração
+    console.log(`A obter clima e mapa para Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`);
+
+    let success = false;
+    for (let i = 0; i < WEATHER_API_KEYS.length; i++) {
+        const apiKey = WEATHER_API_KEYS[i];
         try {
-            const response = await fetch(`${WEATHER_API_URL}?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric&lang=pt_br`);
+            const apiUrl = `${WEATHER_API_URL}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`;
+            console.log(`Tentando API Key: ${apiKey.substring(0, 5)}...`); // Log da URL da API
+            const response = await fetch(apiUrl);
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Erro HTTP: ${response.status} - ${errorData.message || response.statusText}`);
+            }
             const data = await response.json();
             if (data && data.main && weatherInfo) {
                 weatherInfo.innerHTML = `
                     <p class="text-lg"><i class="fas fa-cloud-sun mr-2"></i>${data.main.temp}°C, ${data.weather[0].description}</p>
                     <p class="text-sm">Umidade: ${data.main.humidity}%, Vento: ${data.wind.speed} m/s</p>
-                    <p class="text-xs">Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}</p>
+                    <p class="text-xs">Localização: ${data.name || 'Desconhecida'}, Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}</p>
                 `;
+                // Atualiza o alerta climático dinâmico
+                if (climateAlertElement) {
+                    if (data.main.temp > 30) {
+                        climateAlertElement.innerHTML = `<span class="font-semibold text-red-600">Alerta:</span> Temperatura alta (${data.main.temp}°C)! Considere aumentar a irrigação.`;
+                    } else if (data.weather[0].main.toLowerCase().includes('rain')) {
+                        climateAlertElement.innerHTML = `<span class="font-semibold text-blue-600">Alerta:</span> Chuva prevista (${data.weather[0].description}) - Não irrigue!`;
+                    } else {
+                        climateAlertElement.innerHTML = `<span class="font-semibold text-green-600">Clima:</span> ${data.weather[0].description} (${data.main.temp}°C). Condições favoráveis.`;
+                    }
+                }
+                success = true;
+                break; // Sai do loop se a requisição for bem-sucedida
             } else {
                 if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Não foi possível obter os dados climáticos.</p>';
+                if (climateAlertElement) climateAlertElement.innerHTML = `<span class="font-semibold text-gray-500">Alerta:</span> Clima indisponível. Verifique a conexão ou localização.`;
             }
         } catch (error) {
-            console.error("Erro ao buscar dados climáticos:", error);
-            if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Erro ao obter o clima.</p>';
-        }
-    } else {
-        // Exibir clima simulado se a API Key não estiver configurada
-        if (weatherInfo) {
-            weatherInfo.innerHTML = `
-                <p class="text-lg"><i class="fas fa-cloud-sun mr-2"></i>25°C, Ensolarado</p>
-                <p class="text-sm">Umidade: 60%, Vento: 10 km/h</p>
-                <p class="text-xs">Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}</p>
-            `;
+            console.error(`Erro ao buscar dados climáticos com API Key ${apiKey.substring(0, 5)}...:`, error);
+            if (i === WEATHER_API_KEYS.length - 1) { // Se for a última chave e falhar
+                if (weatherInfo) {
+                    weatherInfo.innerHTML = `<p class="text-lg">Erro ao obter o clima. Verifique suas chaves de API ou conexão. Detalhes: ${error.message}</p>`;
+                }
+                if (climateAlertElement) climateAlertElement.innerHTML = `<span class="font-semibold text-gray-500">Alerta:</span> Erro ao obter clima. Verifique suas chaves de API.`;
+            }
         }
     }
+
+    if (!success) {
+        // Exibir clima simulado se todas as API Keys falharem
+        if (weatherInfo) {
+            weatherInfo.innerHTML = `
+                <p class="text-lg"><i class="fas fa-cloud-sun mr-2"></i>25°C, Ensolarado (Dados Simulados)</p>
+                <p class="text-sm">Umidade: 60%, Vento: 10 km/h</p>
+                <p class="text-xs">Localização: Pitanga, Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}</p>
+                <p class="text-red-500 text-sm mt-1">Atenção: Todas as chaves de API do OpenWeatherMap falharam ou não foram configuradas. Dados climáticos são simulados.</p>
+            `;
+        }
+        if (climateAlertElement) {
+            climateAlertElement.innerHTML = `<span class="font-semibold text-gray-500">Alerta:</span> Clima simulado. Chaves de API não funcionaram.`;
+        }
+    }
+
     // Carregar mapa (simulado com OpenStreetMap)
     if (farmMap) {
         farmMap.innerHTML = `
-            <iframe
+            <iframe id="mapIframe"
                 width="100%"
                 height="100%"
                 frameborder="0"
@@ -1068,9 +1311,61 @@ function showError(error) {
     if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden'); // Garante que esteja escondido
 }
 
+// Lógica para os botões de visualização do mapa
+if (satelliteViewBtn) {
+    satelliteViewBtn.addEventListener('click', () => {
+        const mapIframe = document.getElementById('mapIframe');
+        if (mapIframe) {
+            // OpenStreetMap não tem uma camada de satélite nativa para o embed simples.
+            // Simula uma mudança para "satélite" ou apenas informa.
+            const currentSrc = mapIframe.src;
+            let newSrc = currentSrc;
+            // Tenta mudar a camada para algo que pareça diferente, se possível.
+            // Para OpenStreetMap, 'hydda-full' ou 'osm-intl' podem dar uma aparência diferente,
+            // mas não são satélite. Vamos apenas simular.
+            if (currentSrc.includes('layer=mapnik')) {
+                // Poderíamos tentar outra camada se soubéssemos de uma URL de tile que simule satélite
+                // Ou simplesmente exibir uma mensagem
+                showMessage(mapMessage, 'Visualização Satélite simulada. Esta funcionalidade é limitada com o mapa atual.', 'info');
+            } else {
+                showMessage(mapMessage, 'Visualização Satélite ativada (simulada).', 'info');
+            }
+        } else {
+            showMessage(mapMessage, 'Mapa não encontrado para alterar visualização.', 'error');
+        }
+    });
+}
+
+if (terrainViewBtn) {
+    terrainViewBtn.addEventListener('click', () => {
+        const mapIframe = document.getElementById('mapIframe');
+        if (mapIframe) {
+            showMessage(mapMessage, 'Visualização Terreno ativada (simulada).', 'info');
+            // Poderíamos reverter para a camada padrão 'mapnik' se tivéssemos alterado para outra
+            // Ou apenas informar que a visualização de terreno está ativa
+        } else {
+            showMessage(mapMessage, 'Mapa não encontrado para alterar visualização.', 'error');
+        }
+    });
+}
+
+if (measureAreaBtn) {
+    measureAreaBtn.addEventListener('click', () => {
+        showMessage(mapMessage, 'Funcionalidade "Medir Área" em desenvolvimento.', 'info');
+    });
+}
+
+if (addMarkerBtn) {
+    addMarkerBtn.addEventListener('click', () => {
+        showMessage(mapMessage, 'Funcionalidade "Adicionar Marcador" em desenvolvimento.', 'info');
+    });
+}
+
+
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
     checkLoginState();
+    simulateInitialNotifications(); // Adiciona notificações iniciais para demonstração
     // Adiciona o estado inicial ao histórico para que o botão de voltar funcione corretamente
     if (location.hash) {
         const initialSection = location.hash.substring(1);
