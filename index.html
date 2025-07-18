@@ -4,382 +4,544 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sustenta Pitanga</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="seu_estilo.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Tailwind CSS CDN - Mantido no head para carregamento rápido do estilo base -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome para ícones - Mantido no head para ícones visíveis imediatamente -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link para o arquivo CSS externo -->
+    <link rel="stylesheet" href="style.css">
+ 
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-
-    <header class="bg-gradient-to-r from-blue-500 to-green-500 text-white p-4 shadow-md flex justify-between items-center fixed w-full z-40">
-        <div class="flex items-center">
-            <button id="menuToggle" class="text-white focus:outline-none md:hidden">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
-            <h1 class="text-2xl font-bold ml-4">Sustenta Pitanga</h1>
-        </div>
-        <div class="hidden md:flex space-x-4 header-nav-desktop">
-            <a href="#" class="nav-link" data-target="dashboard">Dashboard</a>
-            <a href="#" class="nav-link" data-target="reports">Relatórios</a>
-            <a href="#" class="nav-link" data-target="profile">Perfil</a>
-            <a href="#" class="nav-link" data-target="about-us">Sobre Nós</a>
-        </div>
-        <div class="relative flex items-center" id="logged-in-controls">
-            <button id="notificationsBtn" class="relative p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-all duration-200">
-                <i class="fas fa-bell"></i>
-                <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">3</span>
-            </button>
-            <div id="notificationsDropdown" class="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 transform origin-top-right transition-all duration-200 opacity-0 scale-95 hidden">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Notificação 1</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Notificação 2</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Notificação 3</a>
+<body class="min-h-screen flex flex-col">
+    <header class="bg-gradient-to-r from-blue-500 to-green-500 text-white p-4 shadow-lg rounded-b-xl"
+            style="background-image: linear-gradient(to right, var(--header-bg-start), var(--header-bg-end));">
+        <div class="container flex justify-between items-center">
+            <div class="flex items-center">
+                <!-- Usando a imagem ccm.png que você enviou -->
+                <img src="imagens/ccm.png" alt="Logotipo do Sustenta Pitanga, representando o Centro Comunitário de Múltiplas Funções" class="h-12 w-12 mr-3 rounded-full shadow-md">
+                <h1 class="text-3xl font-bold">Sustenta Pitanga</h1>
+            </div>
+            
+            <!-- Botão de modo escuro e menu hambúrguer para todas as telas -->
+            <div id="logged-in-controls" class="flex items-center space-x-4 hidden">
+                <button id="headerDarkModeToggle" aria-label="Alternar modo escuro">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="notificationsBtn" class="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors" aria-label="Notificações">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                </button>
+                <button id="menuToggle" class="text-2xl text-white" aria-label="Abrir menu de navegação">
+                    <i class="fas fa-bars"></i> <!-- Ícone de hambúrguer -->
+                </button>
+            </div>
+            
+            <!-- Menu Mobile (agora serve como menu principal para todas as telas) -->
+            <div id="mobileMenu" class="fixed inset-y-0 right-0 w-64 bg-white shadow-lg p-4 z-50 flex flex-col">
+                <div class="flex justify-end mb-4">
+                    <button id="closeMenu" class="text-gray-600 text-2xl hover:text-gray-800" aria-label="Fechar menu de navegação">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <ul class="space-y-4 flex-grow">
+                    <li><a class="nav-link block p-2 rounded-md hover:bg-gray-100" data-target="dashboard"><i class="fas fa-home mr-2"></i>Dashboard</a></li>
+                    <li><a class="nav-link block p-2 rounded-md hover:bg-gray-100" data-target="reports"><i class="fas fa-file-alt mr-2"></i>Relatórios</a></li>
+                    <li><a class="nav-link block p-2 rounded-md hover:bg-gray-100" data-target="profile"><i class="fas fa-user mr-2"></i>Perfil</a></li>
+                    <li><a class="nav-link block p-2 rounded-md hover:bg-gray-100" data-target="about-us"><i class="fas fa-info-circle mr-2"></i>Sobre Nós</a></li> <!-- Novo link -->
+                </ul>
             </div>
 
-            <button id="headerDarkModeToggle" class="text-white focus:outline-none">
-                <i class="fas fa-moon"></i>
-            </button>
-
-            <button id="logoutBtn" class="btn-danger ml-4">Sair</button>
+            <!-- Notificações Dropdown (agora dentro do logged-in-controls) -->
+            <div id="notificationsDropdown" class="hidden absolute right-4 top-16 mt-2 w-72 bg-white rounded-md shadow-lg z-10 transition-all duration-300 ease-in-out transform scale-95 opacity-0">
+                <div class="p-4 border-b border-gray-200">
+                    <h4 class="font-bold text-gray-800">Notificações</h4>
+                </div>
+                <div class="max-h-60 overflow-y-auto">
+                    <a href="#" class="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100">
+                        <p class="text-sm font-medium text-gray-900">Alerta de Chuva</p>
+                        <p class="text-xs text-gray-500">Prevista chuva forte amanhã - evite irrigação</p>
+                    </a>
+                    <a href="#" class="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100">
+                        <p class="text-sm font-medium text-gray-900">Relatório Mensal</p>
+                        <p class="text-xs text-gray-500">Seu relatório de junho está disponível</p>
+                    </a>
+                    <a href="#" class="block px-4 py-3 hover:bg-gray-100">
+                        <p class="text-sm font-medium text-gray-900">Atualização do Sistema</p>
+                        <p class="text-xs text-gray-500">Nova versão disponível com melhorias</p>
+                    </a>
+                </div>
+                <div class="p-2 bg-gray-50 text-center rounded-b-md">
+                    <a href="#" class="text-sm text-blue-600 hover:underline">Ver todas</a>
+                </div>
+            </div>
         </div>
     </header>
 
-    <div id="mobileMenu" class="fixed inset-y-0 right-0 w-64 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-lg z-50 transform translate-x-full transition-transform duration-300 ease-in-out p-4 md:hidden">
-        <button id="closeMenu" class="absolute top-4 right-4 text-gray-600 dark:text-gray-300 text-2xl focus:outline-none">
-            <i class="fas fa-times"></i>
-        </button>
-        <nav class="mt-12 space-y-4">
-            <a href="#" class="nav-link block text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" data-target="dashboard">Dashboard</a>
-            <a href="#" class="nav-link block text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" data-target="reports">Relatórios</a>
-            <a href="#" class="nav-link block text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" data-target="profile">Perfil</a>
-            <a href="#" class="nav-link block text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" data-target="about-us">Sobre Nós</a>
-        </nav>
-    </div>
-
-    <main class="pt-20 pb-8 px-4 md:px-8">
-        <section id="landing-page" class="hidden min-h-screen flex flex-col justify-center items-center text-center">
-            <div class="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-xl card">
-                <h2 class="text-4xl font-extrabold text-blue-700 dark:text-blue-400 mb-6">Sustenta Pitanga</h2>
-                <p class="text-lg text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
-                    Bem-vindo ao Sustenta Pitanga, a sua plataforma inovadora para a gestão sustentável da agricultura em Pitanga e região. Nosso objetivo é capacitar produtores rurais a otimizar o uso de recursos, reduzir o desperdício e promover práticas agrícolas mais eficientes e ambientalmente responsáveis.
-                </p>
-                <div class="space-y-4 md:space-y-0 md:space-x-4 flex flex-col md:flex-row justify-center">
-                    <button id="goToLoginBtn" class="btn-primary">Entrar no Sistema</button>
-                    <button id="goToAboutUsBtn" class="btn-secondary">Saber Mais</button>
+    <main class="flex-grow container mt-8">
+        <!-- Seção de Landing Page (Antigo "Sobre o Projeto") -->
+        <section id="landing-page" class="card max-w-4xl mx-auto mb-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-green-700 mb-4">Bem-vindo ao Sustenta Pitanga</h2>
+                <p class="text-lg text-gray-700 mb-6">Uma plataforma inovadora para monitoramento agrícola sustentável, desenvolvida pelo CCM Dom Pedro.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-blue-50 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Monitoramento em Tempo Real</h3>
+                        <p class="text-gray-600">Acompanhe indicadores de sustentabilidade da sua propriedade.</p>
+                    </div>
+                    
+                    <div class="bg-green-50 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Alertas Inteligentes</h3>
+                        <p class="text-gray-600">Receba recomendações para melhorar sua produção.</p>
+                    </div>
+                    
+                    <div class="bg-yellow-50 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Sensores Caseiros</h3>
+                        <p class="text-gray-600">Integração com dispositivos IoT para coleta de dados.</p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+                    <button id="goToLoginBtn" class="btn-primary">Acessar Plataforma</button>
+                    <button id="goToAboutUsBtn" class="btn-secondary">Saiba Mais</button> <!-- Novo botão -->
                 </div>
             </div>
         </section>
 
-        <section id="login" class="hidden min-h-screen flex flex-col justify-center items-center">
-            <div class="card p-8 w-full max-w-md">
-                <h2 class="text-3xl font-bold text-center mb-6 text-gray-900 dark:text-white">Login</h2>
-                <form id="loginForm" class="space-y-4">
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                        <input type="email" id="email" name="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600">
+        <!-- Seção de Login -->
+        <section id="login" class="hidden">
+            <div class="card max-w-md mx-auto">
+                <h2 class="text-2xl font-semibold mb-6 text-center">Acesse sua Conta</h2>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-bold mb-2">E-mail:</label>
+                        <input type="email" id="email" name="email" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="seuemail@exemplo.com" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
                     </div>
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Senha</label>
-                        <input type="password" id="password" name="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600">
+                    <div class="mb-6">
+                        <label for="password" class="block text-sm font-bold mb-2">Senha:</label>
+                        <input type="password" id="password" name="password" class="shadow appearance-none border rounded-lg w-full py-2 px-3 mb-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="********" required minlength="6">
                     </div>
-                    <button type="submit" id="loginBtn" class="btn-primary w-full flex items-center justify-center">
-                        <span id="loginBtnText">Entrar</span>
-                        <span id="loginBtnSpinner" class="loading-spinner hidden"></span>
-                    </button>
-                    <p class="mt-4 text-center text-gray-700 dark:text-gray-300">
-                        Não tem uma conta? <a href="#" id="registerLink" class="text-blue-600 dark:text-blue-400 hover:underline">Cadastre-se</a>
-                    </p>
+                    <div class="flex items-center justify-between">
+                        <button type="submit" class="btn-primary w-full" id="loginBtn">
+                            <span id="loginBtnText">Entrar</span>
+                            <span id="loginBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                        </button>
+                    </div>
+                    <p class="text-center text-sm mt-4">Não tem uma conta? <a href="#" id="registerLink" class="text-blue-500 hover:underline">Cadastre-se aqui</a></p>
+                    <div id="loginMessage" class="message-box hidden"></div>
                 </form>
-                <div id="loginMessage" class="mt-4 message-box hidden"></div>
             </div>
         </section>
 
-        <section id="register" class="hidden min-h-screen flex flex-col justify-center items-center">
-            <div class="card p-8 w-full max-w-md">
-                <h2 class="text-3xl font-bold text-center mb-6 text-gray-900 dark:text-white">Cadastro</h2>
-                <form id="registerForm" class="space-y-4">
-                    <div>
-                        <label for="registerName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome</label>
-                        <input type="text" id="registerName" name="registerName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600">
+        <!-- Seção de Cadastro -->
+        <section id="register" class="hidden">
+            <div class="card max-w-md mx-auto">
+                <h2 class="text-2xl font-semibold mb-6 text-center">Crie sua Conta</h2>
+                <form id="registerForm">
+                    <div class="mb-4">
+                        <label for="registerName" class="block text-sm font-bold mb-2">Nome Completo:</label>
+                        <input type="text" id="registerName" name="registerName" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="Seu nome" required>
                     </div>
-                    <div>
-                        <label for="registerEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                        <input type="email" id="registerEmail" name="registerEmail" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600">
+                    <div class="mb-4">
+                        <label for="registerEmail" class="block text-sm font-bold mb-2">E-mail:</label>
+                        <input type="email" id="registerEmail" name="registerEmail" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="seuemail@exemplo.com" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
                     </div>
-                    <div>
-                        <label for="registerPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Senha</label>
-                        <input type="password" id="registerPassword" name="registerPassword" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600">
+                    <div class="mb-6">
+                        <label for="registerPassword" class="block text-sm font-bold mb-2">Senha:</label>
+                        <input type="password" id="registerPassword" name="registerPassword" class="shadow appearance-none border rounded-lg w-full py-2 px-3 mb-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="********" required minlength="6">
                     </div>
-                    <div>
-                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirmar Senha</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600">
+                    <div class="mb-6">
+                        <label for="confirmPassword" class="block text-sm font-bold mb-2">Confirmar Senha:</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="shadow appearance-none border rounded-lg w-full py-2 px-3 mb-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="********" required minlength="6">
                     </div>
-                    <div>
-                        <label for="registerCooperative" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cooperativa (Opcional)</label>
-                        <input type="text" id="registerCooperative" name="registerCooperative" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600">
+                    <div class="mb-4">
+                        <label for="registerCooperative" class="block text-sm font-bold mb-2">Cooperativa:</label>
+                        <input type="text" id="registerCooperative" name="registerCooperative" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="Nome da sua cooperativa (opcional)">
                     </div>
-                    <div>
-                        <label for="registerFarmData" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Dados da Fazenda (Opcional)</label>
-                        <textarea id="registerFarmData" name="registerFarmData" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600"></textarea>
+                    <div class="mb-6">
+                        <label for="registerFarmData" class="block text-sm font-bold mb-2">Dados da Fazenda:</label>
+                        <textarea id="registerFarmData" name="registerFarmData" rows="3" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="Nome da fazenda, área, culturas principais (opcional)"></textarea>
                     </div>
-                    <button type="submit" id="registerSubmitBtn" class="btn-secondary w-full flex items-center justify-center">
-                        <span id="registerSubmitBtnText">Cadastrar</span>
-                        <span id="registerSubmitBtnSpinner" class="loading-spinner hidden"></span>
-                    </button>
-                    <p class="mt-4 text-center text-gray-700 dark:text-gray-300">
-                        Já tem uma conta? <a href="#" id="backToLoginLink" class="text-blue-600 dark:text-blue-400 hover:underline">Fazer login</a>
-                    </p>
+                    <div class="flex items-center justify-between">
+                        <button type="submit" class="btn-primary w-full" id="registerSubmitBtn">
+                            <span id="registerSubmitBtnText">Cadastrar</span>
+                            <span id="registerSubmitBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                        </button>
+                    </div>
+                    <p class="text-center text-sm mt-4">Já tem uma conta? <a href="#" id="backToLoginLink" class="text-blue-500 hover:underline">Faça login aqui</a></p>
+                    <div id="registerMessage" class="message-box hidden"></div>
                 </form>
-                <div id="registerMessage" class="mt-4 message-box hidden"></div>
             </div>
         </section>
 
-        <section id="dashboard" class="hidden pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <h2 id="welcomeMessageDisplay" class="text-2xl font-bold text-gray-900 dark:text-white col-span-full mb-4"></h2>
+        <!-- Dashboard -->
+        <section id="dashboard" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Mensagem de Boas-Vindas -->
+            <div class="lg:col-span-3 card text-center">
+                <h2 id="welcomeMessageDisplay" class="text-2xl font-bold text-green-700 mb-4"></h2>
+            </div>
+            
+            <!-- Card de Desperdício por Hectare -->
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-trash-alt mr-2 text-red-500"></i>
+                    Desperdício por Hectare
+                </h3>
+                <p class="text-4xl font-bold text-red-600 mb-4">15%</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar progress-red" style="width: 75%;">75% da meta</div>
+                </div>
+                <p class="text-sm mt-2">Meta: 5% de desperdício. <span class="font-semibold">Ação necessária!</span></p>
+            </div>
 
-            <div class="card p-6 flex flex-col items-center justify-center text-center">
-                <h3 class="text-xl font-semibold mb-3 text-gray-800 dark:text-gray-200"><i class="fas fa-sun mr-2"></i>Clima Atual</h3>
-                <div id="weatherInfo" class="text-gray-800 dark:text-gray-200">
+            <!-- Card de Adubos Utilizados -->
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-leaf mr-2 text-green-500"></i>
+                    Adubos Utilizados
+                </h3>
+                <p class="text-4xl font-bold text-green-600 mb-4">800 kg/ha</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar progress-green" style="width: 80%;">80% do recomendado</div>
+                </div>
+                <p class="text-sm mt-2">Recomendado: 1000 kg/ha. <span class="font-semibold">Bom uso!</span></p>
+            </div>
+
+            <!-- Card de Clima Atual -->
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-cloud-sun mr-2 text-blue-500"></i>
+                    Clima Atual
+                </h3>
+                <div id="weatherInfo">
                     <p class="text-lg">Carregando clima...</p>
                 </div>
             </div>
 
-            <div class="card p-6 col-span-full">
-                <h3 class="text-xl font-semibold mb-3 text-gray-800 dark:text-gray-200"><i class="fas fa-map-marked-alt mr-2"></i>Mapa da Fazenda</h3>
-                <div id="farmMap" class="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-500">
-                    Carregando mapa...
-                </div>
-            </div>
-
-            <div class="card p-6">
-                <h3 class="text-xl font-semibold mb-3 text-green-700 dark:text-green-400"><i class="fas fa-seedling mr-2"></i>Área Cultivada</h3>
-                <p class="text-4xl font-bold text-gray-900 dark:text-white">150 ha</p>
-            </div>
-            <div class="card p-6">
-                <h3 class="text-xl font-semibold mb-3 text-red-600 dark:text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Desperdício (Estimado)</h3>
-                <p class="text-4xl font-bold text-gray-900 dark:text-white">15%</p>
-                <div class="progress-bar-container mt-4">
-                    <div class="progress-bar progress-red" style="width: 15%;">15%</div>
-                </div>
-            </div>
-            <div class="card p-6">
-                <h3 class="text-xl font-semibold mb-3 text-yellow-600 dark:text-yellow-400"><i class="fas fa-flask mr-2"></i>Adubos Utilizados</h3>
-                <p class="text-4xl font-bold text-gray-900 dark:text-white">80 kg/ha</p>
-            </div>
-            <div class="card p-6">
-                <h3 class="text-xl font-semibold mb-3 text-blue-600 dark:text-blue-400"><i class="fas fa-tint mr-2"></i>Uso de Água</h3>
-                <p class="text-4xl font-bold text-gray-900 dark:text-white">700 L/ha/dia</p>
-                <div class="progress-bar-container mt-4">
-                    <div class="progress-bar progress-orange" style="width: 70%;">70%</div>
-                </div>
-            </div>
-
-            <div class="card p-6 col-span-full lg:col-span-1">
-                <h3 class="text-xl font-semibold mb-4 text-blue-700 dark:text-blue-400"><i class="fas fa-calculator mr-2"></i>Calculadora de Impacto</h3>
+            <!-- Card de Calculadora de Impacto -->
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-calculator mr-2 text-purple-500"></i>
+                    Calculadora de Impacto
+                </h3>
                 <div class="space-y-4">
                     <div>
-                        <label for="cultivatedArea" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Área Cultivada (Hectares)</label>
-                        <input type="number" id="cultivatedArea" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600" placeholder="Ex: 50">
+                        <label class="block text-sm font-bold mb-2">Área Cultivada (hectares)</label>
+                        <input type="number" id="cultivatedArea" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="10" min="0">
                     </div>
                     <div>
-                        <label for="cropType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Cultivo</label>
-                        <select id="cropType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600">
-                            <option value="soja">Soja</option>
-                            <option value="milho">Milho</option>
+                        <label class="block text-sm font-bold mb-2">Tipo de Cultura</label>
+                        <select id="cropType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="feijao">Feijão</option>
                             <option value="arroz">Arroz</option>
-                            <option value="cana">Cana de Açúcar</option>
+                            <option value="cana">Cana-de-Açúcar</option>
                             <option value="outro">Outro</option>
                         </select>
                     </div>
-                    <button id="calculateImpactBtn" class="btn-primary w-full flex items-center justify-center">
-                        <span id="calculateImpactBtnText">Calcular Impacto</span>
-                        <span id="calculateImpactBtnSpinner" class="loading-spinner hidden"></span>
+                    <button id="calculateImpactBtn" class="btn-primary w-full">
+                        <span id="calculateImpactBtnText">Calcular Resultados</span>
+                        <span id="calculateImpactBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
                     </button>
-                    <div id="impactCalcMessage" class="mt-2 message-box hidden"></div>
+                    <div id="impactCalcMessage" class="message-box hidden"></div>
+                    <div id="impactResults" class="p-4 bg-blue-50 rounded-lg">
+                        <h4 class="font-bold text-blue-800 mb-2">Resultados:</h4>
+                        <p class="text-sm">Hectares afetados: <span id="affectedHectares" class="font-bold">0</span> ha</p>
+                        <p class="text-sm">Economia de água: <span id="waterSaved" class="font-bold">0</span> litros/ano</p>
+                        <p class="text-sm">Redução de desperdício: <span id="wasteReduction" class="font-bold">0</span>%</p>
+                        <p class="text-sm">Economia financeira: R$ <span id="moneySaved" class="font-bold">0</span>/ano</p>
+                    </div>
                 </div>
             </div>
 
-            <div id="impactResults" class="card p-6 col-span-full lg:col-span-2 hidden flex-col justify-center items-center">
-                <h4 class="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">Resultados da Simulação</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg">
-                    <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold text-blue-600 dark:text-blue-400">Hectares Afetados:</span> <span id="affectedHectaresSpan" class="text-2xl font-bold text-green-600 dark:text-green-400">0</span> ha</p>
-                    <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold text-blue-600 dark:text-blue-400">Água Economizada:</span> <span id="waterSavedSpan" class="text-2xl font-bold text-green-600 dark:text-green-400">0</span> Litros/ano</p>
-                    <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold text-blue-600 dark:text-blue-400">Redução de Resíduos:</span> <span id="wasteReductionSpan" class="text-2xl font-bold text-green-600 dark:text-green-400">0</span>%</p>
-                    <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold text-blue-600 dark:text-blue-400">Economia Financeira:</span> R$ <span id="moneySavedSpan" class="text-2xl font-bold text-green-600 dark:text-green-400">0.00</span>/ano</p>
+            <!-- Card de Alertas Úteis -->
+            <div class="card lg:col-span-2">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-2 text-yellow-500"></i>
+                    Alertas Úteis
+                </h3>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><span class="font-semibold text-red-600">Alerta:</span> Amanhã: CHUVA FORTE - Não irrigue!</li>
+                    <li><span class="font-semibold text-orange-600">Recomendação:</span> Reduza a irrigação de água em 4 litros por hectare.</li>
+                    <li><span class="font-semibold text-green-600">Notificação:</span> Sensoriamento detectou melhora na qualidade do solo. +10 pontos!</li>
+                </ul>
+            </div>
+
+            <!-- Card de Dicas de Sustentabilidade -->
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-lightbulb mr-2 text-purple-500"></i>
+                    Dicas de Sustentabilidade
+                </h3>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li>Considere a rotação de culturas para melhorar a saúde do solo.</li>
+                    <li>Utilize sistemas de irrigação por gotejamento para otimizar o uso da água.</li>
+                    <li>Monitore a saúde das plantas regularmente para identificar problemas precocemente.</li>
+                </ul>
+            </div>
+
+            <!-- Card de Coleta de Dados Interativa -->
+            <div class="card lg:col-span-3">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-database mr-2 text-indigo-500"></i>
+                    Coleta de Dados
+                </h3>
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 flex items-center">
+                            <i class="fas fa-keyboard mr-2 text-blue-500"></i>
+                            Dados Manuais
+                        </h4>
+                        <div class="mb-4">
+                            <label for="dailyWaterInput" class="block text-sm font-bold mb-2">Gasto de Água Diário (litros):</label>
+                            <input type="number" id="dailyWaterInput" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="Ex: 5000">
+                        </div>
+                        <div class="mb-4">
+                            <label for="fertilizerUseInput" class="block text-sm font-bold mb-2">Uso de Fertilizantes (kg):</label>
+                            <input type="number" id="fertilizerUseInput" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="Ex: 200">
+                        </div>
+                        <div class="mb-4">
+                            <label for="soilObservationInput" class="block text-sm font-bold mb-2">Observações do Solo:</label>
+                            <textarea id="soilObservationInput" rows="3" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="Ex: Solo úmido, boa drenagem."></textarea>
+                        </div>
+                        <button id="saveManualDataBtn" class="btn-primary">
+                            <span id="saveManualDataBtnText">Salvar Dados Manuais</span>
+                            <span id="saveManualDataBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                        </button>
+                        <div id="manualSaveMessage" class="message-box hidden"></div>
+                    </div>
+
+                    <div class="mt-8">
+                        <h4 class="text-lg font-semibold mb-3 flex items-center">
+                            <i class="fas fa-microchip mr-2 text-green-500"></i>
+                            Sensores Caseiros (Simulado)
+                        </h4>
+                        <p class="mb-4">Simule a leitura de um medidor de água adaptado com Arduino. Em uma aplicação real, esses dados seriam enviados automaticamente.</p>
+                        <div class="mb-4">
+                            <label for="waterMeterInput" class="block text-sm font-bold mb-2">Leitura do Medidor de Água (litros/min):</label>
+                            <input type="number" id="waterMeterInput" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="Ex: 2.5">
+                        </div>
+                        <button id="simulateSensorDataBtn" class="btn-secondary">
+                            <span id="simulateSensorDataBtnText">Simular Leitura do Sensor</span>
+                            <span id="simulateSensorDataBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                        </button>
+                        <div id="sensorSaveMessage" class="message-box hidden"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="card p-6 col-span-full md:col-span-1">
-                <h3 class="text-xl font-semibold mb-4 text-purple-500 dark:text-purple-400"><i class="fas fa-pencil-alt mr-2"></i>Coleta de Dados Manuais</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label for="dailyWaterInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uso Diário de Água (Litros/ha)</label>
-                        <input type="number" id="dailyWaterInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600" placeholder="Ex: 800">
-                    </div>
-                    <div>
-                        <label for="fertilizerUseInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uso de Fertilizantes (kg/ha)</label>
-                        <input type="number" id="fertilizerUseInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600" placeholder="Ex: 75">
-                    </div>
-                    <div>
-                        <label for="soilObservationInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observações do Solo</label>
-                        <textarea id="soilObservationInput" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600" placeholder="Ex: Solo com boa umidade e nutrientes."></textarea>
-                    </div>
-                    <button id="saveManualDataBtn" class="btn-primary w-full flex items-center justify-center">
-                        <span id="saveManualDataBtnText">Salvar Dados Manuais</span>
-                        <span id="saveManualDataBtnSpinner" class="loading-spinner hidden"></span>
-                    </button>
-                    <div id="manualSaveMessage" class="mt-2 message-box hidden"></div>
+            <!-- Card de Mapa da Propriedade (Movido para o final do Dashboard) -->
+            <div class="card lg:col-span-3">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-map-marked-alt mr-2 text-blue-500"></i>
+                    Mapa da Propriedade
+                </h3>
+                <div id="farmMap" class="h-64 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                    <p class="text-gray-500">Carregando mapa...</p>
+                </div>
+                <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button class="btn-secondary">Visualização Satélite</button>
+                    <button class="btn-secondary">Visualização Terreno</button>
+                    <button class="btn-secondary">Medir Área</button>
+                    <button class="btn-secondary">Adicionar Marcador</button>
                 </div>
             </div>
-
-            <div class="card p-6 col-span-full md:col-span-2">
-                <h3 class="text-xl font-semibold mb-4 text-indigo-500 dark:text-indigo-400"><i class="fas fa-robot mr-2"></i>Simulação de Dados de Sensor</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label for="waterMeterInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Leitura do Medidor de Água (Litros)</label>
-                        <input type="number" id="waterMeterInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600" placeholder="Ex: 2500">
-                    </div>
-                    <button id="simulateSensorDataBtn" class="btn-primary w-full flex items-center justify-center">
-                        <span id="simulateSensorDataBtnText">Simular Leitura do Sensor</span>
-                        <span id="simulateSensorDataBtnSpinner" class="loading-spinner hidden"></span>
-                    </button>
-                    <div id="sensorSaveMessage" class="mt-2 message-box hidden"></div>
-                </div>
-            </div>
-
         </section>
 
-        <section id="reports" class="hidden pt-4">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Relatórios de Desempenho</h2>
+        <!-- Seção de Relatórios (Atualizada) -->
+        <section id="reports" class="hidden">
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-6 text-center">Relatórios Inteligentes</h2>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3 flex items-center">
+                            <i class="fas fa-chart-bar mr-2 text-blue-500"></i>
+                            Relatório Mensal - Junho 2025
+                        </h3>
+                        <p class="text-lg mb-2">Impacto Econômico: <span class="font-bold text-green-600">Economia de R$ 2.500</span> em fertilizantes.</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Desperdício médio: 8% (redução de 7% em relação ao mês anterior).</li>
+                            <li>Uso de água: 1200 litros/hectare (dentro da meta).</li>
+                            <li>Qualidade do solo: Melhoria de 15% nos indicadores.</li>
+                        </ul>
+                    </div>
 
-            <div class="card p-6 mb-6">
-                <h3 class="text-xl font-semibold mb-4 text-blue-700 dark:text-blue-400"><i class="fas fa-chart-pie mr-2"></i>Visão Geral do Desperdício</h3>
-                <div class="flex flex-wrap gap-2 mb-4" id="chartTypeButtons">
-                    <button class="chart-type-btn active" data-chart-type="pie">Pizza</button>
-                    <button class="chart-type-btn" data-chart-type="doughnut">Rosca</button>
-                    <button class="chart-type-btn" data-chart-type="bar-column">Barras (Colunas)</button>
-                    <button class="chart-type-btn" data-chart-type="bar-horizontal">Barras (Horizontal)</button>
-                    <button class="chart-type-btn" data-chart-type="line">Linha</button>
-                    <button class="chart-type-btn" data-chart-type="radar">Radar</button>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3 flex items-center">
+                            <i class="fas fa-file-alt mr-2 text-purple-500"></i>
+                            Relatório Personalizado - Uso de Pesticidas (Maio 2025)
+                        </h3>
+                        <p class="text-lg mb-2">Impacto Ambiental: <span class="font-bold text-red-600">Uso acima do recomendado em 10%</span>.</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Pesticida X: 5% acima do limite seguro.</li>
+                            <li>Recomendação: Avaliar alternativas biológicas para a próxima safra.</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <h3 class="text-xl font-semibold mb-4">Tipo de Gráfico</h3>
+                        <div class="flex flex-wrap justify-center gap-2 mb-6" id="chartTypeButtons">
+                            <button class="chart-type-btn active" data-chart-type="pie">Pizza</button>
+                            <button class="chart-type-btn" data-chart-type="bar-column">Coluna</button>
+                            <button class="chart-type-btn" data-chart-type="line">Linhas</button>
+                            <button class="chart-type-btn" data-chart-type="doughnut">Rosca</button>
+                            <button class="chart-type-btn" data-chart-type="bar-horizontal">Barras</button>
+                            <button class="chart-type-btn" data-chart-type="radar">Radar</button>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <h3 class="text-xl font-semibold mb-4 text-center">Desperdício vs. Uso Eficiente (por Hectare)</h3>
+                        <div class="w-full max-w-sm mx-auto">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-8">
+                        <button id="generatePdfReportBtn" class="btn-secondary">
+                            <span id="generatePdfReportBtnText">Gerar Relatório em PDF</span>
+                            <span id="generatePdfReportBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                        </button>
+                        <div id="pdfMessage" class="message-box hidden"></div>
+                    </div>
                 </div>
-                <div class="w-full h-80 relative">
-                    <canvas id="myChart"></canvas>
-                </div>
-            </div>
-
-            <div class="card p-6 mb-6">
-                <h3 class="text-xl font-semibold mb-4 text-green-700 dark:text-green-400"><i class="fas fa-file-pdf mr-2"></i>Gerar Relatório Completo</h3>
-                <button id="generatePdfReportBtn" class="btn-secondary flex items-center justify-center">
-                    <span id="generatePdfReportBtnText">Gerar PDF</span>
-                    <span id="generatePdfReportBtnSpinner" class="loading-spinner hidden"></span>
-                </button>
-                <div id="pdfMessage" class="mt-2 message-box hidden"></div>
-            </div>
-
-            <button id="backToDashboardFromReportsBtn" class="btn-primary mt-4">
-                <i class="fas fa-arrow-left mr-2"></i>Voltar para o Dashboard
-            </button>
-        </section>
-
-        <section id="profile" class="hidden pt-4">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Meu Perfil</h2>
-            <div class="card p-6 mb-6 flex flex-col items-center">
-                <img id="profilePicImg" src="https://placehold.co/150x150/a7f3d0/065f46?text=Foto" alt="Foto de Perfil" class="w-32 h-32 rounded-full object-cover mb-4 border-4 border-green-500 dark:border-green-400">
-                <button id="changeProfilePicBtn" class="btn-secondary text-sm mb-4">Alterar Foto</button>
-                <input type="file" id="profilePicInput" accept="image/*" class="hidden">
-                <div id="profilePicMessage" class="mt-2 message-box hidden"></div>
-
-                <div class="w-full max-w-md space-y-4 mt-4">
-                    <div>
-                        <label for="profileNameInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome</label>
-                        <input type="text" id="profileNameInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label for="profileEmailInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                        <input type="email" id="profileEmailInput" disabled class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600 cursor-not-allowed">
-                    </div>
-                    <div>
-                        <label for="profileCooperativeInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cooperativa</label>
-                        <input type="text" id="profileCooperativeInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label for="profileFarmDataInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Dados da Fazenda</label>
-                        <textarea id="profileFarmDataInput" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600"></textarea>
-                    </div>
-
-                    <div class="flex items-center justify-between py-2">
-                        <label class="text-gray-700 dark:text-gray-300 mr-4">Modo Escuro:</label>
-                        <label class="switch">
-                            <input type="checkbox" id="profileDarkModeToggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-
-                    <button id="saveProfileBtn" class="btn-primary w-full flex items-center justify-center">
-                        <span id="saveProfileBtnText">Salvar Alterações</span>
-                        <span id="saveProfileBtnSpinner" class="loading-spinner hidden"></span>
+                <div class="text-center mt-8">
+                    <button id="backToDashboardFromReportsBtn" class="btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar para o Dashboard
                     </button>
                 </div>
             </div>
-            <button id="backToDashboardFromProfileBtn" class="btn-primary mt-4">
-                <i class="fas fa-arrow-left mr-2"></i>Voltar para o Dashboard
-            </button>
         </section>
 
-        <section id="about-us" class="hidden min-h-screen pt-4">
-            <div class="card p-8 w-full">
-                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Sobre o Projeto Sustenta Pitanga</h2>
-
-                <p class="text-lg text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-                    O Sustenta Pitanga é uma iniciativa dedicada a revolucionar a agricultura na região de Pitanga, Paraná, através da inovação e sustentabilidade. Nosso projeto nasceu da necessidade de otimizar o uso de recursos naturais, combater o desperdício e promover práticas agrícolas que garantam a prosperidade do campo a longo prazo, em harmonia com o meio ambiente.
-                </p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                    <div>
-                        <h3 class="text-2xl font-semibold text-blue-600 dark:text-blue-400 mb-4 flex items-center"><i class="fas fa-lightbulb mr-3"></i>Nossa Missão</h3>
-                        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                            Capacitar produtores rurais com ferramentas e conhecimentos para uma gestão agrícola mais eficiente, sustentável e lucrativa, utilizando tecnologia para monitorar e otimizar o uso de água, solo e outros insumos.
-                        </p>
+        <!-- Seção de Perfil -->
+        <section id="profile" class="hidden">
+            <div class="card max-w-2xl mx-auto">
+                <h2 class="text-2xl font-semibold mb-6 text-center">Meu Perfil</h2>
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+                    <div class="flex-shrink-0">
+                        <img id="profilePicImg" src="https://placehold.co/150x150/a7f3d0/065f46?text=Foto" alt="Foto de perfil do usuário, atualmente uma imagem de placeholder" class="w-36 h-36 rounded-full object-cover border-4 border-green-400 shadow-md">
+                        <input type="file" id="profilePicInput" accept="image/png, image/jpeg, image="jpg" class="hidden">
+                        <button id="changeProfilePicBtn" class="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">Alterar Foto</button>
+                        <div id="profilePicMessage" class="message-box hidden mt-2"></div>
                     </div>
-                    <div>
-                        <h3 class="text-2xl font-semibold text-green-600 dark:text-green-400 mb-4 flex items-center"><i class="fas fa-seedling mr-3"></i>Nossa Visão</h3>
-                        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                            Ser a principal referência em sustentabilidade agrícola para Pitanga e região, fomentando uma comunidade de produtores conscientes e prósperos, que servem de modelo para o desenvolvimento rural sustentável.
-                        </p>
-                    </div>
-                </div>
 
-                <h3 class="text-2xl font-semibold text-yellow-600 dark:text-yellow-400 mb-4 text-center flex items-center justify-center"><i class="fas fa-users mr-3"></i>Quem Somos</h3>
-                <p class="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed text-center">
-                    Somos um grupo de estudantes da <strong class="text-purple-500 dark:text-purple-400">PUC Paraná</strong>, Campus Londrina, apaixonados por tecnologia e pelo agronegócio. Nosso projeto Sustenta Pitanga é um trabalho de conclusão de curso (TCC) da disciplina de Desenvolvimento Web Full Stack, que busca aplicar conhecimentos de programação para resolver desafios reais do setor agrícola.
-                </p>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-8">
-                    <div class="card p-4">
-                        <img src="https://via.placeholder.com/100x100" alt="Foto do Desenvolvedor 1" class="rounded-full w-24 h-24 mx-auto mb-3 object-cover">
-                        <h4 class="font-semibold text-lg text-gray-900 dark:text-white">Nome do Desenvolvedor 1</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Função/Área</p>
-                    </div>
-                    <div class="card p-4">
-                        <img src="https://via.placeholder.com/100x100" alt="Foto do Desenvolvedor 2" class="rounded-full w-24 h-24 mx-auto mb-3 object-cover">
-                        <h4 class="font-semibold text-lg text-gray-900 dark:text-white">Nome do Desenvolvedor 2</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Função/Área</p>
-                    </div>
-                    <div class="card p-4">
-                        <img src="https://via.placeholder.com/100x100" alt="Foto do Desenvolvedor 3" class="rounded-full w-24 h-24 mx-auto mb-3 object-cover">
-                        <h4 class="font-semibold text-lg text-gray-900 dark:text-white">Nome do Desenvolvedor 3</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Função/Área</p>
+                    <div class="flex-grow w-full">
+                        <div class="mb-4">
+                            <label for="profileNameInput" class="block text-sm font-bold mb-2">Nome:</label>
+                            <input type="text" id="profileNameInput" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400">
+                        </div>
+                        <div class="mb-4">
+                            <label for="profileEmailInput" class="block text-sm font-bold mb-2">E-mail:</label>
+                            <input type="email" id="profileEmailInput" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" disabled>
+                        </div>
+                        <div class="mb-4">
+                            <label for="profileCooperativeInput" class="block text-sm font-bold mb-2">Cooperativa:</label>
+                            <input type="text" id="profileCooperativeInput" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400">
+                        </div>
+                        <div class="mb-4">
+                            <label for="profileFarmDataInput" class="block text-sm font-bold mb-2">Dados da Fazenda:</label>
+                            <textarea id="profileFarmDataInput" rows="4" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400"></textarea>
+                        </div>
+                        <div class="text-right mt-6 flex justify-end gap-4">
+                            <button id="saveProfileBtn" class="btn-primary">
+                                <span id="saveProfileBtnText">Salvar Alterações</span>
+                                <span id="saveProfileBtnSpinner" class="hidden"><i class="fas fa-spinner fa-spin ml-2"></i></span>
+                            </button>
+                            <button id="logoutBtn" class="btn-danger">Sair da Conta</button>
+                        </div>
                     </div>
                 </div>
+                <div class="text-center mt-8">
+                    <button id="backToDashboardFromProfileBtn" class="btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar para o Dashboard
+                    </button>
+                </div>
+            </div>
+        </section>
 
-                <p class="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed text-center">
-                    Nosso objetivo é contribuir para um futuro mais verde e próspero para a agricultura paranaense. Agradecemos o seu interesse no Sustenta Pitanga!
-                </p>
+        <!-- Nova Seção "Sobre Nós" -->
+        <section id="about-us" class="hidden">
+            <div class="card max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-green-700 mb-6 text-center">Nossa História e Missão</h2>
+                <div class="space-y-6 text-lg text-gray-700">
+                    <p>No coração de Pitanga, o Sustenta Pitanga é uma iniciativa do <strong>Centro Comunitário de Múltiplas Funções (CCM Dom Pedro)</strong>, nascido da visão de transformar a agricultura local através da sustentabilidade e tecnologia.</p>
+                    
+                    <h3 class="text-2xl font-semibold text-blue-600 flex items-center"><i class="fas fa-eye mr-3"></i>Nossa Visão</h3>
+                    <p>Visualizamos um futuro onde cada produtor em Pitanga, independentemente do tamanho de sua propriedade, tenha acesso a ferramentas e conhecimentos para cultivar de forma mais eficiente, respeitando o meio ambiente e garantindo a prosperidade de suas famílias.</p>
 
-                <div class="flex justify-center">
-                    <button id="backToLandingFromAboutUsBtn" class="btn-primary">
+                    <h3 class="text-2xl font-semibold text-green-600 flex items-center"><i class="fas fa-building mr-3"></i>O CCM Dom Pedro</h3>
+                    <p>O CCM Dom Pedro, com sua longa história de serviço à comunidade, identificou a necessidade de uma abordagem mais moderna e sustentável na agricultura. O Sustenta Pitanga é a nossa resposta a essa demanda, unindo tradição e inovação para o benefício de todos.</p>
+
+                    <h3 class="text-2xl font-semibold text-yellow-600 flex items-center"><i class="fas fa-handshake mr-3"></i>Nossos Pilares</h3>
+                    <ul class="list-disc pl-8 space-y-3">
+                        <li><strong>Educação e Capacitação:</strong> Oferecemos workshops, treinamentos e materiais educativos para empoderar os agricultores com as melhores práticas.</li>
+                        <li><strong>Tecnologia Acessível:</strong> Desenvolvemos e implementamos soluções de Internet das Coisas (IoT) de baixo custo para monitoramento inteligente de lavouras.</li>
+                        <li><strong>Sustentabilidade Ambiental:</strong> Promovemos ativamente práticas agrícolas que conservam recursos naturais, reduzem o impacto ecológico e protegem a biodiversidade.</li>
+                        <li><strong>Prosperidade Local:</strong> Contribuímos para o aumento da produtividade, otimização de recursos e, consequentemente, a melhoria da renda e qualidade de vida dos agricultores de Pitanga.</li>
+                    </ul>
+
+                    <p class="text-center font-bold text-purple-500 mt-8">Junte-se a nós nesta jornada rumo a uma Pitanga mais verde e próspera!</p>
+
+                    <div class="mt-12 text-center">
+                        <h3 class="text-2xl font-bold text-blue-700 mb-6">Nossa Equipe</h3>
+                        <div class="mb-8">
+                            <img src="imagens/integrantes.jpeg" alt="Foto da equipe do Sustenta Pitanga" class="w-full max-w-md mx-auto rounded-lg shadow-lg object-cover">
+                            <p class="text-sm text-gray-500 mt-2">Uma visão geral do nosso time dedicado.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <!-- Membro 1 -->
+                            <div class="card p-6 flex flex-col items-center text-center">
+                                <img src="https://placehold.co/100x100/3b82f6/ffffff?text=Membro1" alt="Foto de perfil do Membro 1" class="w-24 h-24 rounded-full object-cover border-4 border-blue-400 mb-4 shadow-md">
+                                <h4 class="text-xl font-semibold text-gray-800 mb-2">Arthur</h4>
+                                <p class="text-gray-600 text-sm">Nascido e criado em Pitanga, 15 anos, tenho como objetivo cursar uma faculdade relacionada ao
+                                    desenvolvimento de softwares, gosto de futebol e esportes relacionados. </p>
+                            </div>
+                            <!-- Membro 2 -->
+                            <div class="card p-6 flex flex-col items-center text-center">
+                                <img src="https://placehold.co/100x100/10b981/ffffff?text=Membro2" alt="Foto de perfil do Membro 2" class="w-24 h-24 rounded-full object-cover border-4 border-green-400 mb-4 shadow-md">
+                                <h4 class="text-xl font-semibold text-gray-800 mb-2">Bruno</h4>
+                                <p class="text-gray-600 text-sm">Sim</p>
+                            </div>
+                            <!-- Membro 3 -->
+                            <div class="card p-6 flex flex-col items-center text-center">
+                                <img src="https://placehold.co/100x100/ef4444/ffffff?text=Membro3" alt="Foto de perfil do Membro 3" class="w-24 h-24 rounded-full object-cover border-4 border-red-400 mb-4 shadow-md">
+                                <h4 class="text-xl font-semibold text-gray-800 mb-2">Lucas Chavaren</h4>
+                                <p class="text-gray-600 text-sm">Amogus</p>
+                            </div>
+                            <!-- Membro 4 -->
+                            <div class="card p-6 flex flex-col items-center text-center">
+                                <img src="https://placehold.co/100x100/f97316/ffffff?text=Membro4" alt="Foto de perfil do Membro 4" class="w-24 h-24 rounded-full object-cover border-4 border-orange-400 mb-4 shadow-md">
+                                <h4 class="text-xl font-semibold text-gray-800 mb-2">Lucas Henrique</h4>
+                                <p class="text-gray-600 text-sm">hackerman</p>
+                            </div>
+                            <!-- Membro 5 -->
+                            <div class="card p-6 flex flex-col items-center text-center">
+                                <img src="https://placehold.co/100x100/805ad5/ffffff?text=Membro5" alt="Foto de perfil do Membro 5" class="w-24 h-24 rounded-full object-cover border-4 border-purple-400 mb-4 shadow-md">
+                                <h4 class="text-xl font-semibold text-gray-800 mb-2">Matheus Scaramal</h4>
+                                <p class="text-gray-600 text-sm">Verdade</p>
+                            </div>
+                             <div class="card p-6 flex flex-col items-center text-center">
+                                <img src=https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSvJ7oyGcMRMbMtkr3uAVtTmtw4vBVpTOyQg&s alt="Foto de perfil do Membro 4" class="w-24 h-24 rounded-full object-cover border-4 border-orange-400 mb-4 shadow-md">
+                                <h4 class="text-xl font-semibold text-gray-800 mb-2">Robert</h4>
+                                <p class="text-gray-600 text-sm">minecraft</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-8">
+                    <button id="backToLandingFromAboutUsBtn" class="btn-secondary">
                         <i class="fas fa-arrow-left mr-2"></i>Voltar
                     </button>
                 </div>
@@ -388,44 +550,34 @@
 
     </main>
 
-    <footer class="bg-gray-800 text-white p-6 text-center">
-        <div class="container mx-auto">
-            <p>&copy; 2025 Sustenta Pitanga. Todos os direitos reservados.</p>
-            <p class="text-sm mt-2">Desenvolvido com paixão para a agricultura sustentável.</p>
-            <div class="flex justify-center space-x-4 mt-4">
-                <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+    <!-- Popup de Permissão de Localização -->
+    <div id="locationPermissionPopup" class="popup-overlay hidden">
+        <div class="popup-content">
+            <h3 class="text-xl font-semibold mb-4">Permissão de Localização</h3>
+            <p>Para fornecer dados climáticos precisos e funcionalidades de mapa, o Sustenta Pitanga precisa acessar sua localização.</p>
+            <div class="mt-4 flex items-center justify-center">
+                <input type="checkbox" id="doNotAskAgain" class="mr-2">
+                <label for="doNotAskAgain" class="text-sm">Não perguntar novamente</label>
             </div>
+            <div class="popup-buttons">
+                <button id="allowLocationBtn" class="btn-primary">Permitir Localização</button>
+                <button id="denyLocationBtn" class="btn-danger">Negar</button>
+            </div>
+            <div id="locationMessage" class="message-box hidden"></div>
+        </div>
+    </div> 
+
+    <footer class="bg-gray-800 text-white p-4 text-center mt-8 rounded-t-xl"
+            style="background-color: var(--footer-bg); color: var(--footer-text);">
+        <div class="container">
+            <p>&copy; 2025 Sustenta Pitanga. Todos os direitos reservados.</p>
         </div>
     </footer>
-
-    <div id="locationPermissionPopup" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl text-center max-w-sm w-full mx-4">
-            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Permissão de Localização</h3>
-            <p class="text-gray-700 dark:text-gray-300 mb-6">
-                Para fornecer o clima da sua região e mostrar o mapa da fazenda, o Sustenta Pitanga precisa acessar sua localização.
-            </p>
-
-            <div class="flex items-center justify-center mb-6">
-                <input type="checkbox" id="doNotAskAgain" class="form-checkbox h-5 w-5 text-green-600 dark:text-green-400 rounded">
-                <label for="doNotAskAgain" class="ml-2 text-gray-700 dark:text-gray-300 select-none">
-                    Não perguntar novamente
-                </label>
-            </div>
-
-            <div class="flex justify-around space-x-4">
-                <button id="allowLocationBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out flex-1">
-                    Permitir Localização
-                </button>
-                <button id="denyLocationBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out flex-1">
-                    Recusar
-                </button>
-            </div>
-            <p id="locationMessage" class="mt-4 text-sm"></p>
-        </div>
-    </div>
-
-    <script src="seu_script.js"></script>
+    
+    <!-- Scripts JavaScript - Movidos para o final do body para melhor performance -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Link para o arquivo JavaScript externo -->
+    <script src="script.js"></script>
 </body>
 </html>
