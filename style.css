@@ -514,3 +514,26 @@ body.dark-mode #about-us .text-gray-500 {
         transform: rotate(360deg);
     }
 }
+/* Seu arquivo CSS (ou dentro de um <style> no head) */
+
+#locationPermissionPopup {
+    /* Estilos para posicionamento e sobreposição */
+    z-index: 1000; /* Garante que fique acima de outros elementos */
+    /* Por padrão ele já deve vir com display: none; ou opacity: 0; e pointer-events: none; */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#locationPermissionPopup.visible {
+    /* Quando a classe 'visible' é adicionada pelo JS */
+    opacity: 1;
+    pointer-events: auto; /* Permite interações com o popup */
+    /* Se você está usando TailwindCSS ou classes utilitárias, a classe 'hidden' faria display: none; */
+    /* então a remoção da classe 'hidden' já o tornaria visível */
+}
+
+/* Se você estiver usando Tailwind CSS e a classe 'hidden' é aplicada por padrão,
+   basta garantir que o JS remova 'hidden' e adicione 'visible' para transições.
+   Nesse caso, a propriedade `opacity` pode ser mais para um efeito visual de fade.
+*/

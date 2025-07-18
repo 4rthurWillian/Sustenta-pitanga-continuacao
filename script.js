@@ -1,4 +1,3 @@
-
 // Variáveis globais para simular dados do usuário e estado de login
 let currentUser = null;
 const users = JSON.parse(localStorage.getItem('users')) || {};
@@ -10,8 +9,12 @@ let myChartInstance = null; // Agora uma única instância para o gráfico princ
 // API Key do OpenWeatherMap (Substitua pela sua chave real)
 // ATENÇÃO: Em uma aplicação real, chaves de API nunca devem ser expostas no frontend.
 // Elas devem ser gerenciadas por um servidor backend.
-const WEATHER_API_KEY = "30a970d545783664fb3999d1595d117f"; // Substitua por sua chave real
+const WEATHER_API_KEY = "30a970d545783664fb3999d1595d117f"; 
 const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
+
+// Coordenadas padrão para Pitanga, PR (caso a localização seja negada ou indisponível)
+const DEFAULT_LATITUDE = -25.2929;
+const DEFAULT_LONGITUDE = -51.0425;
 
 // Obter elementos do DOM
 const landingPageSection = document.getElementById('landing-page'); // Renomeado
@@ -80,11 +83,12 @@ const profilePicInput = document.getElementById('profilePicInput');
 const profilePicImg = document.getElementById('profilePicImg');
 const profilePicMessage = document.getElementById('profilePicMessage');
 
+// --- Variáveis do DOM para o Popup de Localização ---
 const locationPermissionPopup = document.getElementById('locationPermissionPopup');
 const allowLocationBtn = document.getElementById('allowLocationBtn');
 const denyLocationBtn = document.getElementById('denyLocationBtn');
-const doNotAskAgainCheckbox = document.getElementById('doNotAskAgain'); // Novo checkbox
-const locationMessage = document.getElementById('locationMessage');
+const doNotAskAgainCheckbox = document.getElementById('doNotAskAgain');
+const locationMessage = document.getElementById('locationMessage'); // Para mensagens relacionadas à localização
 
 // Referências para os spans de texto e spinner dos botões
 const loginBtnText = document.getElementById('loginBtnText');
@@ -184,7 +188,7 @@ function checkLoginState() {
         if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
         showSection('dashboard', false); // Não adiciona ao histórico na inicialização
         loggedInControls.classList.remove('hidden'); // Mostrar controles após login
-        checkLocationPermission();
+        checkLocationPermission(); // Chama a função para verificar e possivelmente mostrar o popup
         loadManualData(); // Carrega os dados manuais ao logar
     } else {
         showSection('landing-page', false); // Não adiciona ao histórico na inicialização
@@ -243,7 +247,7 @@ if (loginForm && loginBtn) {
             if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
             loggedInControls.classList.remove('hidden'); // Mostrar controles após login
             showSection('dashboard'); // Adiciona ao histórico
-            checkLocationPermission(); // Check location after successful login
+            checkLocationPermission(); // Chama a função para verificar e possivelmente mostrar o popup
             loadManualData(); // Carrega os dados manuais ao logar
         } else {
             showMessage(document.getElementById('loginMessage'), 'E-mail ou senha inválidos.', 'error');
@@ -454,7 +458,7 @@ if (calculateImpactBtn && impactResults) {
         if (waterSavedSpan) waterSavedSpan.textContent = waterSaved.toFixed(0);
         if (wasteReductionSpan) wasteReductionSpan.textContent = (wasteReduction * 100).toFixed(1);
         if (moneySavedSpan) moneySavedSpan.textContent = moneySaved.toFixed(2);
-        
+
         impactResults.classList.add('impact-results-visible');
         showMessage(impactCalcMessage, 'Impacto calculado com sucesso!', 'success');
         hideLoading(calculateImpactBtn, calculateImpactBtnText, calculateImpactBtnSpinner);
@@ -488,7 +492,6 @@ if (saveManualDataBtn && manualSaveMessage) {
             users[currentUser.email] = currentUser;
             localStorage.setItem('users', JSON.stringify(users));
         }
-
         console.log('Dados Manuais Salvos:', { dailyWater, fertilizerUse, soilObservation });
         showMessage(manualSaveMessage, 'Dados salvos com sucesso!', 'success');
         // Não limpar campos para manter os dados salvos visíveis
@@ -556,7 +559,12 @@ if (generatePdfReportBtn) {
         y += 7;
         doc.text(`Adubos Utilizados: ${document.querySelector('#dashboard .card:nth-child(3) .text-4xl').textContent}`, 10, y);
         y += 7;
-        doc.text(`Clima Atual: ${weatherInfo.textContent.trim()}`, 10, y);
+        // Verifica se weatherInfo existe antes de tentar acessar textContent
+        if (weatherInfo) {
+            doc.text(`Clima Atual: ${weatherInfo.textContent.trim()}`, 10, y);
+        } else {
+            doc.text(`Clima Atual: N/A`, 10, y);
+        }
         y += 15;
 
         // Adicionar gráfico principal como imagem
@@ -568,7 +576,7 @@ if (generatePdfReportBtn) {
             doc.addImage(imgData, 'PNG', 10, y, 180, 90); // Ajuste as dimensões conforme necessário
             y += 100;
         }
-        
+
         // Simulação de delay para a geração do PDF
         await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -853,7 +861,7 @@ if (changeProfilePicBtn && profilePicInput && profilePicImg) {
 // Função para alternar o modo escuro
 function toggleDarkMode() {
     const isDarkMode = document.body.classList.toggle('dark-mode');
-    
+
     // Atualiza o localStorage
     if (isDarkMode) {
         localStorage.setItem('darkMode', 'enabled');
@@ -891,21 +899,28 @@ function checkLocationPermission() {
     if (locationPermissionStatus === 'granted') {
         getLocation();
         if (locationPermissionPopup) locationPermissionPopup.classList.remove('visible'); // Garante que o popup esteja escondido
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden'); // Usa 'hidden' para esconder visualmente
     } else if (locationPermissionStatus === 'denied' && doNotAsk === 'true') {
         // Se negado e "não perguntar novamente" marcado, não mostra o popup
         if (locationPermissionPopup) locationPermissionPopup.classList.remove('visible');
-        if (weatherInfo) showMessage(weatherInfo, 'Permissão de localização negada. O clima e o mapa podem não ser exibidos corretamente.', 'error');
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
+        if (locationMessage) showMessage(locationMessage, 'Permissão de localização negada. O clima e o mapa podem não ser exibidos corretamente.', 'error');
+        if (weatherInfo) showMessage(weatherInfo, 'Permissão de localização negada. O clima e o mapa podem não ser exibidos corretamente.', 'error'); // Adicionado
         if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível sem permissão de localização.</p>';
+        getLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar com coordenadas padrão
     } else {
         // Se não há status ou "não perguntar novamente" não está marcado, mostra o popup
-        if (locationPermissionPopup) locationPermissionPopup.classList.add('visible');
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('visible'); // Mostra o popup
+        if (locationPermissionPopup) locationPermissionPopup.classList.remove('hidden'); // Remove 'hidden'
     }
 }
 
+// Event listeners para os botões do popup (eles devem existir no HTML com esses IDs)
 if (allowLocationBtn) {
     allowLocationBtn.addEventListener('click', () => {
         getLocation();
-        if (locationPermissionPopup) locationPermissionPopup.classList.remove('visible'); // Esconde o popup imediatamente
+        if (locationPermissionPopup) locationPermissionPopup.classList.remove('visible'); // Esconde o popup
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
         localStorage.setItem('locationPermission', 'granted'); // Salva o status da permissão
         if (doNotAskAgainCheckbox && doNotAskAgainCheckbox.checked) {
             localStorage.setItem('doNotAskAgain', 'true');
@@ -918,6 +933,7 @@ if (allowLocationBtn) {
 if (denyLocationBtn) {
     denyLocationBtn.addEventListener('click', () => {
         if (locationPermissionPopup) locationPermissionPopup.classList.remove('visible'); // Esconde o popup
+        if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden');
         localStorage.setItem('locationPermission', 'denied'); // Salva o status da permissão
         if (doNotAskAgainCheckbox && doNotAskAgainCheckbox.checked) {
             localStorage.setItem('doNotAskAgain', 'true');
@@ -927,69 +943,81 @@ if (denyLocationBtn) {
         if (locationMessage) showMessage(locationMessage, 'Permissão de localização negada. O clima e o mapa podem não ser exibidos corretamente.', 'error');
         if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Localização negada. Não foi possível obter o clima.</p>';
         if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível devido a erro de localização.</p>';
+        getLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar com coordenadas padrão
     });
 }
 
-async function getLocation() {
+// A função getLocation agora pode receber coordenadas opcionais para forçar um local
+async function getLocation(lat = null, lon = null) {
+    // Se coordenadas forem passadas, usa-as diretamente para buscar clima/mapa
+    if (lat !== null && lon !== null) {
+        fetchWeatherAndMap(lat, lon);
+        return;
+    }
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                
-                // Exibir clima usando OpenWeatherMap API
-                if (WEATHER_API_KEY && WEATHER_API_KEY !== "YOUR_OPENWEATHERMAP_API_KEY") {
-                    try {
-                        const response = await fetch(`${WEATHER_API_URL}?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric&lang=pt_br`);
-                        const data = await response.json();
-                        if (data && data.main && weatherInfo) {
-                            weatherInfo.innerHTML = `
-                                <p class="text-lg"><i class="fas fa-cloud-sun mr-2"></i>${data.main.temp}°C, ${data.weather[0].description}</p>
-                                <p class="text-sm">Umidade: ${data.main.humidity}%, Vento: ${data.wind.speed} m/s</p>
-                                <p class="text-xs">Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}</p>
-                            `;
-                        } else {
-                            if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Não foi possível obter os dados climáticos.</p>';
-                        }
-                    } catch (error) {
-                        console.error("Erro ao buscar dados climáticos:", error);
-                        if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Erro ao obter o clima.</p>';
-                    }
-                } else {
-                    // Exibir clima simulado se a API Key não estiver configurada
-                    if (weatherInfo) {
-                        weatherInfo.innerHTML = `
-                            <p class="text-lg"><i class="fas fa-cloud-sun mr-2"></i>25°C, Ensolarado</p>
-                            <p class="text-sm">Umidade: 60%, Vento: 10 km/h</p>
-                            <p class="text-xs">Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}</p>
-                        `;
-                    }
-                }
+                const currentLat = position.coords.latitude;
+                const currentLon = position.coords.longitude;
+                fetchWeatherAndMap(currentLat, currentLon);
                 if (locationMessage) showMessage(locationMessage, 'Localização obtida com sucesso!', 'success');
-
-                // Carregar mapa (simulado com OpenStreetMap)
-                if (farmMap) {
-                    farmMap.innerHTML = `
-                        <iframe 
-                            width="100%" 
-                            height="100%" 
-                            frameborder="0" 
-                            scrolling="no" 
-                            marginheight="0" 
-                            marginwidth="0" 
-                            src="https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.01},${lat - 0.005},${lon + 0.01},${lat + 0.005}&amp;layer=mapnik&amp;marker=${lat},${lon}" 
-                            style="border: 1px solid var(--input-border); border-radius: 0.5rem;">
-                        </iframe>
-                        <small class="mt-2 block"><a href="https://www.openstreetmap.org/#map=16/${lat}/${lon}" class="text-blue-500 hover:underline" target="_blank">Ver Mapa Maior</a></small>
-                    `;
-                }
-            }, 
+            },
             showError
         );
     } else {
         if (locationMessage) showMessage(locationMessage, 'Geolocalização não é suportada por este navegador.', 'error');
         if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Geolocalização não suportada.</p>';
         if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível.</p>';
+        // Se a geolocalização não for suportada, usa as coordenadas padrão
+        fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+    }
+}
+
+// Nova função para buscar o clima e exibir o mapa, separada da lógica de permissão
+async function fetchWeatherAndMap(lat, lon) {
+    if (WEATHER_API_KEY && WEATHER_API_KEY !== "YOUR_OPENWEATHERMAP_API_KEY") {
+        try {
+            const response = await fetch(`${WEATHER_API_URL}?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric&lang=pt_br`);
+            const data = await response.json();
+            if (data && data.main && weatherInfo) {
+                weatherInfo.innerHTML = `
+                    <p class="text-lg"><i class="fas fa-cloud-sun mr-2"></i>${data.main.temp}°C, ${data.weather[0].description}</p>
+                    <p class="text-sm">Umidade: ${data.main.humidity}%, Vento: ${data.wind.speed} m/s</p>
+                    <p class="text-xs">Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}</p>
+                `;
+            } else {
+                if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Não foi possível obter os dados climáticos.</p>';
+            }
+        } catch (error) {
+            console.error("Erro ao buscar dados climáticos:", error);
+            if (weatherInfo) weatherInfo.innerHTML = '<p class="text-lg">Erro ao obter o clima.</p>';
+        }
+    } else {
+        // Exibir clima simulado se a API Key não estiver configurada
+        if (weatherInfo) {
+            weatherInfo.innerHTML = `
+                <p class="text-lg"><i class="fas fa-cloud-sun mr-2"></i>25°C, Ensolarado</p>
+                <p class="text-sm">Umidade: 60%, Vento: 10 km/h</p>
+                <p class="text-xs">Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}</p>
+            `;
+        }
+    }
+    // Carregar mapa (simulado com OpenStreetMap)
+    if (farmMap) {
+        farmMap.innerHTML = `
+            <iframe
+                width="100%"
+                height="100%"
+                frameborder="0"
+                scrolling="no"
+                marginheight="0"
+                marginwidth="0"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.01},${lat - 0.005},${lon + 0.01},${lat + 0.005}&amp;layer=mapnik&amp;marker=${lat},${lon}"
+                style="border: 1px solid var(--input-border); border-radius: 0.5rem;">
+            </iframe>
+            <small class="mt-2 block"><a href="https://www.openstreetmap.org/#map=16/${lat}/${lon}" class="text-blue-500 hover:underline" target="_blank">Ver Mapa Maior</a></small>
+        `;
     }
 }
 
@@ -999,21 +1027,30 @@ function showError(error) {
         case error.PERMISSION_DENIED:
             errorMessage = 'Usuário negou a requisição de Geolocalização.';
             localStorage.setItem('locationPermission', 'denied'); // Salva o status de negado
+            // Após a negação, tenta carregar o clima/mapa com as coordenadas padrão
+            fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             break;
         case error.POSITION_UNAVAILABLE:
             errorMessage = 'Informação de localização indisponível.';
+            // Tenta carregar o clima/mapa com as coordenadas padrão
+            fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             break;
         case error.TIMEOUT:
             errorMessage = 'A requisição para obter a localização expirou.';
+            // Tenta carregar o clima/mapa com as coordenadas padrão
+            fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             break;
         case error.UNKNOWN_ERROR:
             errorMessage = 'Um erro desconhecido ocorreu.';
+            // Tenta carregar o clima/mapa com as coordenadas padrão
+            fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             break;
     }
     if (locationMessage) showMessage(locationMessage, `Erro de Geolocalização: ${errorMessage}`, 'error');
     if (weatherInfo) weatherInfo.innerHTML = `<p class="text-lg">Erro ao obter o clima: ${errorMessage}</p>`;
     if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível devido a erro de localização.</p>';
     if (locationPermissionPopup) locationPermissionPopup.classList.remove('visible'); // Esconde o popup em caso de erro
+    if (locationPermissionPopup) locationPermissionPopup.classList.add('hidden'); // Garante que esteja escondido
 }
 
 // Inicialização
