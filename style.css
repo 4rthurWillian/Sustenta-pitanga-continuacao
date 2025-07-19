@@ -86,15 +86,19 @@ body.dark-mode {
     --chart-btn-active-border: #38a169;
     --popup-bg: #2d3748;
     --popup-text: #e2e8f0;
-    --message-box-info-bg: #2b6cb0;
-    --message-box-info-border: #4299e1;
-    --message-box-info-text: #e0e0e0;
-    --message-box-success-bg: #2f855a;
-    --message-box-success-border: #48bb78;
-    --message-box-success-text: #e0e0e0;
-    --message-box-error-bg: #c53030;
-    --message-box-error-border: #e53e3e;
-    --message-box-error-text: #e0e0e0;
+    /* Cores das mensagens de notificação no modo escuro (fundos claros, texto escuro) */
+    --message-box-info-bg: #bfdbfe;
+    --message-box-info-border: #60a5fa;
+    --message-box-info-text: #1a202c;
+
+    --message-box-success-bg: #d1fae5;
+    --message-box-success-border: #34d399;
+    --message-box-success-text: #1a202c;
+
+    --message-box-error-bg: #fee2e2;
+    --message-box-error-border: #ef4444;
+    --message-box-error-text: #1a202c;
+
     --input-bg: #4a5568;
     --input-text: #e2e8f0;
     --input-border: #616e7f;
@@ -110,7 +114,7 @@ body.dark-mode {
     --text-gray-700-color: #cbd5e0; /* Mais claro para melhor contraste */
     --text-gray-600-color: #e2e8f0; /* Alterado para maior contraste no modo escuro */
     --text-gray-800-color: #e2e8f0;
-    --text-gray-900-color: #e2e8f0;
+    --text-gray-900-color: #1a202c; /* Alterado para ser escuro no dark mode */
     --green-700-color: #68d391;
     --blue-600-color: #63b3ed;
     --green-600-color: #68d391;
@@ -152,7 +156,13 @@ body {
     color: var(--text-color); /* Garante que o texto dentro do card seja adaptável */
     position: relative; /* Adicionado para posicionamento absoluto da mensagem interna */
 }
-.btn-primary {
+.btn-primary, .btn-secondary, .btn-danger {
+    /* Adiciona display flex e justify-content center para centralizar conteúdo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Define uma largura mínima para evitar que o botão diminua */
+    min-width: 150px; /* Ajuste conforme necessário para o maior texto de botão */
     background-color: var(--primary-btn-bg);
     color: white;
     padding: 0.75rem 1.5rem;
@@ -324,6 +334,18 @@ body {
 .message-box.error { background-color: var(--message-box-error-bg); border: 1px solid var(--message-box-error-border); color: var(--message-box-error-text); }
 .message-box.info { background-color: var(--message-box-info-bg); border: 1px solid var(--message-box-info-border); color: var(--message-box-info-text); }
 .message-box .message-icon { font-size: 1.2rem; } /* Tamanho do ícone */
+
+/* Nova classe para mensagens que devem aparecer no fluxo normal do documento */
+.message-box-inline {
+    position: relative; /* Permite que margin-top/bottom funcionem corretamente */
+    margin-top: 1rem; /* Espaço abaixo do botão */
+    margin-bottom: 1rem; /* Espaço acima do próximo elemento */
+    width: 100%; /* Ocupa a largura total do pai */
+    left: auto; /* Anula o left de .message-box */
+    top: auto; /* Anula o top de .message-box */
+    transform: none; /* Anula o transform de .message-box */
+}
+
 
 /* Ajustes para elementos de formulário no modo escuro */
 body.dark-mode input,
@@ -550,10 +572,17 @@ body.dark-mode #points-redemption .text-gray-700,
 body.dark-mode #points-redemption .text-gray-600 {
     color: var(--text-color) !important;
 }
-body.dark-mode #notifications-page .text-gray-600,
-body.dark-mode #notifications-page .text-gray-500 {
-    color: var(--text-color) !important;
+/* Ajuste para as notificações no modo escuro: texto preto em fundo claro */
+body.dark-mode #notificationsDropdown h4,
+body.dark-mode #notificationsDropdown p,
+body.dark-mode #notificationDropdownList p,
+body.dark-mode #notificationList p {
+    color: #1a202c !important; /* Força o texto a ser preto */
 }
+body.dark-mode .notification-item p.text-xs.text-gray-500 {
+    color: #4a5568 !important; /* Um cinza mais escuro para a data no modo escuro */
+}
+
 /* Ajuste para as datas das notificações no modo escuro */
 body.dark-mode .notification-item .text-xs.text-gray-500 {
     color: var(--text-color) !important; /* Garante que a data seja clara no dark mode */
@@ -617,4 +646,39 @@ body.dark-mode .notification-item .text-xs.text-gray-500 {
 /* Estilo para o container do link "Ver Mapa Maior" */
 .map-link-container {
     background-color: transparent; /* Garante que o fundo seja transparente */
+}
+
+/* Estilos para o botão "Voltar ao Topo" */
+#backToTopBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary-btn-bg);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px); /* Começa um pouco abaixo */
+    z-index: 999; /* Garante que fique acima de outros elementos */
+}
+
+#backToTopBtn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0); /* Desliza para a posição final */
+}
+
+#backToTopBtn:hover {
+    background-color: var(--primary-btn-hover);
+    transform: translateY(-2px); /* Pequeno efeito de elevação no hover */
 }

@@ -156,6 +156,10 @@ let currentSectionId = '';
 // Array para armazenar as notificações
 let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
 
+// Botão Voltar ao Topo
+const backToTopBtn = document.getElementById('backToTopBtn');
+
+
 // Função para exibir mensagens
 function showMessage(element, message, type = 'info') {
     if (!element) return;
@@ -169,7 +173,7 @@ function showMessage(element, message, type = 'info') {
         iconHtml = '<i class="message-icon fas fa-info-circle"></i>';
     }
     element.innerHTML = `${iconHtml}<span>${message}</span>`;
-    element.className = `message-box ${type} visible`; // Adiciona 'visible' para animação
+    element.className = `message-box ${element.classList.contains('message-box-inline') ? 'message-box-inline' : ''} ${type} visible`; // Adiciona 'visible' para animação
     element.classList.remove('hidden');
     setTimeout(() => {
         element.classList.remove('visible'); // Inicia a transição para esconder
@@ -184,12 +188,18 @@ function showLoading(buttonElement, textSpan, spinnerSpan) {
     buttonElement.disabled = true;
     if (textSpan) textSpan.classList.add('hidden');
     if (spinnerSpan) spinnerSpan.classList.remove('hidden');
+    // Armazena a largura original do botão antes de desabilitá-lo
+    buttonElement.dataset.originalWidth = buttonElement.offsetWidth + 'px';
+    buttonElement.style.width = buttonElement.dataset.originalWidth;
 }
 
 function hideLoading(buttonElement, textSpan, spinnerSpan) {
     buttonElement.disabled = false;
     if (textSpan) textSpan.classList.remove('hidden');
     if (spinnerSpan) spinnerSpan.classList.add('hidden');
+    // Remove a largura fixa para que o botão possa se ajustar novamente
+    buttonElement.style.width = ''; 
+    delete buttonElement.dataset.originalWidth;
 }
 
 // Função para alternar seções e gerenciar o histórico do navegador
@@ -346,11 +356,6 @@ if (registerForm && registerSubmitBtn) {
         }
         if (password.length < 6) {
             showMessage(document.getElementById('registerMessage'), 'A senha deve ter no mínimo 6 caracteres.', 'error');
-            hideLoading(registerSubmitBtn, registerSubmitBtnText, registerSubmitBtnSpinner);
-            return;
-        }
-        if (users[email]) {
-            showMessage(document.getElementById('registerMessage'), 'Este e-mail já está cadastrado.', 'error');
             hideLoading(registerSubmitBtn, registerSubmitBtnText, registerSubmitBtnSpinner);
             return;
             }
@@ -1437,6 +1442,30 @@ if (measureAreaBtn) {
 if (addMarkerBtn) {
     addMarkerBtn.addEventListener('click', () => {
         showMessage(mapMessage, 'Funcionalidade "Adicionar Marcador" em desenvolvimento.', 'info');
+    });
+}
+
+// Lógica para o botão Voltar ao Topo
+if (backToTopBtn) {
+    window.addEventListener('scroll', () => {
+        // Mostra o botão após rolar 200px para baixo
+        if (window.scrollY > 200) {
+            backToTopBtn.classList.add('show');
+            backToTopBtn.classList.remove('hidden'); // Garante que a classe 'hidden' seja removida
+        } else {
+            backToTopBtn.classList.remove('show');
+            // Adiciona 'hidden' após a transição para um desaparecimento suave
+            setTimeout(() => {
+                backToTopBtn.classList.add('hidden');
+            }, 300); // Corresponde à duração da transição CSS
+        }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Rolagem suave
+        });
     });
 }
 

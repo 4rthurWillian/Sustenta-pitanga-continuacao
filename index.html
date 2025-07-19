@@ -126,7 +126,7 @@
                     <div class="flex items-center justify-between">
                         <button type="submit" class="btn-primary w-full" id="loginBtn">
                             <span id="loginBtnText">Entrar</span>
-                            <span id="loginBtnSpinner"></span>
+                            <span id="loginBtnSpinner" class="loading-spinner hidden"></span>
                         </button>
                     </div>
                     <p class="text-center text-sm mt-4">Não tem uma conta? <a href="#" id="registerLink" class="text-blue-500 hover:underline">Cadastre-se aqui</a></p>
@@ -167,7 +167,7 @@
                     <div class="flex items-center justify-between">
                         <button type="submit" class="btn-primary w-full" id="registerSubmitBtn">
                             <span id="registerSubmitBtnText">Cadastrar</span>
-                            <span id="registerSubmitBtnSpinner"></span>
+                            <span id="registerSubmitBtnSpinner" class="loading-spinner hidden"></span>
                         </button>
                     </div>
                     <p class="text-center text-sm mt-4">Já tem uma conta? <a href="#" id="backToLoginLink" class="text-blue-500 hover:underline">Faça login aqui</a></p>
@@ -240,11 +240,13 @@
                             <option value="outro">Outro</option>
                         </select>
                     </div>
-                    <button id="calculateImpactBtn" class="btn-primary w-full">
-                        <span id="calculateImpactBtnText">Calcular Resultados</span>
-                        <span id="calculateImpactBtnSpinner"></span>
+                    <div class="max-w-sm mx-auto"> <!-- Mantido o wrapper para centralizar e limitar a largura -->
+                        <button id="calculateImpactBtn" class="btn-primary w-full">
+                            <span id="calculateImpactBtnText">Calcular Resultados</span>
+                            <span id="calculateImpactBtnSpinner" class="loading-spinner hidden"></span>
                         </button>
-                    <div id="impactCalcMessage" class="message-box hidden"></div>
+                        <div id="impactCalcMessage" class="message-box message-box-inline hidden w-full mt-4"></div>
+                    </div>
                     <div id="impactResults" class="p-4 bg-blue-50 rounded-lg">
                         <h4 class="font-bold text-blue-800 mb-2">Resultados:</h4>
                         <p class="text-sm">Hectares afetados: <span id="affectedHectares" class="font-bold">0</span> ha</p>
@@ -305,11 +307,13 @@
                             <label for="soilObservationInput" class="block text-sm font-bold mb-2">Observações do Solo:</label>
                             <textarea id="soilObservationInput" rows="3" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="Ex: Solo úmido, boa drenagem."></textarea>
                         </div>
-                        <button id="saveManualDataBtn" class="btn-primary">
-                            <span id="saveManualDataBtnText">Salvar Dados Manuais</span>
-                            <span id="saveManualDataBtnSpinner"></span>
-                        </button>
-                        <div id="manualSaveMessage" class="message-box hidden"></div>
+                        <div class="max-w-sm"> <!-- Removido mx-auto -->
+                            <button id="saveManualDataBtn" class="btn-primary w-full">
+                                <span id="saveManualDataBtnText">Salvar Dados Manuais</span>
+                                <span id="saveManualDataBtnSpinner" class="loading-spinner hidden"></span>
+                            </button>
+                            <div id="manualSaveMessage" class="message-box message-box-inline hidden w-full mt-4"></div>
+                        </div>
                     </div>
 
                     <div class="mt-8">
@@ -322,11 +326,13 @@
                             <label for="waterMeterInput" class="block text-sm font-bold mb-2">Leitura do Medidor de Água (litros/min):</label>
                             <input type="number" id="waterMeterInput" class="shadow appearance-none border rounded-lg w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-400" placeholder="Ex: 2.5">
                         </div>
-                        <button id="simulateSensorDataBtn" class="btn-secondary">
-                            <span id="simulateSensorDataBtnText">Simular Leitura do Sensor</span>
-                            <span id="simulateSensorDataBtnSpinner"></span>
-                        </button>
-                        <div id="sensorSaveMessage" class="message-box hidden"></div>
+                        <div class="max-w-sm"> <!-- Removido mx-auto -->
+                            <button id="simulateSensorDataBtn" class="btn-secondary w-full">
+                                <span id="simulateSensorDataBtnText">Simular Leitura do Sensor</span>
+                                <span id="simulateSensorDataBtnSpinner" class="loading-spinner hidden"></span>
+                            </button>
+                            <div id="sensorSaveMessage" class="message-box message-box-inline hidden w-full mt-4"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -391,7 +397,7 @@
                             <i class="fas fa-file-alt mr-2 text-purple-500"></i>
                             Relatório Personalizado - Uso de Pesticidas (Maio 2025)
                         </h3>
-                        <p class="text-lg mb-2">Impacto Ambiental: <span class="font-bold text-red-600">Uso acima do recomendado em 10%</span>.< /p>
+                        <p class="text-lg mb-2">Impacto Ambiental: <span class="font-bold text-red-600">Uso acima do recomendado em 10%</span>.</p>
                         <ul class="list-disc pl-5 space-y-2">
                             <li>Pesticida X: 5% acima do limite seguro.</li>
                             <li>Recomendação: Avaliar alternativas biológicas para a próxima safra.</li>
@@ -420,9 +426,9 @@
                     <div class="text-center mt-8">
                         <button id="generatePdfReportBtn" class="btn-secondary">
                             <span id="generatePdfReportBtnText">Gerar Relatório em PDF</span>
-                            <span id="generatePdfReportBtnSpinner"></span>
+                            <span id="generatePdfReportBtnSpinner" class="loading-spinner hidden"></span>
                         </button>
-                        <div id="pdfMessage" class="message-box hidden"></div>
+                        <div id="pdfMessage" class="message-box message-box-inline hidden"></div>
                     </div>
                 </div>
                 <div class="text-center mt-8">
@@ -464,7 +470,7 @@
                         <div class="text-right mt-6 flex justify-end gap-4">
                             <button id="saveProfileBtn" class="btn-primary">
                                 <span id="saveProfileBtnText">Salvar Alterações</span>
-                                <span id="saveProfileBtnSpinner"></span>
+                                <span id="saveProfileBtnSpinner" class="loading-spinner hidden"></span>
                             </button>
                             <button id="logoutBtn" class="btn-danger">Sair da Conta</button>
                         </div>
@@ -681,13 +687,14 @@
                             <div class="card p-6 flex flex-col items-center text-center">
                                 <img src="https://placehold.co/100x100/f97316/ffffff?text=Membro4" alt="Foto de perfil do Membro 4" class="w-24 h-24 rounded-full object-cover border-4 border-orange-400 mb-4 shadow-md">
                                 <h4 class="text-xl font-semibold text-gray-800 mb-2">Lucas Henrique</h4>
-                                <p class="text-gray-600 text-sm">hackerman</p>
+                                <p class="text-gray-600 text-sm">Estudante do Ensino Médio e do curso Técnico em Desenvolvimento de Sistemas. 15 anos, futuramente planejando engrenar na área de tecnologia. Gosto de futebol, esportes, jogos e obviamente, dormir.</p>
                             </div>
                             <!-- Membro 5 -->
                             <div class="card p-6 flex flex-col items-center text-center">
                                 <img src="https://placehold.co/100x100/805ad5/ffffff?text=Membro5" alt="Foto de perfil do Membro 5" class="w-24 h-24 rounded-full object-cover border-4 border-purple-400 mb-4 shadow-md">
                                 <h4 class="text-xl font-semibold text-gray-800 mb-2">Matheus Scaramal</h4>
-                                <p class="text-gray-600 text-sm">Verdade</p>
+                                <p class="text-gray-600 text-sm">Aluno do segundo ano técnico, futuro engenheiro eletrônico.
+            Hobbies: Musculação, video games, dormir.</p>
                             </div>
                              <div class="card p-6 flex flex-col items-center text-center">
                                 <img src=https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSvJ7oyGcMRMbMtkr3uAVtTmtw4vBVpTOyQg&s alt="Foto de perfil do Membro 4" class="w-24 h-24 rounded-full object-cover border-4 border-orange-400 mb-4 shadow-md">
@@ -724,11 +731,10 @@
         </div>
     </div> 
 
-    <footer class="bg-gray-800 text-white p-4 text-center mt-8 rounded-t-xl"
+    <footer class="bg-gray-800 text-white p-4 mt-8 rounded-t-xl"
             style="background-color: var(--footer-bg); color: var(--footer-text);">
-        <div class="container flex flex-col sm:flex-row justify-between items-center">
-            <p>&copy; 2025 Sustenta Pitanga. Todos os direitos reservados.</p>
-            <div class="flex space-x-4 mt-4 sm:mt-0">
+        <div class="container flex flex-col items-center justify-center">
+            <div class="flex space-x-4 mb-4">
                 <a href="https://www.instagram.com/ccmdompedro" target="_blank" aria-label="Instagram do CCM Dom Pedro" class="text-white hover:text-gray-300 transition-colors">
                     <i class="fab fa-instagram text-2xl"></i>
                 </a>
@@ -736,9 +742,15 @@
                     <i class="fab fa-facebook-f text-2xl"></i>
                 </a>
             </div>
+            <p class="text-center">&copy; 2025 Sustenta Pitanga. Todos os direitos reservados.</p>
         </div>
     </footer>
     
+    <!-- Botão Voltar ao Topo -->
+    <button id="backToTopBtn" aria-label="Voltar ao topo da página" class="hidden">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <!-- Scripts JavaScript - Movidos para o final do body para melhor performance -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
