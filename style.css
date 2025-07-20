@@ -895,3 +895,8 @@ body.dark-mode .bg-blue-100 h3 {
 body.dark-mode .bg-blue-100 p {
     color: var(--gray-200-color) !important; /* Cor mais clara para o parágrafo */
 }
+
+/* NOVO: Estilo para o hover das notificações no modo escuro */
+body.dark-mode .notification-item:hover {
+    background-color: #3a475a !important; /* Um cinza mais escuro para hover no dark mode */
+}

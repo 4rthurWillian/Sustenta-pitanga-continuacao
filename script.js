@@ -26,6 +26,9 @@ let currentApiKeyIndex = 0; // Índice da chave de API atual a ser usada
 // Alterado para o endpoint de previsão
 const WEATHER_FORECAST_API_URL = "https://api.openweathermap.org/data/2.5/forecast";
 const WEATHER_CURRENT_API_URL = "https://api.openweathermap.org/data/2.5/weather";
+// NOVO: URL da API do IBGE
+const IBGE_NEWS_API_URL = "http://servicodados.ibge.gov.br/api/v3/noticias/";
+const SHARE_APP_LINK = "https://4rthurwillian.github.io/Sustenta-pitanga-continuacao/";
 
 
 // Coordenadas padrão para Pitanga, PR (caso a localização seja negada ou indisponível)
@@ -65,6 +68,7 @@ const logoutBtn = document.getElementById('logoutBtn');
 const welcomeMessageDisplay = document.getElementById('welcomeMessageDisplay');
 const weatherInfo = document.getElementById('weatherInfo');
 const farmMap = document.getElementById('farmMap');
+const environmentalNewsInfo = document.getElementById('environmentalNewsInfo'); // Elemento para notícias ambientais
 
 const cultivatedAreaInput = document.getElementById('cultivatedArea');
 const cropTypeSelect = document.getElementById('cropType');
@@ -108,7 +112,7 @@ const profilePicImg = document.getElementById('profilePicImg');
 // --- Variáveis do DOM para o Popup de Permissão de Localização ---
 const locationPermissionPopup = document.getElementById('locationPermissionPopup');
 const allowLocationBtn = document.getElementById('allowLocationBtn');
-const denyLocationBtn = document.getElementById('denyLocationBtn');
+const denyLocationBtn = document.getElementById('denyLocation'); // ID corrigido
 const doNotAskAgainCheckbox = document.getElementById('doNotAskAgain');
 const locationMessage = document.getElementById('locationMessage'); // Para mensagens relacionadas à localização
 
@@ -142,6 +146,25 @@ const notificationList = document.getElementById('notificationList'); // Contêi
 // Elementos para a nova seção de pontos e resgate
 const currentPointsDisplay = document.getElementById('currentPoints');
 const climateAlertElement = document.getElementById('climateAlert'); // Adicionado para o alerta climático dinâmico
+const claimDailyRewardBtn = document.getElementById('claimDailyRewardBtn'); // NOVO
+const claimDailyRewardBtnText = document.getElementById('claimDailyRewardBtnText'); // NOVO
+const claimDailyRewardBtnSpinner = document.getElementById('claimDailyRewardBtnSpinner'); // NOVO
+const dailyRewardMessage = document.getElementById('dailyRewardMessage'); // NOVO
+
+// Removidos inviteFriendBtn, inviteFriendBtnText, inviteFriendBtnSpinner
+const inviteFriendMessage = document.getElementById('inviteFriendMessage'); // NOVO
+const inviteOptionButtons = document.querySelectorAll('.invite-option-btn'); // NOVO: Seleciona todos os botões de convite
+const rankingList = document.getElementById('rankingList'); // NOVO: Elemento para o ranking
+
+// Dados simulados do ranking
+const studentsRanking = [
+    { name: "Arthur", points: 1500 }, // Arthur is the coolest!
+    { name: "Lucas Henrique", points: 1200 },
+    { name: "Matheus Scaramal", points: 1000 },
+    { name: "Bruno", points: 800 },
+    { name: "Lucas Chavaren", points: 700 },
+    { name: "Robert", points: 600 }
+];
 
 // Elementos para os botões de visualização do mapa e mensagem
 const satelliteViewBtn = document.getElementById('satelliteViewBtn');
@@ -254,6 +277,11 @@ function showSection(sectionId, pushState = true) {
     }
     if (sectionId === 'points-redemption') {
         updatePointsDisplay(); // Atualiza a exibição de pontos
+        checkDailyRewardStatus(); // Verifica o status da recompensa diária
+        renderRanking(); // NOVO: Renderiza o ranking
+    }
+    if (sectionId === 'dashboard') {
+        fetchEnvironmentalNews(); // Carrega notícias ambientais (agora sem coordenadas, pois a API do IBGE não usa)
     }
 }
 
@@ -275,6 +303,17 @@ function checkLoginState() {
             currentUser.points = 0;
             localStorage.setItem('users', JSON.stringify(users));
         }
+        // Inicializa lastClaimedDailyReward se não existir
+        if (currentUser.lastClaimedDailyReward === undefined) {
+            currentUser.lastClaimedDailyReward = null;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        // Inicializa invitedFriendsCount se não existir
+        if (currentUser.invitedFriendsCount === undefined) {
+            currentUser.invitedFriendsCount = 0;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
         if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
         showSection('dashboard', false); // Não adiciona ao histórico na inicialização
         loggedInControls.classList.remove('hidden'); // Mostrar controles após login
@@ -348,6 +387,17 @@ if (loginForm && loginBtn) {
                 currentUser.points = 0;
                 localStorage.setItem('users', JSON.stringify(users));
             }
+            // Inicializa lastClaimedDailyReward se não existir
+            if (currentUser.lastClaimedDailyReward === undefined) {
+                currentUser.lastClaimedDailyReward = null;
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            // Inicializa invitedFriendsCount se não existir
+            if (currentUser.invitedFriendsCount === undefined) {
+                currentUser.invitedFriendsCount = 0;
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
             showMessage(document.getElementById('loginMessage'), 'Login bem-sucedido!', 'success');
             if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
             loggedInControls.classList.remove('hidden'); // Mostrar controles após login
@@ -416,7 +466,7 @@ if (registerForm && registerSubmitBtn) {
         // Simulação de delay para a "requisição"
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        users[email] = { name, email, password, cooperative, farmData, profilePic: "https://placehold.co/150x150/a7f3d0/065f46?text=Foto", manualData: {}, points: 0 }; // Adiciona foto padrão, objeto para dados manuais e pontos
+        users[email] = { name, email, password, cooperative, farmData, profilePic: "https://placehold.co/150x150/a7f3d0/065f46?text=Foto", manualData: {}, points: 0, lastClaimedDailyReward: null, invitedFriendsCount: 0 }; // Adiciona foto padrão, objeto para dados manuais, pontos, lastClaimedDailyReward e invitedFriendsCount
         localStorage.setItem('users', JSON.stringify(users));
         showMessage(document.getElementById('registerMessage'), 'Cadastro realizado com sucesso! Faça login.', 'success');
         e.target.reset(); // Limpa o formulário
@@ -665,6 +715,173 @@ function updatePointsDisplay() {
     }
 }
 
+// Lógica para recompensa diária
+if (claimDailyRewardBtn) {
+    claimDailyRewardBtn.addEventListener('click', async () => {
+        if (!currentUser) {
+            showMessage(dailyRewardMessage, 'Por favor, faça login para reivindicar recompensas.', 'error');
+            return;
+        }
+
+        showLoading(claimDailyRewardBtn, claimDailyRewardBtnText, claimDailyRewardBtnSpinner);
+
+        const today = new Date().toDateString();
+        if (currentUser.lastClaimedDailyReward === today) {
+            showMessage(dailyRewardMessage, 'Você já reivindicou sua recompensa diária hoje.', 'info');
+            hideLoading(claimDailyRewardBtn, claimDailyRewardBtnText, claimDailyRewardBtnSpinner);
+            return;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simula delay
+
+        const dailyPoints = 10; // Alterado para 10 pontos
+        currentUser.points = (currentUser.points || 0) + dailyPoints;
+        currentUser.lastClaimedDailyReward = today;
+        users[currentUser.email] = currentUser;
+        localStorage.setItem('users', JSON.stringify(users));
+
+        updatePointsDisplay();
+        showMessage(dailyRewardMessage, `Você reivindicou ${dailyPoints} pontos de recompensa diária!`, 'success');
+        addNotification(`Você ganhou ${dailyPoints} pontos de recompensa diária!`, 'success', 'Pontos bônus por acessar a plataforma diariamente.');
+        checkDailyRewardStatus(); // Atualiza o estado do botão
+        hideLoading(claimDailyRewardBtn, claimDailyRewardBtnText, claimDailyRewardBtnSpinner);
+        renderRanking(); // Atualiza o ranking ao ganhar pontos
+    });
+}
+
+function checkDailyRewardStatus() {
+    if (!currentUser || !claimDailyRewardBtn) return;
+
+    const today = new Date().toDateString(); // Ex: "Fri Jul 19 2025"
+    const lastClaimDate = currentUser.lastClaimedDailyReward;
+
+    if (lastClaimDate === today) {
+        claimDailyRewardBtn.disabled = true;
+        claimDailyRewardBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        claimDailyRewardBtnText.textContent = 'Recompensa Reivindicada Hoje!';
+        dailyRewardMessage.classList.add('hidden'); // Esconde a mensagem se já reivindicado
+    } else {
+        claimDailyRewardBtn.disabled = false;
+        claimDailyRewardBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        claimDailyRewardBtnText.textContent = 'Reivindicar Recompensa';
+        dailyRewardMessage.classList.add('hidden'); // Esconde a mensagem se não houver recompensa reivindicada
+    }
+}
+
+// NOVO: Lógica para convidar amigos
+if (inviteOptionButtons) {
+    inviteOptionButtons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+            if (!currentUser) {
+                showMessage(inviteFriendMessage, 'Por favor, faça login para convidar amigos.', 'error');
+                return;
+            }
+
+            const platform = e.currentTarget.dataset.platform;
+            const inviteText = `Venha para o Sustenta Pitanga! Monitore sua fazenda de forma sustentável e ganhe recompensas: ${SHARE_APP_LINK}`;
+            let message = '';
+
+            const pointsPerInvite = 30;
+            currentUser.points = (currentUser.points || 0) + pointsPerInvite;
+            currentUser.invitedFriendsCount = (currentUser.invitedFriendsCount || 0) + 1;
+            users[currentUser.email] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+
+            updatePointsDisplay();
+            addNotification(`Você ganhou ${pointsPerInvite} pontos por convidar um amigo via ${platform}!`, 'success', `Pontos bônus por convidar novos usuários para a plataforma via ${platform}.`);
+            renderRanking(); // Atualiza o ranking ao convidar amigos
+
+            switch (platform) {
+                case 'facebook':
+                    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_APP_LINK)}&quote=${encodeURIComponent(inviteText)}`;
+                    window.open(facebookShareUrl, '_blank');
+                    message = 'Compartilhado no Facebook (simulado)!';
+                    break;
+                case 'instagram':
+                    // Instagram não permite compartilhamento direto para feed/stories via URL simples.
+                    // A melhor abordagem é copiar o link e instruir o usuário.
+                    navigator.clipboard.writeText(inviteText).then(() => {
+                        showMessage(inviteFriendMessage, 'Link copiado! Cole no Instagram Stories ou na sua bio.', 'info');
+                    }).catch(err => {
+                        showMessage(inviteFriendMessage, 'Erro ao copiar o link para Instagram. Por favor, copie manualmente.', 'error');
+                        console.error('Erro ao copiar link para Instagram:', err);
+                    });
+                    return; // Sai da função para não mostrar a mensagem padrão abaixo
+                case 'copy-link':
+                    navigator.clipboard.writeText(SHARE_APP_LINK).then(() => {
+                        showMessage(inviteFriendMessage, 'Link de convite copiado para a área de transferência!', 'success');
+                    }).catch(err => {
+                        showMessage(inviteFriendMessage, 'Erro ao copiar o link. Por favor, copie manualmente.', 'error');
+                        console.error('Erro ao copiar link:', err);
+                    });
+                    return; // Sai da função para não mostrar a mensagem padrão abaixo
+                case 'whatsapp':
+                    const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(inviteText)}`;
+                    window.open(whatsappShareUrl, '_blank');
+                    message = 'Link de convite para WhatsApp gerado!';
+                    break;
+                case 'sms':
+                    const smsShareUrl = `sms:?body=${encodeURIComponent(inviteText)}`;
+                    window.open(smsShareUrl, '_blank');
+                    message = 'Link de convite para SMS gerado!';
+                    break;
+                default:
+                    message = 'Opção de convite não reconhecida.';
+            }
+            showMessage(inviteFriendMessage, `Convite via ${platform} simulado. ${message}`, 'success');
+        });
+    });
+}
+
+// NOVO: Função para renderizar o ranking
+function renderRanking() {
+    if (!rankingList) return;
+
+    // Ordena o ranking para garantir que Arthur esteja sempre em primeiro
+    studentsRanking.sort((a, b) => {
+        if (a.name === "Arthur") return -1;
+        if (b.name === "Arthur") return 1;
+        return b.points - a.points;
+    });
+
+    rankingList.innerHTML = ''; // Limpa a lista existente
+
+    if (studentsRanking.length === 0) {
+        rankingList.innerHTML = '<p class="text-gray-600 text-center">Nenhum pontuador no ranking.</p>';
+        return;
+    }
+
+    studentsRanking.forEach((student, index) => {
+        const rankingItem = document.createElement('div');
+        rankingItem.classList.add('flex', 'items-center', 'justify-between', 'p-3', 'rounded-md', 'border-b', 'border-gray-200');
+
+        let rankIcon = '';
+        let rankColor = 'text-gray-700';
+        if (index === 0) {
+            rankIcon = '<i class="fas fa-medal text-yellow-500 mr-2"></i>'; // Ouro
+            rankColor = 'text-yellow-700 font-bold';
+        } else if (index === 1) {
+            rankIcon = '<i class="fas fa-medal text-gray-400 mr-2"></i>'; // Prata
+            rankColor = 'text-gray-600';
+        } else if (index === 2) {
+            rankIcon = '<i class="fas fa-medal text-yellow-800 mr-2"></i>'; // Bronze (tom mais escuro)
+            rankColor = 'text-yellow-800';
+        } else {
+            rankIcon = `<span class="w-6 text-center mr-2">${index + 1}.</span>`;
+        }
+
+        rankingItem.innerHTML = `
+            <div class="flex items-center">
+                ${rankIcon}
+                <span class="font-medium ${rankColor}">${student.name}</span>
+            </div>
+            <span class="font-bold text-green-600">${student.points} pontos</span>
+        `;
+        rankingList.appendChild(rankingItem);
+    });
+}
+
+
 // Calculadora de Impacto
 if (calculateImpactBtn && impactResults) {
     calculateImpactBtn.addEventListener('click', async () => {
@@ -762,8 +979,8 @@ if (saveManualDataBtn && manualSaveMessage) {
         showMessage(manualSaveMessage, 'Dados salvos com sucesso!', 'success');
         addNotification(`Novos dados manuais registrados: Água ${dailyWater}L, Fertilizante ${fertilizerUse}kg. Você ganhou 20 pontos!`, 'info', 'Registro de dados manuais da sua fazenda. Contribui para o monitoramento e pode gerar pontos de recompensa.');
         updatePointsDisplay(); // Atualiza a exibição de pontos
-        // Não limpar campos para manter os dados salvos visíveis
         hideLoading(saveManualDataBtn, saveManualDataBtnText, saveManualDataBtnSpinner);
+        renderRanking(); // Atualiza o ranking ao ganhar pontos
     });
 }
 
@@ -808,6 +1025,7 @@ if (simulateSensorDataBtn && sensorSaveMessage) {
         updatePointsDisplay(); // Atualiza a exibição de pontos
         waterMeterInput.value = '';
         hideLoading(simulateSensorDataBtn, simulateSensorDataBtnText, simulateSensorDataBtnSpinner);
+        renderRanking(); // Atualiza o ranking ao ganhar pontos
     });
 }
 
@@ -867,6 +1085,7 @@ if (generatePdfReportBtn) {
         }
         updatePointsDisplay(); // Atualiza a exibição de pontos
         hideLoading(generatePdfReportBtn, generatePdfReportBtnText, generatePdfReportBtnSpinner);
+        renderRanking(); // Atualiza o ranking ao ganhar pontos
     });
 }
 
@@ -1195,6 +1414,7 @@ function checkLocationPermission() {
         if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível sem permissão de localização.</p>';
         fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar com coordenadas padrão
         fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar alerta com coordenadas padrão
+        fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
     } else {
         // Se não há status ou "não perguntar novamente" não está marcado, mostra o popup
         if (locationPermissionPopup) locationPermissionPopup.classList.add('visible'); // Mostra o popup
@@ -1232,6 +1452,7 @@ if (denyLocationBtn) {
         if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível devido a erro de localização.</p>';
         fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar com coordenadas padrão
         fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar alerta com coordenadas padrão
+        fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
     });
 }
 
@@ -1241,6 +1462,7 @@ async function getLocation(lat = null, lon = null) {
     if (lat !== null && lon !== null) {
         fetchWeatherAndMap(lat, lon);
         fetchNextDayWeatherAlert(lat, lon); // Chama também a função para o alerta do próximo dia
+        fetchEnvironmentalNews(); // Chama a função para notícias ambientais (agora sem coordenadas)
         return;
     }
 
@@ -1251,6 +1473,7 @@ async function getLocation(lat = null, lon = null) {
                 const currentLon = position.coords.longitude;
                 fetchWeatherAndMap(currentLat, currentLon);
                 fetchNextDayWeatherAlert(currentLat, currentLon); // Chama também a função para o alerta do próximo dia
+                fetchEnvironmentalNews(); // Chama a função para notícias ambientais (agora sem coordenadas)
                 if (locationMessage) showMessage(locationMessage, 'Localização obtida com sucesso!', 'success');
             },
             showError
@@ -1262,6 +1485,7 @@ async function getLocation(lat = null, lon = null) {
         // Se a geolocalização não for suportada, usa as coordenadas padrão
         fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
         fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar alerta com coordenadas padrão
+        fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
     }
 }
 
@@ -1416,6 +1640,55 @@ async function fetchNextDayWeatherAlert(lat, lon) {
     }
 }
 
+// NOVO: Função para buscar notícias ambientais do IBGE
+async function fetchEnvironmentalNews() {
+    if (!environmentalNewsInfo) return;
+
+    environmentalNewsInfo.innerHTML = '<p class="text-lg text-gray-700">Carregando notícias ambientais do IBGE...</p>';
+
+    try {
+        const response = await fetch(IBGE_NEWS_API_URL);
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar notícias do IBGE: ${response.status} - ${response.statusText}`);
+        }
+        const data = await response.json();
+
+        let newsHtml = `
+            <p class="text-lg text-gray-700">Últimas Notícias do IBGE:</p>
+            <ul class="list-disc pl-5 space-y-2 text-gray-600 mt-3">
+        `;
+
+        // Filtra e exibe as 5 primeiras notícias (ou menos, se houver menos de 5)
+        const newsToDisplay = data.items.slice(0, 5); // Pega os primeiros 5 itens
+
+        if (newsToDisplay.length > 0) {
+            newsToDisplay.forEach(news => {
+                newsHtml += `
+                    <li>
+                        <a href="${news.link}" target="_blank" class="font-semibold text-blue-600 hover:underline">${news.titulo}</a> - 
+                        <span class="text-xs text-gray-500">Publicado em: ${news.data_publicacao}</span>
+                    </li>
+                `;
+            });
+        } else {
+            newsHtml += `<li>Nenhuma notícia encontrada na API do IBGE.</li>`;
+        }
+
+        newsHtml += `</ul>`;
+        environmentalNewsInfo.innerHTML = newsHtml;
+
+    } catch (error) {
+        console.error('Erro ao buscar notícias do IBGE:', error);
+        environmentalNewsInfo.innerHTML = `
+            <p class="text-lg text-gray-700">Não foi possível carregar as notícias ambientais do IBGE.</p>
+            <p class="text-sm text-red-500 mt-2">Detalhes do erro: ${error.message}</p>
+            <p class="text-sm text-gray-600 mt-2">
+                Verifique sua conexão com a internet ou se a API do IBGE está disponível.
+            </p>
+        `;
+    }
+}
+
 
 function showError(error) {
     let errorMessage = '';
@@ -1426,24 +1699,28 @@ function showError(error) {
             // Após a negação, tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+            fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
             break;
         case error.POSITION_UNAVAILABLE:
             errorMessage = 'Informação de localização indisponível.';
             // Tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+            fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
             break;
         case error.TIMEOUT:
             errorMessage = 'A requisição para obter a localização expirou.';
             // Tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+            fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
             break;
         case error.UNKNOWN_ERROR:
             errorMessage = 'Um erro desconhecido ocorreu.';
             // Tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+            fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
             break;
     }
     if (locationMessage) showMessage(locationMessage, `Erro de Geolocalização: ${errorMessage}`, 'error');
