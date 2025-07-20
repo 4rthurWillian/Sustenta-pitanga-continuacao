@@ -60,6 +60,23 @@
     --blue-800-color: #2a4365;
     --indigo-500-color: #667eea;
     --border-gray-200-color: #edf2f7;
+
+    /* Novas variáveis para cores de ícones e texto "Lembrar-me" */
+    --icon-color: #a0aec0; /* Cor padrão para ícones (gray-400) */
+    --remember-me-text-color: #4a5568; /* Cor padrão para "Lembrar-me" (gray-700) */
+
+    /* Gradientes para o modo claro */
+    --light-mode-gradient: linear-gradient(to bottom right, #ffffff, #f0f4f8); /* Branco para cinza claro */
+
+    /* Cores para os cards da landing page no modo claro */
+    --landing-card-blue-bg: #ebf8ff; /* blue-50 */
+    --landing-card-green-bg: #f0fff4; /* green-50 */
+    --landing-card-yellow-bg: #fffff0; /* yellow-50 */
+    --landing-card-purple-bg: #faf5ff; /* purple-50 */
+    --landing-card-red-bg: #fff5f5; /* red-50 */
+    --landing-card-indigo-bg: #e0e7ff; /* indigo-50 */
+    --landing-card-teal-bg: #e6fffa; /* teal-50 */
+    --landing-mission-bg: #f7fafc; /* gray-50 */
 }
 
 /* Modo Escuro */
@@ -129,11 +146,23 @@ body.dark-mode {
     --indigo-500-color: #9f7aea;
     --border-gray-200-color: #4a5568;
     --text-blue-700-color: #90cdf4; /* Adicionado para adaptação do texto azul no dark mode */
-}
 
-/* Regra específica para o texto da seção IoT no modo escuro */
-body.dark-mode #dashboard .card .text-gray-600 {
-    color: var(--text-color) !important; /* Usar a cor de texto geral do dark mode para garantir contraste */
+    /* Novas variáveis para cores de ícones e texto "Lembrar-me" no modo escuro */
+    --icon-color: #e2e8f0; /* Ícones brancos no modo escuro */
+    --remember-me-text-color: #e2e8f0; /* Texto "Lembrar-me" branco no modo escuro */
+
+    /* Gradientes para o modo escuro */
+    --dark-mode-gradient: linear-gradient(to bottom right, #0a0a0a, #1a202c, #2d3748); /* Preto para azul escuro */
+
+    /* Cores para os cards da landing page no modo escuro (mais escuros) */
+    --landing-card-blue-bg: #1a365d; /* blue-900 */
+    --landing-card-green-bg: #1c4532; /* green-900 */
+    --landing-card-yellow-bg: #4a3200; /* yellow-900 */
+    --landing-card-purple-bg: #322659; /* purple-900 */
+    --landing-card-red-bg: #440000; /* red-900 */
+    --landing-card-indigo-bg: #2a2c4e; /* indigo-900 */
+    --landing-card-teal-bg: #004440; /* teal-900 */
+    --landing-mission-bg: #2d3748; /* gray-800 */
 }
 
 body {
@@ -141,7 +170,34 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color); /* Usa a variável de cor de texto padrão */
     transition: background-color 0.3s ease, color 0.3s ease;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Mantém a imagem fixa ao rolar */
 }
+
+/* Garante que o fundo não seja aplicado quando o modo escuro está ativo */
+body:not(.login-background) {
+    background-image: url(imagens/imagem\ de\ fundo.jpeg); /* Caminho da imagem corrigido */
+}
+
+body.dark-mode:not(.login-background) {
+    background-image: none; /* Remove a imagem de fundo no modo escuro */
+    background-color: var(--bg-color); /* Volta para a cor de fundo do modo escuro */
+}
+
+/* Estilos para o fundo da tela de login/cadastro no modo claro */
+body.login-background {
+    background-image: var(--light-mode-gradient);
+    background-color: transparent; /* Garante que a cor de fundo padrão não interfira */
+}
+
+/* Estilos para o fundo da tela de login/cadastro no modo escuro */
+body.dark-mode.login-background {
+    background-image: var(--dark-mode-gradient);
+    background-color: transparent; /* Garante que a cor de fundo padrão não interfira */
+}
+
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -156,6 +212,22 @@ body {
     color: var(--text-color); /* Garante que o texto dentro do card seja adaptável */
     position: relative; /* Adicionado para posicionamento absoluto da mensagem interna */
 }
+
+/* Estilo específico para o cartão de login para o efeito fosco */
+#login .card, #register .card {
+    background-color: rgba(255, 255, 255, 0.6); /* Fundo semi-transparente para o efeito fosco */
+    backdrop-filter: blur(8px); /* Efeito de desfoque */
+    -webkit-backdrop-filter: blur(8px); /* Compatibilidade com navegadores WebKit */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borda sutil */
+}
+
+/* Ajuste para o modo escuro do cartão de login/cadastro */
+body.dark-mode #login .card, body.dark-mode #register .card {
+    background-color: rgba(45, 55, 72, 0.6); /* Fundo semi-transparente no modo escuro */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
 .btn-primary, .btn-secondary, .btn-danger {
     /* Adiciona display flex e justify-content center para centralizar conteúdo */
     display: flex;
@@ -311,7 +383,7 @@ body {
     text-align: center;
     font-size: 0.9rem;
     opacity: 0;
-    visibility: hidden; /* Esconde completamente quando não visível */
+    visibility: hidden; /* Esconde completamente quando não visible */
     transition: opacity 0.3s ease, visibility 0.3s ease; /* Transição suave */
     z-index: 10; /* Garante que fique acima de outros conteúdos */
     display: flex; /* Para alinhar ícone e texto */
@@ -555,6 +627,16 @@ body.dark-mode .text-blue-700 {
 body.dark-mode #landing-page p.text-gray-700 {
     color: var(--text-color) !important;
 }
+/* Adicionado para garantir que todos os textos na landing page fiquem claros no modo escuro */
+body.dark-mode #landing-page h2,
+body.dark-mode #landing-page h3,
+body.dark-mode #landing-page h4,
+body.dark-mode #landing-page p,
+body.dark-mode #landing-page li,
+body.dark-mode #landing-page strong {
+    color: var(--text-color) !important;
+}
+
 
 /* Ajustes para o texto na seção IoT no dashboard no modo escuro */
 body.dark-mode #dashboard .card p.text-gray-700 {
@@ -572,21 +654,44 @@ body.dark-mode #points-redemption .text-gray-700,
 body.dark-mode #points-redemption .text-gray-600 {
     color: var(--text-color) !important;
 }
-/* Ajuste para as notificações no modo escuro: texto preto em fundo claro */
-body.dark-mode #notificationsDropdown h4,
-body.dark-mode #notificationsDropdown p,
-body.dark-mode #notificationDropdownList p,
-body.dark-mode #notificationList p {
-    color: #1a202c !important; /* Força o texto a ser preto */
-}
-body.dark-mode .notification-item p.text-xs.text-gray-500 {
-    color: #4a5568 !important; /* Um cinza mais escuro para a data no modo escuro */
+
+/* Ajustes para o dropdown de notificações */
+#notificationsDropdown {
+    background-color: var(--card-bg); /* Fundo do dropdown se adapta ao tema */
+    transition: background-color 0.3s ease; /* Adiciona transição para o fundo */
 }
 
-/* Ajuste para as datas das notificações no modo escuro */
-body.dark-mode .notification-item .text-xs.text-gray-500 {
-    color: var(--text-color) !important; /* Garante que a data seja clara no dark mode */
+/* Garante que o texto dentro do dropdown de notificações se adapte ao tema */
+#notificationsDropdown h4,
+#notificationsDropdown p,
+#notificationDropdownList p,
+#notificationList p {
+    color: var(--text-color) !important; /* O texto dentro do dropdown se adapta ao tema */
 }
+
+/* Ajuste para a data da notificação para se adaptar ao tema */
+.notification-item p.text-xs.text-gray-500 {
+    color: var(--text-color) !important; /* A data da notificação se adapta ao tema */
+}
+
+/* Estilo para o link "Ver todas" dentro do dropdown de notificações */
+#viewAllNotifications {
+    background-color: white !important; /* Fundo sempre branco */
+    color: #1a202c !important; /* Texto sempre preto */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Adiciona transição para hover */
+}
+
+#viewAllNotifications:hover {
+    background-color: #f0f0f0 !important; /* Um cinza muito claro no hover para feedback visual */
+}
+
+/* Estilo para o rodapé no modo escuro para combinar com o cabeçalho */
+body.dark-mode footer {
+    background-image: linear-gradient(to right, var(--header-bg-start), var(--header-bg-end)) !important;
+    background-color: transparent !important; /* Garante que a cor de fundo não sobreponha o gradiente */
+    color: var(--footer-text) !important; /* Garante que o texto permaneça branco */
+}
+
 
 /* Estilo para o spinner de carregamento */
 .loading-spinner {
@@ -624,11 +729,6 @@ body.dark-mode .notification-item .text-xs.text-gray-500 {
     /* Se você estiver usando TailwindCSS ou classes utilitárias, a classe 'hidden' faria display: none; */
     /* então a remoção da classe 'hidden' já o tornaria visível */
 }
-
-/* Se você estiver usando Tailwind CSS e a classe 'hidden' é aplicada por padrão,
-   basta garantir que o JS remova 'hidden' e adicione 'visible' para transições.
-   Nesse caso, a propriedade `opacity` pode ser mais para um efeito visual de fade.
-*/
 
 /* Ajustes para alinhar botões na seção de pontos e resgate */
 #points-redemption .grid > div {
@@ -681,4 +781,117 @@ body.dark-mode .notification-item .text-xs.text-gray-500 {
 #backToTopBtn:hover {
     background-color: var(--primary-btn-hover);
     transform: translateY(-2px); /* Pequeno efeito de elevação no hover */
+}
+
+/* Estilos para os ícones dinâmicos no formulário de login */
+.dynamic-icon-color {
+    color: var(--icon-color);
+    transition: color 0.3s ease;
+}
+
+/* Estilos para o texto "Lembrar-me" dinâmico */
+.dynamic-remember-me-text {
+    color: var(--remember-me-text-color);
+    transition: color 0.3s ease;
+}
+
+/* Animação para o botão de mostrar/esconder senha */
+.toggle-password-icon.animate {
+    animation: toggleIconAnimation 0.3s ease-out; /* Alterado para ease-out para mais fluidez */
+}
+
+@keyframes toggleIconAnimation {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.95); opacity: 0.7; } /* Levemente menor e mais transparente */
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Animação para o checkbox "Lembrar-me" */
+.remember-me-checkbox.animate {
+    animation: checkboxSmoothClick 0.3s ease-out; /* Alterado para ease-out para mais fluidez */
+}
+
+@keyframes checkboxSmoothClick {
+    0% { transform: scale(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
+    50% { transform: scale(0.95); box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); } /* Levemente menor e sombra suave */
+    100% { transform: scale(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
+}
+
+/* Novas animações para elementos da landing page */
+@keyframes fadeInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    opacity: 0; /* Começa invisível */
+    animation: fadeInFromBottom 0.6s ease-out forwards;
+}
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+.delay-800 { animation-delay: 0.8s; }
+.delay-900 { animation-delay: 0.9s; }
+.delay-1000 { animation-delay: 1.0s; }
+
+
+/* Estilos para os cards de feature e benefício na landing page */
+.feature-card, .benefit-card {
+    transition: all 0.3s ease-in-out; /* Transição para todas as propriedades */
+    cursor: pointer; /* Indica que o elemento é clicável/interativo */
+}
+
+.feature-card:hover, .benefit-card:hover {
+    transform: scale(1.35) translateY(-20px); /* Aumenta o card em 35% e levanta 20px para um zoom MUITO notável */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4); /* Sombra um pouco mais suave que a anterior, mas ainda notável */
+}
+
+
+/* Cores de fundo dos cards da landing page no modo claro */
+.bg-blue-50 { background-color: var(--landing-card-blue-bg); }
+.bg-green-50 { background-color: var(--landing-card-green-bg); }
+.bg-yellow-50 { background-color: var(--landing-card-yellow-bg); }
+.bg-purple-50 { background-color: var(--landing-card-purple-bg); }
+.bg-red-50 { background-color: var(--landing-card-red-bg); }
+.bg-indigo-50 { background-color: var(--landing-card-indigo-bg); }
+.bg-teal-50 { background-color: var(--landing-card-teal-bg); }
+.bg-gray-50 { background-color: var(--landing-mission-bg); } /* Para a seção de missão */
+
+/* Cores de fundo dos cards da landing page no modo escuro */
+body.dark-mode .bg-blue-50 { background-color: var(--landing-card-blue-bg); }
+body.dark-mode .bg-green-50 { background-color: var(--landing-card-green-bg); }
+body.dark-mode .bg-yellow-50 { background-color: var(--landing-card-yellow-bg); }
+body.dark-mode .bg-purple-50 { background-color: var(--landing-card-purple-bg); }
+body.dark-mode .bg-red-50 { background-color: var(--landing-card-red-bg); }
+body.dark-mode .bg-indigo-50 { background-color: var(--landing-card-indigo-bg); }
+body.dark-mode .bg-teal-50 { background-color: var(--landing-card-teal-bg); }
+body.dark-mode .bg-gray-50 { background-color: var(--landing-mission-bg); } /* Para a seção de missão */
+
+/* Ajustes de texto para os novos cards no modo escuro */
+body.dark-mode .benefit-card h4,
+body.dark-mode .benefit-card p {
+    color: var(--text-color) !important;
+}
+
+/* Ajuste para o fundo da seção de chamada para ação no modo escuro */
+body.dark-mode .bg-blue-100 {
+    background-color: var(--blue-900-bg) !important; /* Usando uma cor mais escura para o fundo azul */
+}
+/* Ajuste para o texto dentro da seção de chamada para ação no modo escuro */
+body.dark-mode .bg-blue-100 h3 {
+    color: var(--blue-200-color) !important; /* Cor mais clara para o título */
+}
+body.dark-mode .bg-blue-100 p {
+    color: var(--gray-200-color) !important; /* Cor mais clara para o parágrafo */
 }

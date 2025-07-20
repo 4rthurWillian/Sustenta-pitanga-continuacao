@@ -159,6 +159,14 @@ let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
 // Botão Voltar ao Topo
 const backToTopBtn = document.getElementById('backToTopBtn');
 
+// Adicionado: Elementos para o login
+const passwordInput = document.getElementById('password');
+const togglePasswordVisibilityBtn = document.getElementById('togglePasswordVisibility');
+const togglePasswordIcon = document.getElementById('togglePasswordIcon'); // Novo ID para o ícone
+const rememberMeCheckbox = document.getElementById('rememberMe');
+const rememberMeLabel = document.querySelector('label[for="rememberMe"]'); // Novo para o label
+const emailInput = document.getElementById('email');
+
 
 // Função para exibir mensagens
 function showMessage(element, message, type = 'info') {
@@ -213,6 +221,13 @@ function showSection(sectionId, pushState = true) {
         }
     });
 
+    // Adiciona ou remove a classe 'login-background' do body
+    if (sectionId === 'login' || sectionId === 'register') {
+        document.body.classList.add('login-background');
+    } else {
+        document.body.classList.remove('login-background');
+    }
+
     // Esconder menu mobile ao navegar
     if (mobileMenu) {
         mobileMenu.classList.remove('active');
@@ -246,6 +261,13 @@ function showSection(sectionId, pushState = true) {
 function checkLoginState() {
     // Verifica se há um usuário logado no localStorage
     loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+
+    if (rememberedEmail && emailInput) {
+        emailInput.value = rememberedEmail;
+        if (rememberMeCheckbox) rememberMeCheckbox.checked = true;
+    }
+
     if (loggedInUserEmail && users[loggedInUserEmail]) {
         currentUser = users[loggedInUserEmail];
         // Inicializa pontos se não existirem
@@ -288,6 +310,7 @@ if (loginForm && loginBtn) {
         showLoading(loginBtn, loginBtnText, loginBtnSpinner);
         const email = e.target.email.value;
         const password = e.target.password.value;
+        const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
 
         // Validação básica do lado do cliente
         if (!email || !password) {
@@ -312,6 +335,14 @@ if (loginForm && loginBtn) {
         if (users[email] && users[email].password === password) {
             currentUser = users[email];
             localStorage.setItem('loggedInUserEmail', email);
+            
+            // Lógica para "Lembrar-me"
+            if (rememberMe) {
+                localStorage.setItem('rememberedEmail', email);
+            } else {
+                localStorage.removeItem('rememberedEmail');
+            }
+
             // Inicializa pontos se não existirem para o usuário logado
             if (currentUser.points === undefined) {
                 currentUser.points = 0;
@@ -328,6 +359,33 @@ if (loginForm && loginBtn) {
             showMessage(document.getElementById('loginMessage'), 'E-mail ou senha inválidos.', 'error');
         }
         hideLoading(loginBtn, loginBtnText, loginBtnSpinner);
+    });
+}
+
+// Adicionado: Lógica para alternar a visibilidade da senha
+if (togglePasswordVisibilityBtn && passwordInput && togglePasswordIcon) {
+    togglePasswordVisibilityBtn.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        // Altera o ícone do olho
+        togglePasswordIcon.classList.toggle('fa-eye');
+        togglePasswordIcon.classList.toggle('fa-eye-slash');
+
+        // Adiciona e remove a classe de animação
+        togglePasswordIcon.classList.add('animate');
+        setTimeout(() => {
+            togglePasswordIcon.classList.remove('animate');
+        }, 300); // Deve corresponder à duração da animação no CSS
+    });
+}
+
+// Adicionado: Animação para o checkbox "Lembrar-me"
+if (rememberMeCheckbox) {
+    rememberMeCheckbox.addEventListener('click', () => {
+        rememberMeCheckbox.classList.add('animate');
+        setTimeout(() => {
+            rememberMeCheckbox.classList.remove('animate');
+        }, 300); // Deve corresponder à duração da animação no CSS
     });
 }
 
@@ -351,11 +409,6 @@ if (registerForm && registerSubmitBtn) {
         }
         if (password !== confirmPassword) {
             showMessage(document.getElementById('registerMessage'), 'As senhas não coincidem.', 'error');
-            hideLoading(registerSubmitBtn, registerSubmitBtnText, registerSubmitBtnSpinner);
-            return;
-        }
-        if (password.length < 6) {
-            showMessage(document.getElementById('registerMessage'), 'A senha deve ter no mínimo 6 caracteres.', 'error');
             hideLoading(registerSubmitBtn, registerSubmitBtnText, registerSubmitBtnSpinner);
             return;
             }
@@ -412,6 +465,11 @@ if (backToLoginLink) backToLoginLink.addEventListener('click', (e) => {
 if (logoutBtn) logoutBtn.addEventListener('click', () => {
     currentUser = null;
     localStorage.removeItem('loggedInUserEmail');
+    // Adicionado: Limpa o campo de senha ao deslogar
+    if (passwordInput) passwordInput.value = ''; 
+    // Adicionado: Desmarca "Lembrar-me" ao deslogar
+    if (rememberMeCheckbox) rememberMeCheckbox.checked = false;
+    localStorage.removeItem('rememberedEmail'); // Remove o email lembrado
     loggedInControls.classList.add('hidden'); // Esconder controles ao deslogar
     showSection('landing-page'); // Volta para a tela "Sobre o Projeto" (landing-page) ao deslogar
 });
