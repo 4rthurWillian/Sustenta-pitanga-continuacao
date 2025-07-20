@@ -42,6 +42,7 @@ const profileSection = document.getElementById('profile');
 const notificationsPageSection = document.getElementById('notifications-page'); // Nova seção de notificações
 const pointsRedemptionSection = document.getElementById('points-redemption'); // Nova seção de pontos e resgate
 const aboutUsSection = document.getElementById('about-us'); // Nova seção
+const leaderboardSection = document.getElementById('leaderboard'); // Nova seção de ranking
 
 const loggedInControls = document.getElementById('logged-in-controls');
 const mobileMenu = document.getElementById('mobileMenu');
@@ -133,6 +134,7 @@ const backToDashboardFromProfileBtn = document.getElementById('backToDashboardFr
 const backToDashboardFromReportsBtn = document.getElementById('backToDashboardFromReportsBtn');
 const backToDashboardFromNotificationsBtn = document.getElementById('backToDashboardFromNotificationsBtn');
 const backToDashboardFromPointsBtn = document.getElementById('backToDashboardFromPointsBtn'); // Novo botão de voltar para pontos
+const backToDashboardFromLeaderboardBtn = document.getElementById('backToDashboardFromLeaderboardBtn'); // Novo botão de voltar para ranking
 
 // Elementos para a nova seção de notificações
 const notificationDropdownList = document.getElementById('notificationDropdownList');
@@ -142,6 +144,22 @@ const clearNotificationsBtn = document.getElementById('clearNotificationsBtn'); 
 
 // Elementos para a nova seção de pontos e resgate
 const currentPointsDisplay = document.getElementById('currentPoints');
+const dailyLoginPointsDisplay = document.getElementById('dailyLoginPointsDisplay'); // Novo elemento
+const redeemDailyPointsBtn = document.getElementById('redeemDailyPointsBtn'); // Novo botão
+const redeemDailyPointsBtnText = document.getElementById('redeemDailyPointsBtnText');
+const redeemDailyPointsBtnSpinner = document.getElementById('redeemDailyPointsBtnSpinner');
+const redeemMessage = document.getElementById('redeemMessage'); // Mensagem para resgate diário
+const shareWebsiteBtn = document.getElementById('shareWebsiteBtn'); // Novo botão
+const shareWebsiteBtnText = document.getElementById('shareWebsiteBtnText');
+const shareWebsiteBtnSpinner = document.getElementById('shareWebsiteBtnSpinner');
+const shareMessage = document.getElementById('shareMessage'); // Mensagem para compartilhamento
+
+// Novos botões de compartilhamento
+const shareInstagramBtn = document.getElementById('shareInstagramBtn');
+const shareFacebookBtn = document.getElementById('shareFacebookBtn');
+const shareWhatsappBtn = document.getElementById('shareWhatsappBtn');
+const copyLinkBtn = document.getElementById('copyLinkBtn');
+
 const climateAlertElement = document.getElementById('climateAlert'); // Adicionado para o alerta climático dinâmico
 
 // Elementos para os botões de visualização do mapa e mensagem
@@ -150,21 +168,6 @@ const terrainViewBtn = document.getElementById('terrainViewBtn');
 const measureAreaBtn = document.getElementById('measureAreaBtn');
 const addMarkerBtn = document.getElementById('addMarkerBtn');
 const mapMessage = document.getElementById('mapMessage');
-const viewLargerMapBtn = document.getElementById('viewLargerMapBtn'); // Botão "Ver Mapa Maior"
-
-// Elementos para a seção de sensoriamento remoto
-const satelliteViewSection = document.getElementById('satelliteView');
-const googleEarthIframe = document.getElementById('googleEarthIframe');
-const iframeOverlay = document.getElementById('iframeOverlay');
-const googleEarthRedirectLink = document.getElementById('googleEarthRedirectLink');
-const updateSatelliteDataBtn = document.getElementById('updateSatelliteDataBtn');
-const updateSatelliteDataBtnText = document.getElementById('updateSatelliteDataBtnText');
-const updateSatelliteDataBtnSpinner = document.getElementById('updateSatelliteDataBtnSpinner');
-const ndviValue = document.getElementById('ndviValue');
-const soilMoistureValue = document.getElementById('soilMoistureValue');
-const waterStressValue = document.getElementById('waterStressValue');
-const satelliteMessage = document.getElementById('satelliteMessage');
-
 
 // Variável para armazenar a seção atual
 let currentSectionId = '';
@@ -183,47 +186,27 @@ const rememberMeCheckbox = document.getElementById('rememberMe');
 const rememberMeLabel = document.querySelector('label[for="rememberMe"]'); // Novo para o label
 const emailInput = document.getElementById('email');
 
-// Dicas de Sustentabilidade Rotativas
-const sustainabilityTipsList = document.getElementById('sustainabilityTipsList');
-const tipRotationTimer = document.getElementById('tipRotationTimer');
-let currentTipIndex = 0;
-const TIPS_PER_ROTATION = 3; // Quantidade de dicas a serem exibidas por vez
-const ROTATION_INTERVAL_SECONDS = 30; // Tempo em segundos para a rotação das dicas
-let timerInterval;
-let timeRemaining = ROTATION_INTERVAL_SECONDS;
+// Elemento para o corpo da tabela do ranking
+const leaderboardBody = document.getElementById('leaderboardBody');
 
+// Dicas de Sustentabilidade
 const sustainabilityTips = [
     "Considere a rotação de culturas para melhorar a saúde do solo e reduzir pragas.",
-    "Utilize sistemas de irrigação por gotejamento para otimizar o uso da água e evitar desperdícios.",
-    "Monitore a saúde das plantas regularmente para identificar problemas precocemente e agir rápido.",
-    "Invista em compostagem para enriquecer o solo com nutrientes naturais e reduzir resíduos orgânicos.",
-    "Plante árvores e arbustos nativos para promover a biodiversidade e criar habitats para polinizadores.",
-    "Adote o plantio direto para proteger o solo da erosão e melhorar sua estrutura.",
-    "Use energias renováveis na fazenda, como painéis solares, para reduzir a pegada de carbono.",
-    "Implemente a integração lavoura-pecuária-floresta para otimizar o uso da terra e diversificar a produção.",
-    "Faça a análise do solo periodicamente para aplicar fertilizantes de forma mais precisa e eficiente.",
-    "Gerencie os resíduos da fazenda de forma adequada, reciclando e reutilizando sempre que possível.",
-    "Proteja as nascentes e cursos d'água da sua propriedade para garantir a qualidade da água.",
-    "Capacite sua equipe em práticas agrícolas sustentáveis para aumentar a eficiência e a consciência ambiental.",
-    "Utilize controladores biológicos para o manejo de pragas, reduzindo a dependência de pesticidas químicos.",
-    "Fomente a agricultura orgânica para produzir alimentos mais saudáveis e valorizar o meio ambiente.",
-    "Crie barreiras vivas para proteger as lavouras do vento e da erosão.",
-    "Aproveite a água da chuva para irrigação e outras necessidades da fazenda.",
-    "Mantenha a cobertura do solo com plantas ou palha para conservar a umidade e controlar ervas daninhas.",
-    "Diversifique as culturas para fortalecer o ecossistema da fazenda e reduzir riscos de pragas.",
-    "Invista em tecnologias de monitoramento inteligente para otimizar a gestão da propriedade.",
-    "Participe de cooperativas e associações para compartilhar conhecimentos e recursos com outros produtores.",
-    "Planeje a colheita de forma a minimizar perdas e desperdícios de alimentos.",
-    "Utilize defensivos agrícolas de forma consciente e seguindo as recomendações técnicas.",
-    "Promova a saúde dos animais da fazenda com práticas de bem-estar e alimentação natural.",
-    "Reduza o uso de plásticos na fazenda, buscando alternativas mais sustentáveis.",
-    "Incentive o consumo local e a venda direta para valorizar a produção da sua comunidade.",
-    "Eduque as novas gerações sobre a importância da sustentabilidade na agricultura.",
-    "Preserve as áreas de vegetação nativa na sua propriedade para proteger a biodiversidade.",
-    "Adote a apicultura para promover a polinização e a produção de mel.",
-    "Implemente sistemas de reuso de água para otimizar o ciclo hídrico na fazenda.",
-    "Crie um plano de manejo de nutrientes para evitar a lixiviação e a contaminação do solo."
+    "Utilize sistemas de irrigação por gotejamento para otimizar o uso da água e economizar.",
+    "Monitore a saúde das plantas regularmente para identificar problemas precocemente e evitar perdas.",
+    "Invista em compostagem para criar adubo orgânico rico em nutrientes para suas plantas.",
+    "Plante árvores e arbustos nativos para atrair polinizadores e aumentar a biodiversidade.",
+    "Reduza o uso de pesticidas químicos, optando por métodos de controle biológico.",
+    "Aproveite a água da chuva para irrigação, instalando cisternas ou sistemas de captação.",
+    "Implemente a agricultura de conservação para proteger o solo da erosão e melhorar sua estrutura.",
+    "Diversifique suas culturas para aumentar a resiliência do ecossistema da sua fazenda.",
+    "Eduque-se continuamente sobre novas técnicas e tecnologias agrícolas sustentáveis."
 ];
+const sustainabilityTipsList = document.getElementById('sustainabilityTipsList');
+const sustainabilityTipsTimer = document.getElementById('sustainabilityTipsTimer');
+let currentTipIndex = 0;
+let tipsInterval;
+let timerSeconds = 30;
 
 
 // Função para exibir mensagens
@@ -245,7 +228,7 @@ function showMessage(element, message, type = 'info') {
         element.classList.remove('visible'); // Inicia a transição para esconder
         setTimeout(() => {
             element.classList.add('hidden'); // Esconde após a transição
-        }, 300); // Tempo da transição
+        }, 5000);
     }, 5000);
 }
 
@@ -270,7 +253,7 @@ function hideLoading(buttonElement, textSpan, spinnerSpan) {
 
 // Função para alternar seções e gerenciar o histórico do navegador
 function showSection(sectionId, pushState = true) {
-    const sections = [landingPageSection, loginSection, registerSection, dashboardSection, reportsSection, profileSection, notificationsPageSection, pointsRedemptionSection, aboutUsSection];
+    const sections = [landingPageSection, loginSection, registerSection, dashboardSection, reportsSection, profileSection, notificationsPageSection, pointsRedemptionSection, aboutUsSection, leaderboardSection];
     sections.forEach(section => {
         if (section && section.id === sectionId) {
             section.classList.remove('hidden');
@@ -312,13 +295,16 @@ function showSection(sectionId, pushState = true) {
     }
     if (sectionId === 'points-redemption') {
         updatePointsDisplay(); // Atualiza a exibição de pontos
+        checkDailyRedemption(); // Verifica o estado do resgate diário
+        checkDailyLoginPointsDisplay(); // Verifica a exibição dos pontos de login diário
+    }
+    if (sectionId === 'leaderboard') {
+        renderLeaderboard(); // Renderiza o ranking
     }
     if (sectionId === 'dashboard') {
-        displaySustainabilityTips(); // Exibe as dicas ao entrar no dashboard
-        startTipRotationTimer(); // Inicia o timer das dicas
-        updateSatelliteData(); // Atualiza os dados de sensoriamento remoto
+        startTipsRotation(); // Inicia a rotação das dicas
     } else {
-        clearInterval(timerInterval); // Para o timer se sair do dashboard
+        stopTipsRotation(); // Para a rotação das dicas
     }
 }
 
@@ -338,14 +324,37 @@ function checkLoginState() {
         // Inicializa pontos se não existirem
         if (currentUser.points === undefined) {
             currentUser.points = 0;
-            localStorage.setItem('users', JSON.stringify(users));
         }
+        // Adiciona lastLoginDate se não existir
+        if (currentUser.lastLoginDate === undefined) {
+            currentUser.lastLoginDate = new Date().toISOString().split('T')[0]; // Define a data de login como hoje
+        }
+        // Inicializa lastRedemptionDate se não existir
+        if (currentUser.lastRedemptionDate === undefined) {
+            currentUser.lastRedemptionDate = null;
+        }
+        // Inicializa lastShareDate se não existir
+        if (currentUser.lastShareDate === undefined) {
+            currentUser.lastShareDate = null;
+        }
+
+        // Verifica o login diário
+        const today = new Date().toISOString().split('T')[0];
+        if (currentUser.lastLoginDate !== today) {
+            currentUser.points += 50; // Adiciona 50 pontos por login diário
+            currentUser.lastLoginDate = today; // Atualiza a data do último login
+            addNotification('Parabéns! Você ganhou 50 pontos pelo login diário!', 'success', 'Pontos bônus concedidos por acessar a plataforma hoje. Continue logando diariamente para mais recompensas!');
+        }
+
+        localStorage.setItem('users', JSON.stringify(users)); // Salva os usuários atualizados
+
         if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
         showSection('dashboard', false); // Não adiciona ao histórico na inicialização
         loggedInControls.classList.remove('hidden'); // Mostrar controles após login
         checkLocationPermission(); // Chama a função para verificar e possivelmente mostrar o popup
         loadManualData(); // Carrega os dados manuais ao logar
         renderNotificationsDropdown(); // Carrega as notificações no dropdown
+        startTipsRotation(); // Inicia a rotação das dicas ao entrar no dashboard
     } else {
         showSection('landing-page', false); // Não adiciona ao histórico na inicialização
         loggedInControls.classList.add('hidden'); // Esconder controles antes do login
@@ -361,6 +370,9 @@ window.addEventListener('popstate', (event) => {
         }
         if (event.state.section === 'reports') {
             initChart('pie');
+        }
+        if (event.state.section === 'leaderboard') {
+            renderLeaderboard();
         }
     } else {
         // Se não houver estado, volta para a landing page ou dashboard, dependendo do login
@@ -408,11 +420,33 @@ if (loginForm && loginBtn) {
                 localStorage.removeItem('rememberedEmail');
             }
 
-            // Inicializa pontos se não existirem para o usuário logado
+            // Inicializa pontos se não existirem
             if (currentUser.points === undefined) {
                 currentUser.points = 0;
-                localStorage.setItem('users', JSON.stringify(users));
             }
+            // Inicializa lastLoginDate se não existir
+            if (currentUser.lastLoginDate === undefined) {
+                currentUser.lastLoginDate = new Date().toISOString().split('T')[0];
+            }
+            // Inicializa lastRedemptionDate se não existir
+            if (currentUser.lastRedemptionDate === undefined) {
+                currentUser.lastRedemptionDate = null;
+            }
+            // Inicializa lastShareDate se não existir
+            if (currentUser.lastShareDate === undefined) {
+                currentUser.lastShareDate = null;
+            }
+
+            // Verifica o login diário para o usuário recém-logado
+            const today = new Date().toISOString().split('T')[0];
+            if (currentUser.lastLoginDate !== today) {
+                currentUser.points += 50; // Adiciona 50 pontos por login diário
+                currentUser.lastLoginDate = today; // Atualiza a data do último login
+                addNotification('Parabéns! Você ganhou 50 pontos pelo login diário!', 'success', 'Pontos bônus concedidos por acessar a plataforma hoje. Continue logando diariamente para mais recompensas!');
+            }
+
+            localStorage.setItem('users', JSON.stringify(users)); // Salva os usuários atualizados
+
             showMessage(document.getElementById('loginMessage'), 'Login bem-sucedido!', 'success');
             if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
             loggedInControls.classList.remove('hidden'); // Mostrar controles após login
@@ -420,6 +454,7 @@ if (loginForm && loginBtn) {
             checkLocationPermission(); // Chama a função para verificar e possivelmente mostrar o popup
             loadManualData(); // Carrega os dados manuais ao logar
             renderNotificationsDropdown(); // Carrega as notificações no dropdown
+            startTipsRotation(); // Inicia a rotação das dicas
         } else {
             showMessage(document.getElementById('loginMessage'), 'E-mail ou senha inválidos.', 'error');
         }
@@ -481,7 +516,19 @@ if (registerForm && registerSubmitBtn) {
         // Simulação de delay para a "requisição"
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        users[email] = { name, email, password, cooperative, farmData, profilePic: "https://placehold.co/150x150/a7f3d0/065f46?text=Foto", manualData: {}, points: 0 }; // Adiciona foto padrão, objeto para dados manuais e pontos
+        users[email] = { 
+            name, 
+            email, 
+            password, 
+            cooperative, 
+            farmData, 
+            profilePic: "https://placehold.co/150x150/a7f3d0/065f46?text=Foto", 
+            manualData: {}, 
+            points: 0,
+            lastLoginDate: null, // Novo campo para a data do último login
+            lastRedemptionDate: null, // Novo campo para o último resgate diário
+            lastShareDate: null // Novo campo para o último compartilhamento
+        }; // Adiciona foto padrão, objeto para dados manuais e pontos
         localStorage.setItem('users', JSON.stringify(users));
         showMessage(document.getElementById('registerMessage'), 'Cadastro realizado com sucesso! Faça login.', 'success');
         e.target.reset(); // Limpa o formulário
@@ -517,6 +564,9 @@ if (backToDashboardFromNotificationsBtn) {
 }
 if (backToDashboardFromPointsBtn) {
     backToDashboardFromPointsBtn.addEventListener('click', () => showSection('dashboard'));
+}
+if (backToDashboardFromLeaderboardBtn) {
+    backToDashboardFromLeaderboardBtn.addEventListener('click', () => showSection('dashboard'));
 }
 
 if (registerLink) registerLink.addEventListener('click', (e) => {
@@ -557,13 +607,16 @@ if (navLinks) {
             e.preventDefault();
             const target = e.target.dataset.target;
             // Permite acesso a landing-page, about-us, notifications-page e points-redemption sem login
-            if (currentUser || target === 'landing-page' || target === 'about-us' || target === 'notifications-page' || target === 'points-redemption') {
+            if (currentUser || target === 'landing-page' || target === 'about-us' || target === 'notifications-page' || target === 'points-redemption' || target === 'leaderboard') {
                 showSection(target); // Adiciona ao histórico
                 if (target === 'profile') {
                     loadProfileData();
                 }
                 if (target === 'reports') {
                     initChart('pie'); // Inicializa o gráfico de pizza por padrão ao entrar em relatórios
+                }
+                if (target === 'leaderboard') {
+                    renderLeaderboard(); // Renderiza o ranking ao entrar na página
                 }
             } else {
                 showMessage(document.getElementById('loginMessage'), 'Por favor, faça login para acessar esta seção.', 'info');
@@ -643,6 +696,18 @@ function renderNotificationsDropdown() {
         const notificationItem = document.createElement('a');
         notificationItem.href = "#"; // Pode ser um link para detalhes da notificação
         notificationItem.classList.add('block', 'px-4', 'py-3', 'hover:bg-gray-100', 'border-b', 'border-gray-100', 'notification-item'); // Adiciona classe para estilo de data
+        
+        // Garante que o texto da notificação se adapte ao dark mode
+        if (document.body.classList.contains('dark-mode')) {
+            notificationItem.style.backgroundColor = 'var(--card-bg)';
+            notificationItem.style.color = 'var(--text-color)';
+            notificationItem.style.borderColor = 'var(--border-gray-200-color)';
+        } else {
+            notificationItem.style.backgroundColor = ''; // Reseta para o padrão
+            notificationItem.style.color = '';
+            notificationItem.style.borderColor = '';
+        }
+
         notificationItem.title = notification.conceptExplanation; // Adiciona o tooltip
         notificationItem.innerHTML = `
             <p class="text-sm font-medium text-gray-900">${notification.message}</p>
@@ -701,6 +766,12 @@ function renderNotifications() {
         }
 
         notificationCard.classList.add(bgColorClass, textColorClass);
+        // Garante que o texto dentro do card de notificação se adapte ao tema
+        if (document.body.classList.contains('dark-mode')) {
+            notificationCard.style.backgroundColor = 'var(--card-bg)';
+            notificationCard.style.color = 'var(--text-color)';
+        }
+
 
         notificationCard.innerHTML = `
             <div class="flex items-center mb-2">
@@ -714,14 +785,17 @@ function renderNotifications() {
 }
 
 // Função para limpar todas as notificações
+function clearNotifications() {
+    notifications = []; // Esvazia o array de notificações
+    saveNotifications(); // Salva o estado vazio no localStorage
+    renderNotificationsDropdown(); // Atualiza o dropdown
+    renderNotifications(); // Atualiza a página de notificações
+    showMessage(document.getElementById('notifications-page').querySelector('.message-box') || notificationList, 'Todas as notificações foram limpas.', 'success');
+}
+
+// Event listener para o botão de limpar notificações
 if (clearNotificationsBtn) {
-    clearNotificationsBtn.addEventListener('click', () => {
-        notifications = []; // Limpa o array de notificações
-        saveNotifications(); // Salva o estado vazio no localStorage
-        renderNotifications(); // Atualiza a exibição na página de notificações
-        renderNotificationsDropdown(); // Atualiza o dropdown de notificações
-        showMessage(document.getElementById('notifications-page').querySelector('.card'), 'Todas as notificações foram limpas.', 'success');
-    });
+    clearNotificationsBtn.addEventListener('click', clearNotifications);
 }
 
 // Simula a chegada de algumas notificações iniciais (apenas para demonstração)
@@ -740,6 +814,197 @@ function updatePointsDisplay() {
         currentPointsDisplay.textContent = currentUser.points;
     }
 }
+
+// Função para verificar e exibir a mensagem de pontos de login diário
+function checkDailyLoginPointsDisplay() {
+    if (dailyLoginPointsDisplay && currentUser) {
+        const today = new Date().toISOString().split('T')[0];
+        if (currentUser.lastLoginDate === today) {
+            dailyLoginPointsDisplay.classList.remove('hidden');
+        } else {
+            dailyLoginPointsDisplay.classList.add('hidden');
+        }
+    }
+}
+
+// Função para verificar o estado do resgate diário
+function checkDailyRedemption() {
+    if (redeemDailyPointsBtn && currentUser) {
+        const today = new Date().toISOString().split('T')[0];
+        if (currentUser.lastRedemptionDate === today) {
+            redeemDailyPointsBtn.disabled = true;
+            redeemDailyPointsBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            redeemDailyPointsBtnText.textContent = 'Pontos Diários Resgatados Hoje!';
+        } else {
+            redeemDailyPointsBtn.disabled = false;
+            redeemDailyPointsBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            redeemDailyPointsBtnText.textContent = 'Resgatar 10 Pontos Diários';
+        }
+    }
+}
+
+// Event listener para o botão de resgate diário
+if (redeemDailyPointsBtn) {
+    redeemDailyPointsBtn.addEventListener('click', async () => {
+        if (!currentUser) {
+            showMessage(redeemMessage, 'Você precisa estar logado para resgatar pontos.', 'error');
+            return;
+        }
+        showLoading(redeemDailyPointsBtn, redeemDailyPointsBtnText, redeemDailyPointsBtnSpinner);
+        await new Promise(resolve => setTimeout(resolve, 700)); // Simula delay
+
+        const today = new Date().toISOString().split('T')[0];
+        if (currentUser.lastRedemptionDate !== today) {
+            currentUser.points = (currentUser.points || 0) + 10;
+            currentUser.lastRedemptionDate = today;
+            users[currentUser.email] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+            updatePointsDisplay();
+            checkDailyRedemption(); // Atualiza o estado do botão
+            addNotification('Você resgatou 10 pontos diários!', 'success', 'Pontos bônus concedidos por resgatar pontos diários. Pode ser feito uma vez por dia.');
+            showMessage(redeemMessage, '10 pontos diários resgatados com sucesso!', 'success');
+        } else {
+            showMessage(redeemMessage, 'Você já resgatou seus pontos diários hoje.', 'info');
+        }
+        hideLoading(redeemDailyPointsBtn, redeemDailyPointsBtnText, redeemDailyPointsBtnSpinner);
+    });
+}
+
+// Link para compartilhamento
+const SHARE_LINK = "https://4rthurwillian.github.io/Sustenta-pitanga-continuacao/";
+const SHARE_TEXT = "Confira esta plataforma incrível para agricultura sustentável!";
+
+// Função para lidar com o compartilhamento e conceder pontos
+async function handleShare(platform) {
+    if (!currentUser) {
+        showMessage(shareMessage, 'Você precisa estar logado para compartilhar o site.', 'error');
+        return;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    if (currentUser.lastShareDate === today) {
+        showMessage(shareMessage, 'Você já ganhou pontos por compartilhar hoje.', 'info');
+        return;
+    }
+
+    let sharedSuccessfully = false;
+    let shareUrl = '';
+
+    switch (platform) {
+        case 'instagram':
+            // Instagram sharing is tricky for web. This will open Instagram, but won't pre-fill content.
+            // A direct share API for Instagram usually requires server-side integration.
+            // This is a fallback to open Instagram.
+            shareUrl = `https://www.instagram.com/share?url=${encodeURIComponent(SHARE_LINK)}`;
+            window.open(shareUrl, '_blank');
+            sharedSuccessfully = true; // Assume success for simplicity in simulation
+            break;
+        case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_LINK)}&quote=${encodeURIComponent(SHARE_TEXT)}`;
+            window.open(shareUrl, '_blank');
+            sharedSuccessfully = true;
+            break;
+        case 'whatsapp':
+            shareUrl = `https://wa.me/?text=${encodeURIComponent(SHARE_TEXT + " " + SHARE_LINK)}`;
+            window.open(shareUrl, '_blank');
+            sharedSuccessfully = true;
+            break;
+        case 'copy':
+            try {
+                // Use document.execCommand('copy') for better compatibility in iframes
+                const tempInput = document.createElement('textarea');
+                tempInput.value = SHARE_LINK;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                showMessage(shareMessage, 'Link copiado para a área de transferência!', 'success');
+                sharedSuccessfully = true;
+            } catch (err) {
+                console.error('Erro ao copiar o link:', err);
+                showMessage(shareMessage, 'Não foi possível copiar o link. Por favor, copie manualmente.', 'error');
+            }
+            break;
+    }
+
+    if (sharedSuccessfully) {
+        currentUser.points = (currentUser.points || 0) + 30;
+        currentUser.lastShareDate = today;
+        users[currentUser.email] = currentUser;
+        localStorage.setItem('users', JSON.stringify(users));
+        updatePointsDisplay();
+        addNotification(`Você ganhou 30 pontos por compartilhar o site via ${platform}!`, 'success', `Pontos bônus concedidos por compartilhar a plataforma com amigos e familiares via ${platform}.`);
+        if (platform !== 'copy') { // Avoid double message for copy
+            showMessage(shareMessage, `Site compartilhado via ${platform}! Você ganhou 30 pontos!`, 'success');
+        }
+    }
+}
+
+// Event listeners para os novos botões de compartilhamento
+if (shareInstagramBtn) {
+    shareInstagramBtn.addEventListener('click', () => handleShare('instagram'));
+}
+if (shareFacebookBtn) {
+    shareFacebookBtn.addEventListener('click', () => handleShare('facebook'));
+}
+if (shareWhatsappBtn) {
+    shareWhatsappBtn.addEventListener('click', () => handleShare('whatsapp'));
+}
+if (copyLinkBtn) {
+    copyLinkBtn.addEventListener('click', () => handleShare('copy'));
+}
+// Event listener para o botão de compartilhar site (o original)
+if (shareWebsiteBtn) {
+    shareWebsiteBtn.addEventListener('click', () => handleShare('website')); // Can be a generic share
+}
+
+
+// Função para renderizar o ranking de pontuação
+function renderLeaderboard() {
+    if (!leaderboardBody) return;
+
+    leaderboardBody.innerHTML = ''; // Limpa a lista existente
+
+    const allUsers = Object.values(users);
+    // Filtra usuários sem pontos ou com pontos inválidos e depois ordena
+    const sortedUsers = allUsers
+        .filter(user => typeof user.points === 'number' && !isNaN(user.points))
+        .sort((a, b) => b.points - a.points); // Ordena do maior para o menor
+
+    if (sortedUsers.length === 0) {
+        leaderboardBody.innerHTML = `
+            <tr>
+                <td colspan="3" class="py-3 px-6 text-center text-gray-500 dark:text-gray-400">Nenhum usuário no ranking ainda.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    sortedUsers.forEach((user, index) => {
+        const row = document.createElement('tr');
+        row.classList.add('border-b', 'border-gray-200', 'dark:border-gray-700', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+        if (index % 2 === 0) {
+            row.classList.add('bg-gray-50', 'dark:bg-gray-800');
+        } else {
+            row.classList.add('bg-white', 'dark:bg-gray-900');
+        }
+
+        row.innerHTML = `
+            <td class="py-3 px-6 text-left whitespace-nowrap">
+                <span class="font-bold text-lg">${index + 1}º</span>
+            </td>
+            <td class="py-3 px-6 text-left">
+                <div class="flex items-center">
+                    <img src="${user.profilePic || 'https://placehold.co/40x40/a7f3d0/065f46?text=Foto'}" alt="Foto de perfil de ${user.name}" class="w-10 h-10 rounded-full mr-3 object-cover">
+                    <span>${user.name || user.email.split('@')[0]}</span>
+                </div>
+            </td>
+            <td class="py-3 px-6 text-left">${user.points}</td>
+        `;
+        leaderboardBody.appendChild(row);
+    });
+}
+
 
 // Calculadora de Impacto
 if (calculateImpactBtn && impactResults) {
@@ -1238,6 +1503,11 @@ function toggleDarkMode() {
     if (myChartInstance) {
         initChart(myChartInstance.config.type);
     }
+    // Re-renderizar notificações para atualizar cores
+    renderNotificationsDropdown();
+    renderNotifications();
+    // Re-renderizar ranking para atualizar cores
+    renderLeaderboard();
 }
 
 // Event listeners para o toggle de modo escuro do header
@@ -1404,12 +1674,6 @@ async function fetchWeatherAndMap(lat, lon) {
                 src="https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.01},${lat - 0.005},${lon + 0.01},${lat + 0.005}&amp;layer=mapnik&amp;marker=${lat},${lon}"
                 style="border: 1px solid var(--input-border); border-radius: 0.5rem;">
             </iframe>
-            <small class="mt-2 block text-center map-link-container">
-                <a id="viewLargerMapBtn" href="https://www.openstreetmap.org/#map=16/${lat}/${lon}" target="_blank" 
-                class="map-button-style">
-                <i class="fas fa-external-link-alt mr-2"></i>Ver Mapa Maior
-                </a>
-            </small>
         `;
     }
 }
@@ -1603,101 +1867,62 @@ if (backToTopBtn) {
     });
 }
 
-// Função para exibir as dicas de sustentabilidade rotativas
-function displaySustainabilityTips() {
+// Função para exibir as dicas de sustentabilidade
+function displayTips() {
     if (!sustainabilityTipsList) return;
 
     sustainabilityTipsList.innerHTML = '';
-    const startIndex = currentTipIndex;
-    const endIndex = (currentTipIndex + TIPS_PER_ROTATION);
-    
-    // Lidar com o loop do array
-    let tipsToDisplay = [];
-    if (endIndex <= sustainabilityTips.length) {
-        tipsToDisplay = sustainabilityTips.slice(startIndex, endIndex);
-    } else {
-        // Se o final do array for atingido, pega o restante e depois do início
-        tipsToDisplay = sustainabilityTips.slice(startIndex);
-        tipsToDisplay = tipsToDisplay.concat(sustainabilityTips.slice(0, endIndex % sustainabilityTips.length));
+    const tipsToShow = [];
+    for (let i = 0; i < 3; i++) {
+        tipsToShow.push(sustainabilityTips[(currentTipIndex + i) % sustainabilityTips.length]);
     }
 
-    tipsToDisplay.forEach(tip => {
-        const listItem = document.createElement('li');
-        listItem.textContent = tip;
-        sustainabilityTipsList.appendChild(listItem);
+    tipsToShow.forEach(tip => {
+        const li = document.createElement('li');
+        li.textContent = tip;
+        sustainabilityTipsList.appendChild(li);
     });
 
-    currentTipIndex = (currentTipIndex + TIPS_PER_ROTATION) % sustainabilityTips.length;
-    timeRemaining = ROTATION_INTERVAL_SECONDS; // Reinicia o contador
-    updateTipTimerDisplay();
+    currentTipIndex = (currentTipIndex + 1) % sustainabilityTips.length;
 }
 
-// Função para atualizar o display do timer das dicas
-function updateTipTimerDisplay() {
-    if (tipRotationTimer) {
-        tipRotationTimer.textContent = `Próxima dica em: ${timeRemaining} segundos`;
+// Função para atualizar o timer das dicas
+function updateTipsTimer() {
+    if (sustainabilityTipsTimer) {
+        sustainabilityTipsTimer.textContent = `Próxima dica em ${timerSeconds} segundos...`;
+        timerSeconds--;
+        if (timerSeconds < 0) {
+            timerSeconds = 30;
+        }
     }
 }
 
-// Função para iniciar o timer de rotação das dicas
-function startTipRotationTimer() {
-    clearInterval(timerInterval); // Limpa qualquer timer existente
-    timerInterval = setInterval(() => {
-        timeRemaining--;
-        updateTipTimerDisplay();
-        if (timeRemaining <= 0) {
-            displaySustainabilityTips();
-        }
-    }, 1000);
+// Iniciar a rotação das dicas
+function startTipsRotation() {
+    if (tipsInterval) clearInterval(tipsInterval); // Limpa qualquer intervalo anterior
+    currentTipIndex = 0; // Reinicia o índice
+    timerSeconds = 30; // Reinicia o timer
+    displayTips();
+    updateTipsTimer(); // Exibe o timer inicial
+    tipsInterval = setInterval(() => {
+        displayTips();
+        timerSeconds = 30; // Reinicia o timer para a próxima rodada
+        updateTipsTimer();
+    }, 30000); // Troca a cada 30 segundos
+
+    // Atualiza o timer a cada segundo
+    setInterval(updateTipsTimer, 1000);
 }
 
-// Função para atualizar os dados de sensoriamento remoto
-if (updateSatelliteDataBtn) {
-    updateSatelliteDataBtn.addEventListener('click', async () => {
-        showLoading(updateSatelliteDataBtn, updateSatelliteDataBtnText, updateSatelliteDataBtnSpinner);
-
-        // Simulação de delay para a "busca" de dados
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // Gerar valores aleatórios para simulação
-        const ndvi = (Math.random() * (0.9 - 0.3) + 0.3).toFixed(2);
-        const soilMoisture = (Math.random() * (90 - 30) + 30).toFixed(0);
-        let waterStress = "Baixo";
-        if (soilMoisture < 50) waterStress = "Moderado";
-        if (soilMoisture < 30) waterStress = "Alto";
-
-        if (ndviValue) ndviValue.textContent = ndvi;
-        if (soilMoistureValue) soilMoistureValue.textContent = `${soilMoisture}%`;
-        if (waterStressValue) waterStressValue.textContent = waterStress;
-
-        // Não altera o src do iframe, pois ele já aponta para o Google Earth
-        // Apenas exibe a mensagem de sucesso
-        showMessage(satelliteMessage, 'Dados de satélite atualizados (simulados)!', 'success');
-        addNotification('Dados de sensoriamento remoto atualizados.', 'info', 'Novos dados de satélite simulados estão disponíveis para sua propriedade.');
-
-        if (currentUser) {
-            currentUser.points = (currentUser.points || 0) + 25; // Ganha 25 pontos
-            users[currentUser.email] = currentUser;
-            localStorage.setItem('users', JSON.stringify(users));
-        }
-        updatePointsDisplay();
-        hideLoading(updateSatelliteDataBtn, updateSatelliteDataBtnText, updateSatelliteDataBtnSpinner);
-    });
-}
-
-// Lógica para o fallback do Google Earth iframe
-if (googleEarthIframe) {
-    googleEarthIframe.addEventListener('error', () => {
-        if (iframeOverlay) {
-            iframeOverlay.classList.remove('hidden');
-        }
-    });
-    // Opcional: Remover overlay se carregar com sucesso após um tempo (pode ser falso positivo)
-    googleEarthIframe.addEventListener('load', () => {
-        if (iframeOverlay) {
-            iframeOverlay.classList.add('hidden');
-        }
-    });
+// Parar a rotação das dicas
+function stopTipsRotation() {
+    if (tipsInterval) {
+        clearInterval(tipsInterval);
+        tipsInterval = null;
+    }
+    if (sustainabilityTipsTimer) {
+        sustainabilityTipsTimer.textContent = ''; // Limpa o timer
+    }
 }
 
 
@@ -1713,5 +1938,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Se não houver hash na URL, empurra o estado da landing page
         history.replaceState({ section: 'landing-page' }, '', '#landing-page');
         currentSectionId = 'landing-page';
+    }
+    // Inicia a rotação das dicas se o dashboard for a seção inicial
+    if (currentSectionId === 'dashboard') {
+        startTipsRotation();
     }
 });
