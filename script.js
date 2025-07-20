@@ -3,8 +3,8 @@
 // Isso garante que, ao acessar diretamente o link, o usuário sempre precise fazer login.
 // IMPORTANTE: Para uma aplicação em produção onde você deseja que o login persista,
 // você precisaria REMOVER ou COMENTAR esta linha.
-// localStorage.removeItem('isLoggedIn'); // Removido para persistir o login
-// localStorage.removeItem('loggedInUserEmail'); // Removido para persistir o login
+localStorage.removeItem('isLoggedIn'); // Removido para persistir o login
+localStorage.removeItem('loggedInUserEmail'); // Removido para persistir o login
 // --- FIM DA FERRAMENTA DE DESLOGAR AO CARREGAR --
 
 // Variáveis globais para simular dados do usuário e estado de login
