@@ -220,7 +220,27 @@ const sustainabilityTips = [
     "Invista em capacitação para sua equipe sobre práticas agrícolas sustentáveis.",
     "Mantenha registros detalhados de todas as atividades agrícolas para monitoramento e melhoria contínua.",
     "Priorize a segurança e o bem-estar dos trabalhadores rurais, garantindo condições dignas de trabalho.",
-    "Busque certificações de sustentabilidade para agregar valor aos seus produtos e acessar novos mercados."
+    "Busque certificações de sustentabilidade para agregar valor aos seus produtos e acessar novos mercados.",
+    "Monitore a saúde do solo com frequência para ajustar as necessidades de nutrientes e evitar excessos.",
+    "Implemente sistemas de rotação de culturas que incluam leguminosas para fixação natural de nitrogênio.",
+    "Utilize culturas de cobertura para proteger o solo da erosão e melhorar sua fertilidade.",
+    "Adote a compostagem de resíduos orgânicos da fazenda para produzir fertilizante natural.",
+    "Reduza o uso de fertilizantes sintéticos, priorizando alternativas orgânicas e biológicas.",
+    "Invista em tecnologias de sensoriamento remoto para otimizar a aplicação de água e insumos.",
+    "Crie corredores ecológicos e áreas de refúgio para a fauna silvestre na sua propriedade.",
+    "Gerencie a água de forma integrada, considerando a captação, armazenamento e reuso.",
+    "Reduza o consumo de energia elétrica na fazenda, otimizando equipamentos e iluminação.",
+    "Promova a educação ambiental entre os colaboradores e a comunidade local.",
+    "Dê preferência a variedades de culturas resistentes a pragas e doenças para diminuir a necessidade de defensivos.",
+    "Planeje o plantio de acordo com as condições climáticas e o tipo de solo para maximizar a eficiência.",
+    "Reavalie e otimize o sistema de drenagem para evitar o encharcamento e a perda de nutrientes.",
+    "Utilize biofertilizantes e biopesticidas para um controle mais natural e menos agressivo ao meio ambiente.",
+    "Considere a integração lavoura-pecuária-floresta (ILPF) para otimizar o uso da terra e recursos.",
+    "Minimize o uso de máquinas pesadas para evitar a compactação do solo.",
+    "Pratique a agroecologia, buscando um equilíbrio entre a produção agrícola e os ecossistemas naturais.",
+    "Participe de programas de incentivo à agricultura sustentável e obtenha apoio técnico.",
+    "Faça o descarte correto de embalagens de defensivos e outros resíduos perigosos.",
+    "Estimule a biodiversidade no entorno da fazenda, plantando espécies nativas e criando refúgios."
 ];
 const sustainabilityTipsList = document.getElementById('sustainabilityTipsList');
 const sustainabilityTipsTimer = document.getElementById('sustainabilityTipsTimer');
@@ -1892,18 +1912,18 @@ function displayTips() {
     if (!sustainabilityTipsList) return;
 
     sustainabilityTipsList.innerHTML = '';
-    const tipsToShow = [];
+    // Calcula o índice de início para o próximo conjunto de 3 dicas
+    const startIndex = currentTipIndex;
+
     for (let i = 0; i < 3; i++) {
-        tipsToShow.push(sustainabilityTips[(currentTipIndex + i) % sustainabilityTips.length]);
+        const tipIndex = (startIndex + i) % sustainabilityTips.length;
+        const li = document.createElement('li');
+        li.textContent = sustainabilityTips[tipIndex];
+        sustainabilityTipsList.appendChild(li);
     }
 
-    tipsToShow.forEach(tip => {
-        const li = document.createElement('li');
-        li.textContent = tip;
-        sustainabilityTipsList.appendChild(li);
-    });
-
-    currentTipIndex = (currentTipIndex + 1) % sustainabilityTips.length;
+    // Avança currentTipIndex por 3 para mostrar dicas completamente novas na próxima vez
+    currentTipIndex = (currentTipIndex + 3) % sustainabilityTips.length;
 }
 
 // Função para atualizar o timer das dicas
@@ -1948,19 +1968,22 @@ function stopTipsRotation() {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-    checkLoginState();
-    simulateInitialNotifications(); // Adiciona notificações iniciais para demonstração
-    // Adiciona o estado inicial ao histórico para que o botão de voltar funcione corretamente
-    if (location.hash) {
-        const initialSection = location.hash.substring(1);
-        showSection(initialSection, false); // Não empurra novamente se já está na URL
-    } else {
-        // Se não houver hash na URL, empurra o estado da landing page
-        history.replaceState({ section: 'landing-page' }, '', '#landing-page');
-        currentSectionId = 'landing-page';
-    }
-    // Inicia a rotação das dicas se o dashboard for a seção inicial
-    if (currentSectionId === 'dashboard') {
-        startTipsRotation();
-    }
+    // Adiciona um pequeno atraso para permitir que todos os recursos sejam carregados
+    setTimeout(() => {
+        checkLoginState();
+        simulateInitialNotifications(); // Adiciona notificações iniciais para demonstração
+        // Adiciona o estado inicial ao histórico para que o botão de voltar funcione corretamente
+        if (location.hash) {
+            const initialSection = location.hash.substring(1);
+            showSection(initialSection, false); // Não empurra novamente se já está na URL
+        } else {
+            // Se não houver hash na URL, empurra o estado da landing page
+            history.replaceState({ section: 'landing-page' }, '', '#landing-page');
+            currentSectionId = 'landing-page';
+        }
+        // Inicia a rotação das dicas se o dashboard for a seção inicial
+        if (currentSectionId === 'dashboard') {
+            startTipsRotation();
+        }
+    }, 100); // Atraso de 100ms
 });
