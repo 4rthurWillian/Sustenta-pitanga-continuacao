@@ -200,7 +200,27 @@ const sustainabilityTips = [
     "Aproveite a água da chuva para irrigação, instalando cisternas ou sistemas de captação.",
     "Implemente a agricultura de conservação para proteger o solo da erosão e melhorar sua estrutura.",
     "Diversifique suas culturas para aumentar a resiliência do ecossistema da sua fazenda.",
-    "Eduque-se continuamente sobre novas técnicas e tecnologias agrícolas sustentáveis."
+    "Eduque-se continuamente sobre novas técnicas e tecnologias agrícolas sustentáveis.",
+    "Realize análise de solo periodicamente para otimizar a adubação e corrigir deficiências.",
+    "Adote o plantio direto para reduzir a erosão e melhorar a matéria orgânica do solo.",
+    "Explore sistemas agroflorestais, integrando árvores e culturas para benefícios mútuos.",
+    "Implemente o Manejo Integrado de Pragas (MIP) para controlar pragas de forma mais ecológica.",
+    "Otimize o uso de máquinas e implementos agrícolas para reduzir o consumo de combustível.",
+    "Invista em energias renováveis na fazenda, como painéis solares, para reduzir custos e impacto.",
+    "Gerencie o pastoreio de forma sustentável para evitar a degradação do solo e promover a recuperação.",
+    "Proteja e restaure áreas de mata ciliar e nascentes para preservar recursos hídricos.",
+    "Reutilize a água sempre que possível, por exemplo, água de lavagem para irrigação de áreas não comestíveis.",
+    "Minimize o desperdício de alimentos na colheita e pós-colheita.",
+    "Participe de cooperativas e redes de produtores para compartilhar conhecimentos e recursos.",
+    "Utilize sementes crioulas ou variedades adaptadas localmente para maior resiliência.",
+    "Pratique a agricultura de precisão para aplicar insumos de forma mais eficiente e localizada.",
+    "Considere a aquaponia ou hidroponia para produção em ambientes controlados e economia de água.",
+    "Promova a saúde dos polinizadores criando habitats e evitando pesticidas prejudiciais.",
+    "Reduza a pegada de carbono da sua fazenda através de práticas de sequestro de carbono no solo.",
+    "Invista em capacitação para sua equipe sobre práticas agrícolas sustentáveis.",
+    "Mantenha registros detalhados de todas as atividades agrícolas para monitoramento e melhoria contínua.",
+    "Priorize a segurança e o bem-estar dos trabalhadores rurais, garantindo condições dignas de trabalho.",
+    "Busque certificações de sustentabilidade para agregar valor aos seus produtos e acessar novos mercados."
 ];
 const sustainabilityTipsList = document.getElementById('sustainabilityTipsList');
 const sustainabilityTipsTimer = document.getElementById('sustainabilityTipsTimer');
