@@ -177,7 +177,7 @@ body {
 
 /* Garante que o fundo não seja aplicado quando o modo escuro está ativo */
 body:not(.login-background) {
-    background-image: url(imagens/imagem\ de\ fundo.jpeg); /* Caminho da imagem corrigido */
+    background-image: url(https://placehold.co/1200x800/f0f4f8/333333?text=Imagem+de+Fundo); /* Caminho da imagem corrigido */
 }
 
 body.dark-mode:not(.login-background) {
@@ -671,7 +671,7 @@ body.dark-mode #points-redemption .text-gray-600 {
 
 /* Ajuste para a data da notificação para se adaptar ao tema */
 .notification-item p.text-xs.text-gray-500 {
-    color: var(--text-color) !important; /* A data da notificação se adapta ao tema */
+    color: var(--text-color) !important;
 }
 
 /* Estilo para o link "Ver todas" dentro do dropdown de notificações */
@@ -853,8 +853,8 @@ body.dark-mode footer {
 }
 
 .feature-card:hover, .benefit-card:hover {
-    transform: scale(1.35) translateY(-20px); /* Aumenta o card em 35% e levanta 20px para um zoom MUITO notável */
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4); /* Sombra um pouco mais suave que a anterior, mas ainda notável */
+    transform: scale(1.05) translateY(-5px); /* Aumenta o card em 5% e levanta 5px */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra mais proeminente */
 }
 
 
@@ -896,7 +896,54 @@ body.dark-mode .bg-blue-100 p {
     color: var(--gray-200-color) !important; /* Cor mais clara para o parágrafo */
 }
 
-/* NOVO: Estilo para o hover das notificações no modo escuro */
-body.dark-mode .notification-item:hover {
-    background-color: #3a475a !important; /* Um cinza mais escuro para hover no dark mode */
+/* Estilos para o botão "Ver no Google Earth" */
+.map-button-style {
+    background-color: var(--primary-btn-bg);
+    color: white;
+    padding: 0.5rem 1rem; /* Menor padding */
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: inline-flex; /* Para centralizar ícone e texto */
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem; /* text-sm */
+    min-width: auto; /* Remove o min-width padrão do btn-primary */
+}
+
+.map-button-style:hover {
+    background-color: var(--primary-btn-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.map-button-style:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para o botão de limpar notificações */
+#clearNotificationsBtn {
+    font-size: 0.875rem; /* Equivalente a text-sm do Tailwind */
+    padding: 0.5rem 1rem; /* Padding menor */
+    min-width: auto; /* Permite que o botão se ajuste ao conteúdo */
+}
+
+#clearNotificationsBtn:hover {
+    background-color: var(--danger-btn-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+#clearNotificationsBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para o timer das dicas de sustentabilidade */
+#tipRotationTimer {
+    font-size: 0.875rem; /* text-sm */
+    color: var(--text-color);
+    margin-top: 1rem;
+    text-align: center;
 }

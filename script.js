@@ -26,9 +26,6 @@ let currentApiKeyIndex = 0; // Índice da chave de API atual a ser usada
 // Alterado para o endpoint de previsão
 const WEATHER_FORECAST_API_URL = "https://api.openweathermap.org/data/2.5/forecast";
 const WEATHER_CURRENT_API_URL = "https://api.openweathermap.org/data/2.5/weather";
-// NOVO: URL da API do IBGE
-const IBGE_NEWS_API_URL = "http://servicodados.ibge.gov.br/api/v3/noticias/";
-const SHARE_APP_LINK = "https://4rthurwillian.github.io/Sustenta-pitanga-continuacao/";
 
 
 // Coordenadas padrão para Pitanga, PR (caso a localização seja negada ou indisponível)
@@ -68,7 +65,6 @@ const logoutBtn = document.getElementById('logoutBtn');
 const welcomeMessageDisplay = document.getElementById('welcomeMessageDisplay');
 const weatherInfo = document.getElementById('weatherInfo');
 const farmMap = document.getElementById('farmMap');
-const environmentalNewsInfo = document.getElementById('environmentalNewsInfo'); // Elemento para notícias ambientais
 
 const cultivatedAreaInput = document.getElementById('cultivatedArea');
 const cropTypeSelect = document.getElementById('cropType');
@@ -112,7 +108,7 @@ const profilePicImg = document.getElementById('profilePicImg');
 // --- Variáveis do DOM para o Popup de Permissão de Localização ---
 const locationPermissionPopup = document.getElementById('locationPermissionPopup');
 const allowLocationBtn = document.getElementById('allowLocationBtn');
-const denyLocationBtn = document.getElementById('denyLocation'); // ID corrigido
+const denyLocationBtn = document.getElementById('denyLocationBtn');
 const doNotAskAgainCheckbox = document.getElementById('doNotAskAgain');
 const locationMessage = document.getElementById('locationMessage'); // Para mensagens relacionadas à localização
 
@@ -142,29 +138,11 @@ const backToDashboardFromPointsBtn = document.getElementById('backToDashboardFro
 const notificationDropdownList = document.getElementById('notificationDropdownList');
 const viewAllNotificationsLink = document.getElementById('viewAllNotificationsLink');
 const notificationList = document.getElementById('notificationList'); // Contêiner para notificações na página dedicada
+const clearNotificationsBtn = document.getElementById('clearNotificationsBtn'); // Botão de limpar notificações
 
 // Elementos para a nova seção de pontos e resgate
 const currentPointsDisplay = document.getElementById('currentPoints');
 const climateAlertElement = document.getElementById('climateAlert'); // Adicionado para o alerta climático dinâmico
-const claimDailyRewardBtn = document.getElementById('claimDailyRewardBtn'); // NOVO
-const claimDailyRewardBtnText = document.getElementById('claimDailyRewardBtnText'); // NOVO
-const claimDailyRewardBtnSpinner = document.getElementById('claimDailyRewardBtnSpinner'); // NOVO
-const dailyRewardMessage = document.getElementById('dailyRewardMessage'); // NOVO
-
-// Removidos inviteFriendBtn, inviteFriendBtnText, inviteFriendBtnSpinner
-const inviteFriendMessage = document.getElementById('inviteFriendMessage'); // NOVO
-const inviteOptionButtons = document.querySelectorAll('.invite-option-btn'); // NOVO: Seleciona todos os botões de convite
-const rankingList = document.getElementById('rankingList'); // NOVO: Elemento para o ranking
-
-// Dados simulados do ranking
-const studentsRanking = [
-    { name: "Arthur", points: 1500 }, // Arthur is the coolest!
-    { name: "Lucas Henrique", points: 1200 },
-    { name: "Matheus Scaramal", points: 1000 },
-    { name: "Bruno", points: 800 },
-    { name: "Lucas Chavaren", points: 700 },
-    { name: "Robert", points: 600 }
-];
 
 // Elementos para os botões de visualização do mapa e mensagem
 const satelliteViewBtn = document.getElementById('satelliteViewBtn');
@@ -172,6 +150,21 @@ const terrainViewBtn = document.getElementById('terrainViewBtn');
 const measureAreaBtn = document.getElementById('measureAreaBtn');
 const addMarkerBtn = document.getElementById('addMarkerBtn');
 const mapMessage = document.getElementById('mapMessage');
+const viewLargerMapBtn = document.getElementById('viewLargerMapBtn'); // Botão "Ver Mapa Maior"
+
+// Elementos para a seção de sensoriamento remoto
+const satelliteViewSection = document.getElementById('satelliteView');
+const googleEarthIframe = document.getElementById('googleEarthIframe');
+const iframeOverlay = document.getElementById('iframeOverlay');
+const googleEarthRedirectLink = document.getElementById('googleEarthRedirectLink');
+const updateSatelliteDataBtn = document.getElementById('updateSatelliteDataBtn');
+const updateSatelliteDataBtnText = document.getElementById('updateSatelliteDataBtnText');
+const updateSatelliteDataBtnSpinner = document.getElementById('updateSatelliteDataBtnSpinner');
+const ndviValue = document.getElementById('ndviValue');
+const soilMoistureValue = document.getElementById('soilMoistureValue');
+const waterStressValue = document.getElementById('waterStressValue');
+const satelliteMessage = document.getElementById('satelliteMessage');
+
 
 // Variável para armazenar a seção atual
 let currentSectionId = '';
@@ -189,6 +182,48 @@ const togglePasswordIcon = document.getElementById('togglePasswordIcon'); // Nov
 const rememberMeCheckbox = document.getElementById('rememberMe');
 const rememberMeLabel = document.querySelector('label[for="rememberMe"]'); // Novo para o label
 const emailInput = document.getElementById('email');
+
+// Dicas de Sustentabilidade Rotativas
+const sustainabilityTipsList = document.getElementById('sustainabilityTipsList');
+const tipRotationTimer = document.getElementById('tipRotationTimer');
+let currentTipIndex = 0;
+const TIPS_PER_ROTATION = 3; // Quantidade de dicas a serem exibidas por vez
+const ROTATION_INTERVAL_SECONDS = 30; // Tempo em segundos para a rotação das dicas
+let timerInterval;
+let timeRemaining = ROTATION_INTERVAL_SECONDS;
+
+const sustainabilityTips = [
+    "Considere a rotação de culturas para melhorar a saúde do solo e reduzir pragas.",
+    "Utilize sistemas de irrigação por gotejamento para otimizar o uso da água e evitar desperdícios.",
+    "Monitore a saúde das plantas regularmente para identificar problemas precocemente e agir rápido.",
+    "Invista em compostagem para enriquecer o solo com nutrientes naturais e reduzir resíduos orgânicos.",
+    "Plante árvores e arbustos nativos para promover a biodiversidade e criar habitats para polinizadores.",
+    "Adote o plantio direto para proteger o solo da erosão e melhorar sua estrutura.",
+    "Use energias renováveis na fazenda, como painéis solares, para reduzir a pegada de carbono.",
+    "Implemente a integração lavoura-pecuária-floresta para otimizar o uso da terra e diversificar a produção.",
+    "Faça a análise do solo periodicamente para aplicar fertilizantes de forma mais precisa e eficiente.",
+    "Gerencie os resíduos da fazenda de forma adequada, reciclando e reutilizando sempre que possível.",
+    "Proteja as nascentes e cursos d'água da sua propriedade para garantir a qualidade da água.",
+    "Capacite sua equipe em práticas agrícolas sustentáveis para aumentar a eficiência e a consciência ambiental.",
+    "Utilize controladores biológicos para o manejo de pragas, reduzindo a dependência de pesticidas químicos.",
+    "Fomente a agricultura orgânica para produzir alimentos mais saudáveis e valorizar o meio ambiente.",
+    "Crie barreiras vivas para proteger as lavouras do vento e da erosão.",
+    "Aproveite a água da chuva para irrigação e outras necessidades da fazenda.",
+    "Mantenha a cobertura do solo com plantas ou palha para conservar a umidade e controlar ervas daninhas.",
+    "Diversifique as culturas para fortalecer o ecossistema da fazenda e reduzir riscos de pragas.",
+    "Invista em tecnologias de monitoramento inteligente para otimizar a gestão da propriedade.",
+    "Participe de cooperativas e associações para compartilhar conhecimentos e recursos com outros produtores.",
+    "Planeje a colheita de forma a minimizar perdas e desperdícios de alimentos.",
+    "Utilize defensivos agrícolas de forma consciente e seguindo as recomendações técnicas.",
+    "Promova a saúde dos animais da fazenda com práticas de bem-estar e alimentação natural.",
+    "Reduza o uso de plásticos na fazenda, buscando alternativas mais sustentáveis.",
+    "Incentive o consumo local e a venda direta para valorizar a produção da sua comunidade.",
+    "Eduque as novas gerações sobre a importância da sustentabilidade na agricultura.",
+    "Preserve as áreas de vegetação nativa na sua propriedade para proteger a biodiversidade.",
+    "Adote a apicultura para promover a polinização e a produção de mel.",
+    "Implemente sistemas de reuso de água para otimizar o ciclo hídrico na fazenda.",
+    "Crie um plano de manejo de nutrientes para evitar a lixiviação e a contaminação do solo."
+];
 
 
 // Função para exibir mensagens
@@ -277,11 +312,13 @@ function showSection(sectionId, pushState = true) {
     }
     if (sectionId === 'points-redemption') {
         updatePointsDisplay(); // Atualiza a exibição de pontos
-        checkDailyRewardStatus(); // Verifica o status da recompensa diária
-        renderRanking(); // NOVO: Renderiza o ranking
     }
     if (sectionId === 'dashboard') {
-        fetchEnvironmentalNews(); // Carrega notícias ambientais (agora sem coordenadas, pois a API do IBGE não usa)
+        displaySustainabilityTips(); // Exibe as dicas ao entrar no dashboard
+        startTipRotationTimer(); // Inicia o timer das dicas
+        updateSatelliteData(); // Atualiza os dados de sensoriamento remoto
+    } else {
+        clearInterval(timerInterval); // Para o timer se sair do dashboard
     }
 }
 
@@ -303,17 +340,6 @@ function checkLoginState() {
             currentUser.points = 0;
             localStorage.setItem('users', JSON.stringify(users));
         }
-        // Inicializa lastClaimedDailyReward se não existir
-        if (currentUser.lastClaimedDailyReward === undefined) {
-            currentUser.lastClaimedDailyReward = null;
-            localStorage.setItem('users', JSON.stringify(users));
-        }
-        // Inicializa invitedFriendsCount se não existir
-        if (currentUser.invitedFriendsCount === undefined) {
-            currentUser.invitedFriendsCount = 0;
-            localStorage.setItem('users', JSON.stringify(users));
-        }
-
         if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
         showSection('dashboard', false); // Não adiciona ao histórico na inicialização
         loggedInControls.classList.remove('hidden'); // Mostrar controles após login
@@ -387,17 +413,6 @@ if (loginForm && loginBtn) {
                 currentUser.points = 0;
                 localStorage.setItem('users', JSON.stringify(users));
             }
-            // Inicializa lastClaimedDailyReward se não existir
-            if (currentUser.lastClaimedDailyReward === undefined) {
-                currentUser.lastClaimedDailyReward = null;
-                localStorage.setItem('users', JSON.stringify(users));
-            }
-            // Inicializa invitedFriendsCount se não existir
-            if (currentUser.invitedFriendsCount === undefined) {
-                currentUser.invitedFriendsCount = 0;
-                localStorage.setItem('users', JSON.stringify(users));
-            }
-
             showMessage(document.getElementById('loginMessage'), 'Login bem-sucedido!', 'success');
             if (welcomeMessageDisplay) welcomeMessageDisplay.textContent = `Bem-vindo(a), ${currentUser.name || currentUser.email}!`;
             loggedInControls.classList.remove('hidden'); // Mostrar controles após login
@@ -466,7 +481,7 @@ if (registerForm && registerSubmitBtn) {
         // Simulação de delay para a "requisição"
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        users[email] = { name, email, password, cooperative, farmData, profilePic: "https://placehold.co/150x150/a7f3d0/065f46?text=Foto", manualData: {}, points: 0, lastClaimedDailyReward: null, invitedFriendsCount: 0 }; // Adiciona foto padrão, objeto para dados manuais, pontos, lastClaimedDailyReward e invitedFriendsCount
+        users[email] = { name, email, password, cooperative, farmData, profilePic: "https://placehold.co/150x150/a7f3d0/065f46?text=Foto", manualData: {}, points: 0 }; // Adiciona foto padrão, objeto para dados manuais e pontos
         localStorage.setItem('users', JSON.stringify(users));
         showMessage(document.getElementById('registerMessage'), 'Cadastro realizado com sucesso! Faça login.', 'success');
         e.target.reset(); // Limpa o formulário
@@ -698,6 +713,17 @@ function renderNotifications() {
     });
 }
 
+// Função para limpar todas as notificações
+if (clearNotificationsBtn) {
+    clearNotificationsBtn.addEventListener('click', () => {
+        notifications = []; // Limpa o array de notificações
+        saveNotifications(); // Salva o estado vazio no localStorage
+        renderNotifications(); // Atualiza a exibição na página de notificações
+        renderNotificationsDropdown(); // Atualiza o dropdown de notificações
+        showMessage(document.getElementById('notifications-page').querySelector('.card'), 'Todas as notificações foram limpas.', 'success');
+    });
+}
+
 // Simula a chegada de algumas notificações iniciais (apenas para demonstração)
 async function simulateInitialNotifications() {
     if (notifications.length === 0) { // Adiciona apenas se não houver notificações
@@ -714,173 +740,6 @@ function updatePointsDisplay() {
         currentPointsDisplay.textContent = currentUser.points;
     }
 }
-
-// Lógica para recompensa diária
-if (claimDailyRewardBtn) {
-    claimDailyRewardBtn.addEventListener('click', async () => {
-        if (!currentUser) {
-            showMessage(dailyRewardMessage, 'Por favor, faça login para reivindicar recompensas.', 'error');
-            return;
-        }
-
-        showLoading(claimDailyRewardBtn, claimDailyRewardBtnText, claimDailyRewardBtnSpinner);
-
-        const today = new Date().toDateString();
-        if (currentUser.lastClaimedDailyReward === today) {
-            showMessage(dailyRewardMessage, 'Você já reivindicou sua recompensa diária hoje.', 'info');
-            hideLoading(claimDailyRewardBtn, claimDailyRewardBtnText, claimDailyRewardBtnSpinner);
-            return;
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simula delay
-
-        const dailyPoints = 10; // Alterado para 10 pontos
-        currentUser.points = (currentUser.points || 0) + dailyPoints;
-        currentUser.lastClaimedDailyReward = today;
-        users[currentUser.email] = currentUser;
-        localStorage.setItem('users', JSON.stringify(users));
-
-        updatePointsDisplay();
-        showMessage(dailyRewardMessage, `Você reivindicou ${dailyPoints} pontos de recompensa diária!`, 'success');
-        addNotification(`Você ganhou ${dailyPoints} pontos de recompensa diária!`, 'success', 'Pontos bônus por acessar a plataforma diariamente.');
-        checkDailyRewardStatus(); // Atualiza o estado do botão
-        hideLoading(claimDailyRewardBtn, claimDailyRewardBtnText, claimDailyRewardBtnSpinner);
-        renderRanking(); // Atualiza o ranking ao ganhar pontos
-    });
-}
-
-function checkDailyRewardStatus() {
-    if (!currentUser || !claimDailyRewardBtn) return;
-
-    const today = new Date().toDateString(); // Ex: "Fri Jul 19 2025"
-    const lastClaimDate = currentUser.lastClaimedDailyReward;
-
-    if (lastClaimDate === today) {
-        claimDailyRewardBtn.disabled = true;
-        claimDailyRewardBtn.classList.add('opacity-50', 'cursor-not-allowed');
-        claimDailyRewardBtnText.textContent = 'Recompensa Reivindicada Hoje!';
-        dailyRewardMessage.classList.add('hidden'); // Esconde a mensagem se já reivindicado
-    } else {
-        claimDailyRewardBtn.disabled = false;
-        claimDailyRewardBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        claimDailyRewardBtnText.textContent = 'Reivindicar Recompensa';
-        dailyRewardMessage.classList.add('hidden'); // Esconde a mensagem se não houver recompensa reivindicada
-    }
-}
-
-// NOVO: Lógica para convidar amigos
-if (inviteOptionButtons) {
-    inviteOptionButtons.forEach(button => {
-        button.addEventListener('click', async (e) => {
-            if (!currentUser) {
-                showMessage(inviteFriendMessage, 'Por favor, faça login para convidar amigos.', 'error');
-                return;
-            }
-
-            const platform = e.currentTarget.dataset.platform;
-            const inviteText = `Venha para o Sustenta Pitanga! Monitore sua fazenda de forma sustentável e ganhe recompensas: ${SHARE_APP_LINK}`;
-            let message = '';
-
-            const pointsPerInvite = 30;
-            currentUser.points = (currentUser.points || 0) + pointsPerInvite;
-            currentUser.invitedFriendsCount = (currentUser.invitedFriendsCount || 0) + 1;
-            users[currentUser.email] = currentUser;
-            localStorage.setItem('users', JSON.stringify(users));
-
-            updatePointsDisplay();
-            addNotification(`Você ganhou ${pointsPerInvite} pontos por convidar um amigo via ${platform}!`, 'success', `Pontos bônus por convidar novos usuários para a plataforma via ${platform}.`);
-            renderRanking(); // Atualiza o ranking ao convidar amigos
-
-            switch (platform) {
-                case 'facebook':
-                    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_APP_LINK)}&quote=${encodeURIComponent(inviteText)}`;
-                    window.open(facebookShareUrl, '_blank');
-                    message = 'Compartilhado no Facebook (simulado)!';
-                    break;
-                case 'instagram':
-                    // Instagram não permite compartilhamento direto para feed/stories via URL simples.
-                    // A melhor abordagem é copiar o link e instruir o usuário.
-                    navigator.clipboard.writeText(inviteText).then(() => {
-                        showMessage(inviteFriendMessage, 'Link copiado! Cole no Instagram Stories ou na sua bio.', 'info');
-                    }).catch(err => {
-                        showMessage(inviteFriendMessage, 'Erro ao copiar o link para Instagram. Por favor, copie manualmente.', 'error');
-                        console.error('Erro ao copiar link para Instagram:', err);
-                    });
-                    return; // Sai da função para não mostrar a mensagem padrão abaixo
-                case 'copy-link':
-                    navigator.clipboard.writeText(SHARE_APP_LINK).then(() => {
-                        showMessage(inviteFriendMessage, 'Link de convite copiado para a área de transferência!', 'success');
-                    }).catch(err => {
-                        showMessage(inviteFriendMessage, 'Erro ao copiar o link. Por favor, copie manualmente.', 'error');
-                        console.error('Erro ao copiar link:', err);
-                    });
-                    return; // Sai da função para não mostrar a mensagem padrão abaixo
-                case 'whatsapp':
-                    const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(inviteText)}`;
-                    window.open(whatsappShareUrl, '_blank');
-                    message = 'Link de convite para WhatsApp gerado!';
-                    break;
-                case 'sms':
-                    const smsShareUrl = `sms:?body=${encodeURIComponent(inviteText)}`;
-                    window.open(smsShareUrl, '_blank');
-                    message = 'Link de convite para SMS gerado!';
-                    break;
-                default:
-                    message = 'Opção de convite não reconhecida.';
-            }
-            showMessage(inviteFriendMessage, `Convite via ${platform} simulado. ${message}`, 'success');
-        });
-    });
-}
-
-// NOVO: Função para renderizar o ranking
-function renderRanking() {
-    if (!rankingList) return;
-
-    // Ordena o ranking para garantir que Arthur esteja sempre em primeiro
-    studentsRanking.sort((a, b) => {
-        if (a.name === "Arthur") return -1;
-        if (b.name === "Arthur") return 1;
-        return b.points - a.points;
-    });
-
-    rankingList.innerHTML = ''; // Limpa a lista existente
-
-    if (studentsRanking.length === 0) {
-        rankingList.innerHTML = '<p class="text-gray-600 text-center">Nenhum pontuador no ranking.</p>';
-        return;
-    }
-
-    studentsRanking.forEach((student, index) => {
-        const rankingItem = document.createElement('div');
-        rankingItem.classList.add('flex', 'items-center', 'justify-between', 'p-3', 'rounded-md', 'border-b', 'border-gray-200');
-
-        let rankIcon = '';
-        let rankColor = 'text-gray-700';
-        if (index === 0) {
-            rankIcon = '<i class="fas fa-medal text-yellow-500 mr-2"></i>'; // Ouro
-            rankColor = 'text-yellow-700 font-bold';
-        } else if (index === 1) {
-            rankIcon = '<i class="fas fa-medal text-gray-400 mr-2"></i>'; // Prata
-            rankColor = 'text-gray-600';
-        } else if (index === 2) {
-            rankIcon = '<i class="fas fa-medal text-yellow-800 mr-2"></i>'; // Bronze (tom mais escuro)
-            rankColor = 'text-yellow-800';
-        } else {
-            rankIcon = `<span class="w-6 text-center mr-2">${index + 1}.</span>`;
-        }
-
-        rankingItem.innerHTML = `
-            <div class="flex items-center">
-                ${rankIcon}
-                <span class="font-medium ${rankColor}">${student.name}</span>
-            </div>
-            <span class="font-bold text-green-600">${student.points} pontos</span>
-        `;
-        rankingList.appendChild(rankingItem);
-    });
-}
-
 
 // Calculadora de Impacto
 if (calculateImpactBtn && impactResults) {
@@ -979,8 +838,8 @@ if (saveManualDataBtn && manualSaveMessage) {
         showMessage(manualSaveMessage, 'Dados salvos com sucesso!', 'success');
         addNotification(`Novos dados manuais registrados: Água ${dailyWater}L, Fertilizante ${fertilizerUse}kg. Você ganhou 20 pontos!`, 'info', 'Registro de dados manuais da sua fazenda. Contribui para o monitoramento e pode gerar pontos de recompensa.');
         updatePointsDisplay(); // Atualiza a exibição de pontos
+        // Não limpar campos para manter os dados salvos visíveis
         hideLoading(saveManualDataBtn, saveManualDataBtnText, saveManualDataBtnSpinner);
-        renderRanking(); // Atualiza o ranking ao ganhar pontos
     });
 }
 
@@ -1025,7 +884,6 @@ if (simulateSensorDataBtn && sensorSaveMessage) {
         updatePointsDisplay(); // Atualiza a exibição de pontos
         waterMeterInput.value = '';
         hideLoading(simulateSensorDataBtn, simulateSensorDataBtnText, simulateSensorDataBtnSpinner);
-        renderRanking(); // Atualiza o ranking ao ganhar pontos
     });
 }
 
@@ -1085,7 +943,6 @@ if (generatePdfReportBtn) {
         }
         updatePointsDisplay(); // Atualiza a exibição de pontos
         hideLoading(generatePdfReportBtn, generatePdfReportBtnText, generatePdfReportBtnSpinner);
-        renderRanking(); // Atualiza o ranking ao ganhar pontos
     });
 }
 
@@ -1414,7 +1271,6 @@ function checkLocationPermission() {
         if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível sem permissão de localização.</p>';
         fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar com coordenadas padrão
         fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar alerta com coordenadas padrão
-        fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
     } else {
         // Se não há status ou "não perguntar novamente" não está marcado, mostra o popup
         if (locationPermissionPopup) locationPermissionPopup.classList.add('visible'); // Mostra o popup
@@ -1452,7 +1308,6 @@ if (denyLocationBtn) {
         if (farmMap) farmMap.innerHTML = '<p class="text-gray-500">Mapa não disponível devido a erro de localização.</p>';
         fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar com coordenadas padrão
         fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar alerta com coordenadas padrão
-        fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
     });
 }
 
@@ -1462,7 +1317,6 @@ async function getLocation(lat = null, lon = null) {
     if (lat !== null && lon !== null) {
         fetchWeatherAndMap(lat, lon);
         fetchNextDayWeatherAlert(lat, lon); // Chama também a função para o alerta do próximo dia
-        fetchEnvironmentalNews(); // Chama a função para notícias ambientais (agora sem coordenadas)
         return;
     }
 
@@ -1473,7 +1327,6 @@ async function getLocation(lat = null, lon = null) {
                 const currentLon = position.coords.longitude;
                 fetchWeatherAndMap(currentLat, currentLon);
                 fetchNextDayWeatherAlert(currentLat, currentLon); // Chama também a função para o alerta do próximo dia
-                fetchEnvironmentalNews(); // Chama a função para notícias ambientais (agora sem coordenadas)
                 if (locationMessage) showMessage(locationMessage, 'Localização obtida com sucesso!', 'success');
             },
             showError
@@ -1485,7 +1338,6 @@ async function getLocation(lat = null, lon = null) {
         // Se a geolocalização não for suportada, usa as coordenadas padrão
         fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
         fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE); // Tenta carregar alerta com coordenadas padrão
-        fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
     }
 }
 
@@ -1553,9 +1405,9 @@ async function fetchWeatherAndMap(lat, lon) {
                 style="border: 1px solid var(--input-border); border-radius: 0.5rem;">
             </iframe>
             <small class="mt-2 block text-center map-link-container">
-                <a href="https://www.openstreetmap.org/#map=16/${lat}/${lon}" target="_blank" 
-                   class="inline-block bg-blue-500 text-white px-3 py-1 rounded-md text-xs hover:bg-blue-600 transition-colors">
-                   Ver Mapa Maior
+                <a id="viewLargerMapBtn" href="https://www.openstreetmap.org/#map=16/${lat}/${lon}" target="_blank" 
+                class="map-button-style">
+                <i class="fas fa-external-link-alt mr-2"></i>Ver Mapa Maior
                 </a>
             </small>
         `;
@@ -1640,55 +1492,6 @@ async function fetchNextDayWeatherAlert(lat, lon) {
     }
 }
 
-// NOVO: Função para buscar notícias ambientais do IBGE
-async function fetchEnvironmentalNews() {
-    if (!environmentalNewsInfo) return;
-
-    environmentalNewsInfo.innerHTML = '<p class="text-lg text-gray-700">Carregando notícias ambientais do IBGE...</p>';
-
-    try {
-        const response = await fetch(IBGE_NEWS_API_URL);
-        if (!response.ok) {
-            throw new Error(`Erro ao buscar notícias do IBGE: ${response.status} - ${response.statusText}`);
-        }
-        const data = await response.json();
-
-        let newsHtml = `
-            <p class="text-lg text-gray-700">Últimas Notícias do IBGE:</p>
-            <ul class="list-disc pl-5 space-y-2 text-gray-600 mt-3">
-        `;
-
-        // Filtra e exibe as 5 primeiras notícias (ou menos, se houver menos de 5)
-        const newsToDisplay = data.items.slice(0, 5); // Pega os primeiros 5 itens
-
-        if (newsToDisplay.length > 0) {
-            newsToDisplay.forEach(news => {
-                newsHtml += `
-                    <li>
-                        <a href="${news.link}" target="_blank" class="font-semibold text-blue-600 hover:underline">${news.titulo}</a> - 
-                        <span class="text-xs text-gray-500">Publicado em: ${news.data_publicacao}</span>
-                    </li>
-                `;
-            });
-        } else {
-            newsHtml += `<li>Nenhuma notícia encontrada na API do IBGE.</li>`;
-        }
-
-        newsHtml += `</ul>`;
-        environmentalNewsInfo.innerHTML = newsHtml;
-
-    } catch (error) {
-        console.error('Erro ao buscar notícias do IBGE:', error);
-        environmentalNewsInfo.innerHTML = `
-            <p class="text-lg text-gray-700">Não foi possível carregar as notícias ambientais do IBGE.</p>
-            <p class="text-sm text-red-500 mt-2">Detalhes do erro: ${error.message}</p>
-            <p class="text-sm text-gray-600 mt-2">
-                Verifique sua conexão com a internet ou se a API do IBGE está disponível.
-            </p>
-        `;
-    }
-}
-
 
 function showError(error) {
     let errorMessage = '';
@@ -1699,28 +1502,24 @@ function showError(error) {
             // Após a negação, tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
-            fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
             break;
         case error.POSITION_UNAVAILABLE:
             errorMessage = 'Informação de localização indisponível.';
             // Tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
-            fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
             break;
         case error.TIMEOUT:
             errorMessage = 'A requisição para obter a localização expirou.';
             // Tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
-            fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
             break;
         case error.UNKNOWN_ERROR:
             errorMessage = 'Um erro desconhecido ocorreu.';
             // Tenta carregar o clima/mapa com as coordenadas padrão
             fetchWeatherAndMap(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
             fetchNextDayWeatherAlert(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
-            fetchEnvironmentalNews(); // Tenta carregar notícias ambientais (agora sem coordenadas)
             break;
     }
     if (locationMessage) showMessage(locationMessage, `Erro de Geolocalização: ${errorMessage}`, 'error');
@@ -1801,6 +1600,103 @@ if (backToTopBtn) {
             top: 0,
             behavior: 'smooth' // Rolagem suave
         });
+    });
+}
+
+// Função para exibir as dicas de sustentabilidade rotativas
+function displaySustainabilityTips() {
+    if (!sustainabilityTipsList) return;
+
+    sustainabilityTipsList.innerHTML = '';
+    const startIndex = currentTipIndex;
+    const endIndex = (currentTipIndex + TIPS_PER_ROTATION);
+    
+    // Lidar com o loop do array
+    let tipsToDisplay = [];
+    if (endIndex <= sustainabilityTips.length) {
+        tipsToDisplay = sustainabilityTips.slice(startIndex, endIndex);
+    } else {
+        // Se o final do array for atingido, pega o restante e depois do início
+        tipsToDisplay = sustainabilityTips.slice(startIndex);
+        tipsToDisplay = tipsToDisplay.concat(sustainabilityTips.slice(0, endIndex % sustainabilityTips.length));
+    }
+
+    tipsToDisplay.forEach(tip => {
+        const listItem = document.createElement('li');
+        listItem.textContent = tip;
+        sustainabilityTipsList.appendChild(listItem);
+    });
+
+    currentTipIndex = (currentTipIndex + TIPS_PER_ROTATION) % sustainabilityTips.length;
+    timeRemaining = ROTATION_INTERVAL_SECONDS; // Reinicia o contador
+    updateTipTimerDisplay();
+}
+
+// Função para atualizar o display do timer das dicas
+function updateTipTimerDisplay() {
+    if (tipRotationTimer) {
+        tipRotationTimer.textContent = `Próxima dica em: ${timeRemaining} segundos`;
+    }
+}
+
+// Função para iniciar o timer de rotação das dicas
+function startTipRotationTimer() {
+    clearInterval(timerInterval); // Limpa qualquer timer existente
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTipTimerDisplay();
+        if (timeRemaining <= 0) {
+            displaySustainabilityTips();
+        }
+    }, 1000);
+}
+
+// Função para atualizar os dados de sensoriamento remoto
+if (updateSatelliteDataBtn) {
+    updateSatelliteDataBtn.addEventListener('click', async () => {
+        showLoading(updateSatelliteDataBtn, updateSatelliteDataBtnText, updateSatelliteDataBtnSpinner);
+
+        // Simulação de delay para a "busca" de dados
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Gerar valores aleatórios para simulação
+        const ndvi = (Math.random() * (0.9 - 0.3) + 0.3).toFixed(2);
+        const soilMoisture = (Math.random() * (90 - 30) + 30).toFixed(0);
+        let waterStress = "Baixo";
+        if (soilMoisture < 50) waterStress = "Moderado";
+        if (soilMoisture < 30) waterStress = "Alto";
+
+        if (ndviValue) ndviValue.textContent = ndvi;
+        if (soilMoistureValue) soilMoistureValue.textContent = `${soilMoisture}%`;
+        if (waterStressValue) waterStressValue.textContent = waterStress;
+
+        // Não altera o src do iframe, pois ele já aponta para o Google Earth
+        // Apenas exibe a mensagem de sucesso
+        showMessage(satelliteMessage, 'Dados de satélite atualizados (simulados)!', 'success');
+        addNotification('Dados de sensoriamento remoto atualizados.', 'info', 'Novos dados de satélite simulados estão disponíveis para sua propriedade.');
+
+        if (currentUser) {
+            currentUser.points = (currentUser.points || 0) + 25; // Ganha 25 pontos
+            users[currentUser.email] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        updatePointsDisplay();
+        hideLoading(updateSatelliteDataBtn, updateSatelliteDataBtnText, updateSatelliteDataBtnSpinner);
+    });
+}
+
+// Lógica para o fallback do Google Earth iframe
+if (googleEarthIframe) {
+    googleEarthIframe.addEventListener('error', () => {
+        if (iframeOverlay) {
+            iframeOverlay.classList.remove('hidden');
+        }
+    });
+    // Opcional: Remover overlay se carregar com sucesso após um tempo (pode ser falso positivo)
+    googleEarthIframe.addEventListener('load', () => {
+        if (iframeOverlay) {
+            iframeOverlay.classList.add('hidden');
+        }
     });
 }
 

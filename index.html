@@ -20,7 +20,7 @@
         <div class="container flex justify-between items-center">
             <div class="flex items-center">
                 <!-- Usando a imagem ccm.png que você enviou -->
-                <img src="imagens/ccm.png" alt="Logotipo do Sustenta Pitanga, representando o Centro Comunitário de Múltiplas Funções" class="h-12 w-12 mr-3 rounded-full shadow-md">
+                <img src="https://placehold.co/48x48/a7f3d0/065f46?text=CCM" alt="Logotipo do Sustenta Pitanga, representando o Centro Comunitário de Múltiplas Funções" class="h-12 w-12 mr-3 rounded-full shadow-md">
                 <h1 class="text-3xl font-bold">Sustenta Pitanga</h1>
             </div>
             
@@ -77,6 +77,24 @@
                 <h2 class="text-4xl font-bold text-green-700 mb-4 animate-fade-in-up">Bem-vindo ao Sustenta Pitanga</h2>
                 <p class="text-xl text-gray-700 mb-8 animate-fade-in-up delay-100">Uma plataforma inovadora para monitoramento agrícola sustentável, desenvolvida pelo CCM Dom Pedro.</p>
                 
+                <!-- Seção de Chamada para Ação com Imagem (Movida para cima) -->
+                <div class="my-12 flex flex-col md:flex-row items-center bg-blue-100 dark:bg-blue-900 p-8 rounded-lg shadow-xl animate-fade-in-up delay-1000">
+                    <div class="md:w-1/2 mb-6 md:mb-0 md:mr-8">
+                        <img src="https://placehold.co/600x400/a7f3d0/065f46?text=Planta" alt="Imagem ilustrativa de agricultura sustentável com plantações verdes e sol" class="rounded-lg shadow-lg w-full h-auto object-cover">
+                    </div>
+                    <div class="md:w-1/2 text-left">
+                        <h3 class="text-3xl font-bold text-blue-800 dark:text-blue-200 mb-4">Pronto para Transformar sua Fazenda?</h3>
+                        <p class="text-lg text-gray-800 dark:text-gray-200 mb-6">
+                            Junte-se a centenas de agricultores que já estão colhendo os benefícios de uma gestão mais inteligente e sustentável.
+                            É fácil começar, e o futuro da sua produção está a apenas um clique de distância.
+                        </p>
+                        <div class="flex flex-col sm:flex-row justify-start gap-4">
+                            <button id="goToLoginBtn" class="btn-primary">Acessar Plataforma</button>
+                            <button id="goToAboutUsBtn" class="btn-secondary">Saiba Mais</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="feature-card bg-blue-50 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 animate-fade-in-up delay-200">
                         <svg class="w-12 h-12 mx-auto mb-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,24 +152,6 @@
                         <i class="fas fa-users text-4xl text-teal-600 dark:text-teal-300 mb-4"></i>
                         <h4 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-2">Comunidade e Conhecimento</h4>
                         <p class="text-gray-600 dark:text-gray-300">Compartilhe experiências e aprenda com outros produtores.</p>
-                    </div>
-                </div>
-
-                <!-- Seção de Chamada para Ação com Imagem -->
-                <div class="my-12 flex flex-col md:flex-row items-center bg-blue-100 dark:bg-blue-900 p-8 rounded-lg shadow-xl animate-fade-in-up delay-1000">
-                    <div class="md:w-1/2 mb-6 md:mb-0 md:mr-8">
-                        <img src=imagens/planta.jpg alt="Imagem ilustrativa de agricultura sustentável com plantações verdes e sol" class="rounded-lg shadow-lg w-full h-auto object-cover">
-                    </div>
-                    <div class="md:w-1/2 text-left">
-                        <h3 class="text-3xl font-bold text-blue-800 dark:text-blue-200 mb-4">Pronto para Transformar sua Fazenda?</h3>
-                        <p class="text-lg text-gray-800 dark:text-gray-200 mb-6">
-                            Junte-se a centenas de agricultores que já estão colhendo os benefícios de uma gestão mais inteligente e sustentável.
-                            É fácil começar, e o futuro da sua produção está a apenas um clique de distância.
-                        </p>
-                        <div class="flex flex-col sm:flex-row justify-start gap-4">
-                            <button id="goToLoginBtn" class="btn-primary">Acessar Plataforma</button>
-                            <button id="goToAboutUsBtn" class="btn-secondary">Saiba Mais</button>
-                        </div>
                     </div>
                 </div>
 
@@ -352,11 +352,10 @@
                     <i class="fas fa-lightbulb mr-2 text-purple-500"></i>
                     Dicas de Sustentabilidade
                 </h3>
-                <ul class="list-disc pl-5 space-y-2">
-                    <li>Considere a rotação de culturas para melhorar a saúde do solo.</li>
-                    <li>Utilize sistemas de irrigação por gotejamento para otimizar o uso da água.</li>
-                    <li>Monitore a saúde das plantas regularmente para identificar problemas precocemente.</li>
+                <ul id="sustainabilityTipsList" class="list-disc pl-5 space-y-2">
+                    <!-- Dicas serão carregadas aqui pelo JS -->
                 </ul>
+                <div id="tipRotationTimer" class="text-sm text-center mt-4">Próxima dica em: 30 segundos</div>
             </div>
 
             <!-- Card de Coleta de Dados Interativa -->
@@ -431,15 +430,42 @@
                 </div>
             </div>
 
-            <!-- NOVO: Card de Notícias Ambientais Locais -->
+            <!-- Card de Sensoriamento Remoto via Satélite -->
             <div class="card lg:col-span-3">
                 <h3 class="text-xl font-semibold mb-4 flex items-center">
-                    <i class="fas fa-newspaper mr-2 text-orange-500"></i>
-                    Notícias Ambientais Locais
+                    <i class="fas fa-satellite-dish mr-2 text-blue-500"></i>
+                    Sensoriamento Remoto via Satélite
                 </h3>
-                <div id="environmentalNewsInfo">
-                    <p class="text-lg text-gray-700">Carregando notícias ambientais...</p>
-                    <!-- As notícias serão carregadas aqui pelo JS -->
+                <p class="text-gray-700 mb-4">Visualize sua propriedade através de imagens de satélite e obtenha dados importantes sobre a saúde da vegetação e umidade do solo.</p>
+                <div id="satelliteView" class="h-96 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden relative">
+                    <iframe id="googleEarthIframe" src="https://earth.google.com/web/@-24.76032575,-51.76428831,893.06593283a,12223.44610966d,35y,0h,0t,0r/data=CgRCAggBMikKJwolCiExOGItTVJRUWludHl0ekR6YWdhYUVsenc0ZjFrRVk4TnUgAToDCgEwQgIIAEoICP_Ul5kEEAE" frameborder="0" allowfullscreen class="w-full h-full"></iframe>
+                    <div id="iframeOverlay" class="absolute inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center text-white text-center p-4 hidden">
+                        <p>Não foi possível carregar o Google Earth incorporado. <a id="googleEarthRedirectLink" href="https://earth.google.com/web/@-24.76032575,-51.76428831,893.06593283a,12223.44610966d,35y,0h,0t,0r/data=CgRCAggBMikKJwolCiExOGItTVJRUWludHl0ekR6YWdhYUVsenc0ZjFrRVk4TnUgAToDCgEwQgIIAEoICP_Ul5kEEAE" target="_blank" class="text-blue-400 underline hover:text-blue-300">Clique aqui para abrir no Google Earth</a>.</p>
+                    </div>
+                </div>
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-green-50 rounded-lg text-center">
+                        <i class="fas fa-seedling text-green-600 text-2xl mb-2"></i>
+                        <p class="text-sm font-semibold">Índice de Vegetação (NDVI)</p>
+                        <p id="ndviValue" class="text-xl font-bold text-green-700">0.00</p>
+                    </div>
+                    <div class="p-4 bg-blue-50 rounded-lg text-center">
+                        <i class="fas fa-tint text-blue-600 text-2xl mb-2"></i>
+                        <p class="text-sm font-semibold">Umidade do Solo</p>
+                        <p id="soilMoistureValue" class="text-xl font-bold text-blue-700">0%</p>
+                    </div>
+                    <div class="p-4 bg-yellow-50 rounded-lg text-center">
+                        <i class="fas fa-thermometer-half text-yellow-600 text-2xl mb-2"></i>
+                        <p class="text-sm font-semibold">Estresse Hídrico</p>
+                        <p id="waterStressValue" class="text-xl font-bold text-yellow-700">Baixo</p>
+                    </div>
+                </div>
+                <div class="text-center mt-6">
+                    <button id="updateSatelliteDataBtn" class="btn-primary">
+                        <span id="updateSatelliteDataBtnText">Atualizar Dados do Satélite</span>
+                        <span id="updateSatelliteDataBtnSpinner" class="loading-spinner hidden"></span>
+                    </button>
+                    <div id="satelliteMessage" class="message-box message-box-inline hidden w-full mt-4"></div>
                 </div>
             </div>
 
@@ -452,11 +478,14 @@
                 <div id="farmMap" class="h-64 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                     <p class="text-gray-500">Carregando mapa...</p>
                 </div>
-                <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="mt-4 flex flex-wrap justify-center gap-4">
                     <button id="satelliteViewBtn" class="btn-secondary">Visualização Satélite</button>
                     <button id="terrainViewBtn" class="btn-secondary">Visualização Terreno</button>
                     <button id="measureAreaBtn" class="btn-secondary">Medir Área</button>
                     <button id="addMarkerBtn" class="btn-secondary">Adicionar Marcador</button>
+                    <a id="viewLargerMapBtn" href="#" target="_blank" class="map-button-style">
+                        <i class="fas fa-external-link-alt mr-2"></i>Ver Mapa Maior
+                    </a>
                 </div>
                 <div id="mapMessage" class="message-box hidden mt-4"></div> <!-- Adicionado para mensagens do mapa -->
             </div>
@@ -485,7 +514,7 @@
                             <i class="fas fa-file-alt mr-2 text-purple-500"></i>
                             Relatório Personalizado - Uso de Pesticidas (Maio 2025)
                         </h3>
-                        <p class="text-lg mb-2">Impacto Ambiental: <span class="font-bold text-red-600">Uso acima do recomendado em 10%</span>.< /p>
+                        <p class="text-lg mb-2">Impacto Ambiental: <span class="font-bold text-red-600">Uso acima do recomendado em 10%</span>.</p>
                         <ul class="list-disc pl-5 space-y-2">
                             <li>Pesticida X: 5% acima do limite seguro.</li>
                             <li>Recomendação: Avaliar alternativas biológicas para a próxima safra.</li>
@@ -582,59 +611,6 @@
                 <div class="mb-8 text-center">
                     <h3 class="text-xl font-semibold mb-2">Seus Pontos Atuais:</h3>
                     <p id="currentPoints" class="text-5xl font-bold text-green-600">0</p>
-                </div>
-
-                <!-- Recompensa Diária -->
-                <div class="mb-8 p-6 bg-green-50 rounded-lg shadow-md text-center">
-                    <h3 class="text-xl font-semibold mb-4 flex items-center justify-center">
-                        <i class="fas fa-gift mr-2 text-green-700"></i>
-                        Recompensa Diária
-                    </h3>
-                    <p class="text-lg text-gray-700 mb-4">Reivindique seus <span class="font-bold text-green-600">10 pontos</span> diários!</p>
-                    <button id="claimDailyRewardBtn" class="btn-primary">
-                        <span id="claimDailyRewardBtnText">Reivindicar Recompensa</span>
-                        <span id="claimDailyRewardBtnSpinner" class="loading-spinner hidden"></span>
-                    </button>
-                    <div id="dailyRewardMessage" class="message-box message-box-inline hidden w-full mt-4"></div>
-                </div>
-
-                <!-- NOVO: Convidar Amigos -->
-                <div class="mb-8 p-6 bg-blue-50 rounded-lg shadow-md text-center">
-                    <h3 class="text-xl font-semibold mb-4 flex items-center justify-center">
-                        <i class="fas fa-user-plus mr-2 text-blue-700"></i>
-                        Convidar Amigos
-                    </h3>
-                    <p class="text-lg text-gray-700 mb-4">Convide um amigo para o Sustenta Pitanga e ganhe <span class="font-bold text-blue-600">30 pontos</span>!</p>
-                    <div class="flex flex-wrap justify-center gap-4 mt-4">
-                        <button class="btn-secondary invite-option-btn" data-platform="facebook">
-                            <i class="fab fa-facebook-f mr-2"></i> Facebook
-                        </button>
-                        <button class="btn-secondary invite-option-btn" data-platform="instagram">
-                            <i class="fab fa-instagram mr-2"></i> Instagram
-                        </button>
-                        <button class="btn-secondary invite-option-btn" data-platform="copy-link">
-                            <i class="fas fa-link mr-2"></i> Copiar Link
-                        </button>
-                        <button class="btn-secondary invite-option-btn" data-platform="whatsapp">
-                            <i class="fab fa-whatsapp mr-2"></i> WhatsApp
-                        </button>
-                        <button class="btn-secondary invite-option-btn" data-platform="sms">
-                            <i class="fas fa-sms mr-2"></i> SMS
-                        </button>
-                    </div>
-                    <div id="inviteFriendMessage" class="message-box message-box-inline hidden w-full mt-4"></div>
-                </div>
-
-                <!-- NOVO: Área de Ranking -->
-                <div class="mb-8 p-6 bg-yellow-50 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold mb-4 flex items-center justify-center">
-                        <i class="fas fa-trophy mr-2 text-yellow-700"></i>
-                        Ranking de Pontuadores
-                    </h3>
-                    <div id="rankingList" class="space-y-2">
-                        <!-- O ranking será renderizado aqui pelo JS -->
-                        <p class="text-gray-600 text-center">Carregando ranking...</p>
-                    </div>
                 </div>
 
                 <div class="mb-8">
@@ -762,11 +738,14 @@
         <section id="notifications-page" class="hidden">
             <div class="card max-w-4xl mx-auto">
                 <h2 class="text-2xl font-semibold mb-6 text-center">Suas Notificações</h2>
-                <div id="notificationList" class="space-y-4">
+                <div id="notificationList" class="space-y-4 mb-6">
                     <!-- As notificações serão carregadas aqui pelo JavaScript -->
                     <p class="text-gray-600 text-center">Nenhuma notificação para exibir.</p>
                 </div>
-                <div class="text-center mt-8">
+                <div class="flex flex-col md:flex-row justify-center items-center gap-4 mt-8">
+                    <button id="clearNotificationsBtn" class="btn-danger">
+                        <i class="fas fa-trash-alt mr-2"></i>Limpar Todas as Notificações
+                    </button>
                     <button id="backToDashboardFromNotificationsBtn" class="btn-secondary">
                         <i class="fas fa-arrow-left mr-2"></i>Voltar para o Dashboard
                     </button>
@@ -799,31 +778,48 @@
 
                     <div class="mt-12 text-center">
                         <h3 class="text-2xl font-bold text-blue-700 mb-6">Nossa Equipe</h3>
+                        <div class="mb-8">
+                            <img src="https://placehold.co/600x400/a7f3d0/065f46?text=Integrantes" alt="Foto da equipe do Sustenta Pitanga" class="w-full max-w-md mx-auto rounded-lg shadow-lg object-cover">
+                            <p class="text-sm text-gray-500 mt-2">Uma visão geral do nosso time dedicado.</p>
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             <!-- Membro 1 -->
                             <div class="card p-6 flex flex-col items-center text-center">
                                 <img src="https://placehold.co/100x100/3b82f6/ffffff?text=Membro1" alt="Foto de perfil do Membro 1" class="w-24 h-24 rounded-full object-cover border-4 border-blue-400 mb-4 shadow-md">
                                 <h4 class="text-xl font-semibold text-gray-800 mb-2">Arthur</h4>
-                                <p class="text-gray-600 text-sm">Nascido e criado em Pitanga, 15 anos, tenho como objetivo cursar uma faculdade relacionada ao
+                                <p class="text-gray-600 text-sm">Estudante do segundo ano técnico em desenvolvimento de sistemas, tenho como objetivo cursar uma faculdade relacionada ao
                                     desenvolvimento de softwares, gosto de futebol e esportes relacionados. </p>
+                                <a href="https://www.instagram.com/arthur7ota" target="_blank" aria-label="Instagram do Arthur" class="text-purple-600 hover:text-purple-700 transition-colors mt-2">
+                                    <i class="fab fa-instagram text-2xl"></i>
+                                </a>
                             </div>
                             <!-- Membro 2 -->
                             <div class="card p-6 flex flex-col items-center text-center">
                                 <img src="https://placehold.co/100x100/10b981/ffffff?text=Membro2" alt="Foto de perfil do Membro 2" class="w-24 h-24 rounded-full object-cover border-4 border-green-400 mb-4 shadow-md">
                                 <h4 class="font-semibold text-xl font-semibold text-gray-800 mb-2">Bruno</h4>
-                                <p class="text-gray-600 text-sm">Sim</p>
+                                <p class="text-gray-600 text-sm">Pitanga PR, 16 anos, estudante, grande interesse por tecnologia e programação.</p>
+                                <a href="javascript:void(0);" class="text-purple-600 hover:text-purple-700 transition-colors mt-2 cursor-default">
+                                    <i class="fab fa-instagram text-2xl"></i>
+                                </a>
                             </div>
                             <!-- Membro 3 -->
                             <div class="card p-6 flex flex-col items-center text-center">
                                 <img src="https://placehold.co/100x100/ef4444/ffffff?text=Membro3" alt="Foto de perfil do Membro 3" class="w-24 h-24 rounded-full object-cover border-4 border-red-400 mb-4 shadow-md">
                                 <h4 class="text-xl font-semibold text-gray-800 mb-2">Lucas Chavaren</h4>
-                                <p class="text-gray-600 text-sm">Amogus</p>
+                                <p class="text-gray-600 text-sm">Aluno do 2º ano do Ensino Médio Técnico em Desenvolvimento de Sistemas. Planejo cursar uma faculdade de Engenharia de Software, meus hobbies são assistir e jogar futebol e também videogames.</p>
+                                <a href="https://www.instagram.com/lucaschavaren_32/." target="_blank" aria-label="Instagram do Lucas Chavaren" href="javascript:void(0);" class="text-purple-600 hover:text-purple-700 transition-colors mt-2 cursor-default">
+                                    <i class="fab fa-instagram text-2xl"></i>
+                                </a>
                             </div>
                             <!-- Membro 4 -->
                             <div class="card p-6 flex flex-col items-center text-center">
                                 <img src="https://placehold.co/100x100/f97316/ffffff?text=Membro4" alt="Foto de perfil do Membro 4" class="w-24 h-24 rounded-full object-cover border-4 border-orange-400 mb-4 shadow-md">
                                 <h4 class="text-xl font-semibold text-gray-800 mb-2">Lucas Henrique</h4>
                                 <p class="text-gray-600 text-sm">Estudante do Ensino Médio e do curso Técnico em Desenvolvimento de Sistemas. 15 anos, futuramente planejando engrenar na área de tecnologia. Gosto de futebol, esportes, jogos e obviamente, dormir.</p>
+                                <a href="https://www.instagram.com/lcs_oliveira007" target="_blank" aria-label="Instagram do Lucas Chavaren" href="javascript:void(0);" class="text-purple-600 hover:text-purple-700 transition-colors mt-2 cursor-default">
+                                    <i class="fab fa-instagram text-2xl"></i>
+                                </a>
                             </div>
                             <!-- Membro 5 -->
                             <div class="card p-6 flex flex-col items-center text-center">
@@ -831,34 +827,21 @@
                                 <h4 class="text-xl font-semibold text-gray-800 mb-2">Matheus Scaramal</h4>
                                 <p class="text-gray-600 text-sm">Aluno do segundo ano técnico, futuro engenheiro eletrônico.
             Hobbies: Musculação, video games, dormir.</p>
+                                <a href="javascript:void(0);" class="text-purple-600 hover:text-purple-700 transition-colors mt-2 cursor-default">
+                                    <i class="fab fa-instagram text-2xl"></i>
+                                </a>
                             </div>
                              <div class="card p-6 flex flex-col items-center text-center">
-                                <img src=https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSvJ7oyGcMRMbMtkr3uAVtTmtw4vBVpTOyQg&s alt="Foto de perfil do Membro 4" class="w-24 h-24 rounded-full object-cover border-4 border-orange-400 mb-4 shadow-md">
+                                <img src="https://placehold.co/100x100/f97316/ffffff?text=Membro6" alt="Foto de perfil do Membro 4" class="w-24 h-24 rounded-full object-cover border-4 border-orange-400 mb-4 shadow-md">
                                 <h4 class="text-xl font-semibold text-gray-800 mb-2">Robert</h4>
-                                <p class="text-gray-600 text-sm">minecraft</p>
+                                <p class="text-gray-600 text-sm">Cursando ensino médio técnico, 16 anos, gosto de muay thay e videogames.</p>
+                                <a href="javascript:void(0);" class="text-purple-600 hover:text-purple-700 transition-colors mt-2 cursor-default">
+                                    <i class="fab fa-instagram text-2xl"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- NOVO: Bloco de Informações do Professor Supervisor (substitui o feedback) -->
-                <div class="mt-12 p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-inner text-center">
-                    <h3 class="text-2xl font-bold text-blue-700 dark:text-blue-400 mb-4">Nosso Professor Supervisor</h3>
-                    <p class="text-gray-700 dark:text-gray-300 mb-4">
-                        Seu feedback é fundamental para o aprimoramento contínuo do Sustenta Pitanga!
-                        Entre em contato com o professor supervisor para compartilhar suas sugestões,
-                        dúvidas ou relatar problemas. Sua contribuição nos ajuda a construir uma plataforma cada vez melhor.
-                    </p>
-                    <a href="https://www.instagram.com/scaramaljunior" target="_blank" aria-label="Instagram do Professor Supervisor" class="inline-flex items-center justify-center bg-purple-600 text-white px-6 py-3 rounded-md text-lg font-semibold hover:bg-purple-700 transition-colors shadow-md">
-                        <i class="fab fa-instagram text-2xl mr-3"></i>
-                        Siga @scaramaljunior no Instagram
-                    </a>
-                    <a href="https://www.facebook.com/junior.scaramal.2025?locale=pt_BR" target="_blank" aria-label="Facebook do Professor Supervisor" class="inline-flex items-center justify-center bg-blue-600 text-white px-6 py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition-colors shadow-md mt-4">
-                        <i class="fab fa-facebook-f text-2xl mr-3"></i>
-                        Siga @junior.scaramal.2025 no Facebook
-                    </a>
-                </div>
-
                 <div class="text-center mt-8">
                     <button id="backToLandingFromAboutUsBtn" class="btn-secondary">
                         <i class="fas fa-arrow-left mr-2"></i>Voltar
@@ -880,7 +863,7 @@
             </div>
             <div class="popup-buttons">
                 <button id="allowLocationBtn" class="btn-primary">Permitir Localização</button>
-                <button id="denyLocation" class="btn-danger">Negar</button>
+                <button id="denyLocationBtn" class="btn-danger">Negar</button>
             </div>
             <div id="locationMessage" class="message-box hidden"></div>
         </div>
@@ -909,7 +892,6 @@
     <!-- Scripts JavaScript - Movidos para o final do body para melhor performance -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Link para o arquivo JavaScript externo -->
     <script src="script.js"></script>
 </body>
 </html>
